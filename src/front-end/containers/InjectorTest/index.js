@@ -6,6 +6,7 @@ import {
 import loadWith from '~/components/loadWith';
 import reducer from './reducer';
 import epic from './epic';
+import saga from './saga';
 import { compose } from 'recompose';
 
 let InjectorTest = ({ isPinging, ping }) => (
@@ -20,6 +21,7 @@ export default compose(
     moduleName: 'InjectorTest',
     reducer,
     epic,
+    saga,
   }),
   connect(
     state => ({ isPinging: state.get('InjectorTest').isPinging }),

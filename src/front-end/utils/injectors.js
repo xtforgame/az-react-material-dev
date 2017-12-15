@@ -79,8 +79,32 @@ export function injectAsyncEpics(store, isValid) {
         }
       }
       return injectable;
-    }
+    },
   };
+}
+
+/**
+ * Inject an asynchronously loaded saga
+ */
+export function injectAsyncSagas(store, isValid) {
+  let removeSaga = (name, task) => {
+    if(store.asyncSagas[name] === task){
+      store.asyncSagas[name] = null;
+    }
+    return (task && task.cancel());
+  };
+  return {
+    injectSaga: (name, saga) => {
+      if(!name || !saga){
+        return null;
+      }
+      if(store.asyncSagas[name]){
+        removeSaga(name, store.asyncSagas[name]);
+      }
+      return (store.asyncSagas[name] = store.runSaga(saga));
+    },
+    removeSaga,
+  }
 }
 
 /**
@@ -92,5 +116,6 @@ export function getAsyncInjectors(store) {
   return {
     injectReducer: injectAsyncReducer(store, true),
     ...injectAsyncEpics(store, true),
+    ...injectAsyncSagas(store, true),
   };
 }
