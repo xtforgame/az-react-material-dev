@@ -4,7 +4,6 @@ import { capitalizeFirstLetter } from 'common/utils';
 export const FormTextFieldGetProps = ({
   value,
   link,
-  linker,
   handleChange,
   errorOccurred,
   helperMessage,
@@ -23,7 +22,7 @@ export const FormTextFieldGetProps = ({
   }
 
   return {
-    id: `${linker.namespace}${link.name}`,
+    id: link.key,
     value,
     onChange: handleChange,
     error: !!errorOccurred,
@@ -35,7 +34,6 @@ export const FormTextFieldGetProps = ({
 export const FormTextInputGetProps = ({
   value,
   link,
-  linker,
   handleChange,
   errorOccurred,
   helperMessage,
@@ -54,7 +52,7 @@ export const FormTextInputGetProps = ({
   }
 
   return {
-    id: `${linker.namespace}${link.name}`,
+    id: link.key,
     value,
     onChange: handleChange,
     formProps: {
@@ -90,8 +88,12 @@ export class Converter {
 }
 
 export class StateLink {
-  constructor(link) {
+  constructor(linker, link) {
+    this.linker = linker;
+    this.namespace = this.linker.namespace;
     this.name = link.name;
+    this.uniqueName = this.namespace ? `${this.namespace}-${this.name}` : this.name;
+    this.key = this.uniqueName;
     this.defaultValue = link.defaultValue;
     this.exposed = false;
     this.exposedProps = {};
@@ -126,7 +128,6 @@ export default class FormInputLinker {
     prevPropsStateName = 'prevProps',
   }) {
     this.component = component;
-    this.namespace = namespace && `${namespace}-`;
     this.fieldStateName = fieldStateName;
     this.fieldErrorStateName = fieldErrorStateName;
     this.prevPropsStateName = prevPropsStateName;
@@ -135,12 +136,12 @@ export default class FormInputLinker {
 
   add(...fields) {
     fields.forEach((field) => {
-      this.fields[field.name] = new StateLink(field);
+      this.fields[field.name] = new StateLink(this, field);
     });
   }
 
   getOutput(fieldName) {
-    const valueFromState = this.getOutputFromState(fieldName);
+    const valueFromState = this.getValueFromState(fieldName);
     return this.fields[fieldName].converter.toOutput(valueFromState);
   }
 
@@ -164,7 +165,7 @@ export default class FormInputLinker {
     return (targetState || this.component.state)[this.fieldStateName];
   }
 
-  getOutputFromState(fieldName, targetState) {
+  getValueFromState(fieldName, targetState) {
     return this.getFieldsFromState(targetState)[fieldName];
   }
 
@@ -245,7 +246,7 @@ export default class FormInputLinker {
     Object.keys(this.fields).forEach((fieldName) => {
       if (this.fields[fieldName].validate) {
         try {
-          const result = this.fields[fieldName].validate(this.getOutputFromState(fieldName));
+          const result = this.fields[fieldName].validate(this.getValueFromState(fieldName));
           if (result instanceof Error) {
             newErrorState[fieldName] = result;
             passed = false;
@@ -293,8 +294,7 @@ export default class FormInputLinker {
   handleChange = field => (...args) => {
     const fieldName = field.name;
     const value = this.fields[fieldName].converter.fromView({
-      linker: this,
-      valueInState: this.getOutputFromState(fieldName),
+      valueInState: this.getValueFromState(fieldName),
       link: field,
     }, ...args);
     const onChangeProp = this.fields[fieldName].exposedProps.onChange;
@@ -315,8 +315,7 @@ export default class FormInputLinker {
     } = this.getErrorStatus(fieldName);
 
     return field.getProps({
-      linker: this,
-      value: field.converter.toView(this.getOutputFromState(fieldName)),
+      value: field.converter.toView(this.getValueFromState(fieldName)),
       link: field,
       handleChange: this.handleChange(field),
       errorOccurred: occurred,

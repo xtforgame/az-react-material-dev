@@ -17,9 +17,9 @@ import {
 
 import FormInputLinker, {
   FormTextFieldGetProps,
-  FromPasswordVisibilityGetProps,
+  FormPasswordVisibilityGetProps,
   assert,
-} from '~/utils/FormInputLinker';
+} from '~/utils/FormInputLinker2';
 
 import createCommonStyles from '~/styles/common';
 import createFormPaperStyle from '~/styles/FormPaper';
@@ -67,7 +67,7 @@ class LoginForm extends React.Component {
     }, {
       name: 'password-visibility',
       defaultValue: false,
-      getProps: FromPasswordVisibilityGetProps,
+      getProps: FormPasswordVisibilityGetProps,
       converter: {
         fromView: (({ valueInState }) => !valueInState),
       },
