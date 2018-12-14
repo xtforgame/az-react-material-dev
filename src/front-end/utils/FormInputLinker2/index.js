@@ -125,12 +125,10 @@ export default class FormInputLinker {
     namespace = '',
     fieldStateName = 'fields',
     fieldErrorStateName = 'errors',
-    prevPropsStateName = 'prevProps',
   }) {
     this.component = component;
     this.fieldStateName = fieldStateName;
     this.fieldErrorStateName = fieldErrorStateName;
-    this.prevPropsStateName = prevPropsStateName;
     this.fields = {};
   }
 
@@ -177,14 +175,6 @@ export default class FormInputLinker {
     return this.getErrorsFromState(targetState)[fieldName];
   }
 
-  getPrevPropsFromState(targetState) {
-    return (targetState || this.component.state)[this.prevPropsStateName];
-  }
-
-  getPrevPropFromState(fieldName, targetState) {
-    return this.getPrevPropsFromState(targetState)[fieldName];
-  }
-
   mergeInitState(state = {}) {
     const newState = {
       ...state,
@@ -194,29 +184,12 @@ export default class FormInputLinker {
       [this.fieldErrorStateName]: {
         ...state[this.fieldErrorStateName],
       },
-      [this.prevPropsStateName]: {
-        ...state[this.prevPropsStateName],
-      },
     };
     Object.keys(this.fields).forEach((fieldName) => {
       newState[this.fieldStateName][fieldName] = this.fields[fieldName].defaultValue;
       newState[this.fieldErrorStateName][fieldName] = undefined;
     });
     return newState;
-  }
-
-  derivedFromProps(props, currState) {
-    let state = null;
-    Object.keys(this.fields).forEach((fieldName) => {
-      const valueProp = this.fields[fieldName].exposedProps.value;
-      if (valueProp && props[valueProp] !== this.getPrevPropFromState(fieldName, currState)) {
-        if (!state) {
-          state = { ...currState };
-        }
-        state = this._getUpdatedState(fieldName, this.fields[fieldName].converter.propToState(props[valueProp]), state);
-      }
-    });
-    return state;
   }
 
   _getUpdatedState(fieldName, value, targetState) {
@@ -228,10 +201,6 @@ export default class FormInputLinker {
       [this.fieldErrorStateName]: {
         ...this.getErrorsFromState(targetState),
         [fieldName]: undefined,
-      },
-      [this.prevPropsStateName]: {
-        ...this.getPrevPropsFromState(targetState),
-        [fieldName]: value,
       },
     };
   }
@@ -315,6 +284,8 @@ export default class FormInputLinker {
     } = this.getErrorStatus(fieldName);
 
     return field.getProps({
+      ownerProps: this.component.props,
+      ownerState: this.component.state,
       value: field.converter.toView(this.getValueFromState(fieldName)),
       link: field,
       handleChange: this.handleChange(field),

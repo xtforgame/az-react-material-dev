@@ -38,7 +38,7 @@ class LoginForm extends React.Component {
     this.fil.add({
       name: 'username',
       exposed: {
-        onChange: 'onUsernameChange',
+        onChange: 'xonUsernameChange',
         value: 'username',
         error: 'usernameError',
       },
@@ -48,6 +48,10 @@ class LoginForm extends React.Component {
           emailAddress: { key: 'emailAddress' },
           phoneNumber: { key: 'phoneNumber' },
         }),
+        onChange: (e) => {
+          __.ownerProps.onUsernameChange(e.target.value);
+          __.handleChange(e);
+        },
       }),
       validate: value => assert(!!value, null, {
         key: 'usernameEmptyError',
@@ -80,11 +84,11 @@ class LoginForm extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (state.fil) {
-      return state.fil.derivedFromProps(props, state);
-    }
+    // if (state.fil) {
+    //   return state.fil.derivedFromProps(props, state);
+    // }
 
-    // No state update necessary
+    // // No state update necessary
     return null;
   }
 
