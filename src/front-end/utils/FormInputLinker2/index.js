@@ -1,32 +1,22 @@
 /* eslint-disable no-underscore-dangle */
-import { capitalizeFirstLetter } from 'common/utils';
-
 export const FormTextFieldGetProps = ({
   value,
   link,
   handleChange,
-  errorOccurred,
-  helperMessage,
   validateError,
-  errorFromProps,
 },
 { translate } = {}) => {
-  let errorMessage;
-  if (validateError) {
-    errorMessage = (
-      (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
-      || validateError.message
-    );
-  } else if (errorFromProps) {
-    errorMessage = errorFromProps === true ? '' : errorFromProps;
-  }
+  const validateErrorMessage = validateError && (
+    (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
+    || validateError.message
+  );
 
   return {
     id: link.key,
     value,
     onChange: handleChange,
-    error: !!errorOccurred,
-    helperText: errorMessage, // helperMessage,
+    error: !!validateErrorMessage,
+    helperText: validateErrorMessage, // helperMessage,
     ...link.props,
   };
 };
@@ -35,36 +25,28 @@ export const FormTextInputGetProps = ({
   value,
   link,
   handleChange,
-  errorOccurred,
-  helperMessage,
   validateError,
-  errorFromProps,
 },
 { translate } = {}) => {
-  let errorMessage;
-  if (validateError) {
-    errorMessage = (
-      (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
-      || validateError.message
-    );
-  } else if (errorFromProps) {
-    errorMessage = errorFromProps === true ? '' : errorFromProps;
-  }
+  const validateErrorMessage = validateError && (
+    (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
+    || validateError.message
+  );
 
   return {
     id: link.key,
     value,
     onChange: handleChange,
     formProps: {
-      error: errorOccurred,
+      error: validateErrorMessage,
     },
-    helperText: errorMessage, // helperMessage,
+    helperText: validateErrorMessage, // helperMessage,
     ...link.props,
   };
 };
 
 export const FormPasswordVisibilityGetProps = ({
-  value, link, linker, handleChange, errorOccurred, helperMessage,
+  value, link, handleChange, validateError,
 }, options = {}) => ({
   type: value ? 'text' : 'password',
   onShowPassswordClick: handleChange,
@@ -80,7 +62,6 @@ export const assert = (condition, message, i18n) => {
 
 export class Converter {
   constructor(convertFuncMap = {}) {
-    this.propToState = convertFuncMap.propToState || (value => value);
     this.fromView = convertFuncMap.fromView || ((_, event) => event.target.value);
     this.toView = convertFuncMap.toView || (value => value || '');
     this.toOutput = convertFuncMap.toOutput || (value => value);
@@ -95,21 +76,6 @@ export class StateLink {
     this.uniqueName = this.namespace ? `${this.namespace}-${this.name}` : this.name;
     this.key = this.uniqueName;
     this.defaultValue = link.defaultValue;
-    this.exposed = false;
-    this.exposedProps = {};
-    if (link.exposed) {
-      this.exposed = true;
-      const {
-        onChange = `on${capitalizeFirstLetter(link.name)}Change`,
-        value,
-        error = `${link.name}Error`,
-      } = link.exposed;
-      this.exposedProps = {
-        onChange,
-        value,
-        error,
-      };
-    }
 
     this.converter = new Converter(link.converter);
 
@@ -127,6 +93,7 @@ export default class FormInputLinker {
     fieldErrorStateName = 'errors',
   }) {
     this.component = component;
+    this.namespace = namespace;
     this.fieldStateName = fieldStateName;
     this.fieldErrorStateName = fieldErrorStateName;
     this.fields = {};
@@ -239,23 +206,9 @@ export default class FormInputLinker {
   }
 
   getErrorStatus(fieldName) {
-    let occurred = false;
-    let message;
-    const errorFromProps = this.fields[fieldName].exposedProps.error
-      && this.component.props[this.fields[fieldName].exposedProps.error];
     const validateError = this.getErrorFromState(fieldName);
-    if (validateError) {
-      message = validateError;
-      occurred = true;
-    } else if (errorFromProps) {
-      message = errorFromProps === true ? '' : errorFromProps;
-      occurred = true;
-    }
     return {
-      occurred,
-      message,
       validateError,
-      errorFromProps,
     };
   }
 
@@ -266,10 +219,7 @@ export default class FormInputLinker {
       valueInState: this.getValueFromState(fieldName),
       link: field,
     }, ...args);
-    const onChangeProp = this.fields[fieldName].exposedProps.onChange;
-    const onChange = this.component.props[onChangeProp] || (() => {});
     this.updateState(fieldName, value);
-    onChange(value);
   };
 
   // render helper
@@ -277,10 +227,7 @@ export default class FormInputLinker {
     const field = this.fields[fieldName];
 
     const {
-      occurred,
-      message,
       validateError,
-      errorFromProps,
     } = this.getErrorStatus(fieldName);
 
     return field.getProps({
@@ -289,10 +236,7 @@ export default class FormInputLinker {
       value: field.converter.toView(this.getValueFromState(fieldName)),
       link: field,
       handleChange: this.handleChange(field),
-      errorOccurred: occurred,
-      helperMessage: message,
       validateError,
-      errorFromProps,
     }, options);
   };
 }

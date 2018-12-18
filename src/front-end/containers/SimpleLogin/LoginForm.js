@@ -37,11 +37,6 @@ class LoginForm extends React.Component {
     });
     this.fil.add({
       name: 'username',
-      exposed: {
-        onChange: 'xonUsernameChange',
-        value: 'username',
-        error: 'usernameError',
-      },
       getProps: (__, _) => ({
         ...FormTextFieldGetProps(__, _),
         placeholder: _.translate('usernameEmptyError', {
@@ -62,10 +57,6 @@ class LoginForm extends React.Component {
       }),
     }, {
       name: 'password',
-      exposed: {
-        onChange: 'onPasswordChange',
-        error: 'passwordError',
-      },
       getProps: FormTextFieldGetProps,
       validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
     }, {
@@ -78,7 +69,6 @@ class LoginForm extends React.Component {
     });
 
     this.state = this.fil.mergeInitState({
-      fil: this.fil,
       rememberMe: this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false,
     });
   }
