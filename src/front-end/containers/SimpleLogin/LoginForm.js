@@ -37,9 +37,13 @@ class LoginForm extends React.Component {
     });
     this.fil.add({
       name: 'username',
-      onChange: (e, value, { ownerProps }) => {
-        ownerProps.onUsernameChange(e.target.value);
+      handledByProps: {
+        value: 'username',
+        onChange: 'onUsernameChange',
       },
+      // onChange: (value, [e], { ownerProps }) => {
+      //   ownerProps.onUsernameChange(e.target.value);
+      // },
       getProps: (__, options) => {
         const props1 = FormTextFieldGetProps(__, options);
         const {
@@ -83,7 +87,8 @@ class LoginForm extends React.Component {
       defaultValue: false,
       getProps: FormPasswordVisibilityGetProps,
       converter: {
-        fromView: (({ storedValue }) => !storedValue),
+        fromView: ((_, { storedValue }) => !storedValue),
+        toOutput: () => undefined,
       },
     });
 
@@ -157,11 +162,11 @@ class LoginForm extends React.Component {
               .renderProps('password-visibility', { translate })}
           />
           <FormCheckbox
+            label={translated.rememberMe}
             dense="true"
             color="primary"
             checked={this.state.rememberMe}
             onChange={this.handleRememberMeChange}
-            label={translated.rememberMe}
             onKeyPress={this.handleEnterForTextField}
           />
           <FormSpace variant="content1" />
