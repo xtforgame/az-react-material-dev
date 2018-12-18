@@ -37,17 +37,25 @@ class LoginForm extends React.Component {
     });
     this.fil.add({
       name: 'username',
-      getProps: (__, _) => ({
-        ...FormTextFieldGetProps(__, _),
-        placeholder: _.translate('usernameEmptyError', {
+      onChange: (e, value, { ownerProps }) => {
+        ownerProps.onUsernameChange(e.target.value);
+      },
+      getProps: (__, options) => {
+        const props1 = FormTextFieldGetProps(__, options);
+        const {
+          ownerProps,
+          validateError,
+        } = __;
+        props1.placeholder = options.translate('usernameEmptyError', {
           emailAddress: { key: 'emailAddress' },
           phoneNumber: { key: 'phoneNumber' },
-        }),
-        onChange: (e) => {
-          __.ownerProps.onUsernameChange(e.target.value);
-          __.handleChange(e);
-        },
-      }),
+        });
+        if (!validateError && ownerProps.passwordError) {
+          props1.error = true;
+          props1.helperText = undefined;
+        }
+        return props1;
+      },
       validate: value => assert(!!value, null, {
         key: 'usernameEmptyError',
         values: {
@@ -57,29 +65,31 @@ class LoginForm extends React.Component {
       }),
     }, {
       name: 'password',
-      getProps: FormTextFieldGetProps,
+      getProps: (__, options) => {
+        const props1 = FormTextFieldGetProps(__, options);
+        const {
+          ownerProps,
+          validateError,
+        } = __;
+        if (!validateError && ownerProps.passwordError) {
+          props1.error = true;
+          props1.helperText = ownerProps.passwordError;
+        }
+        return props1;
+      },
       validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
     }, {
       name: 'password-visibility',
       defaultValue: false,
       getProps: FormPasswordVisibilityGetProps,
       converter: {
-        fromView: (({ valueInState }) => !valueInState),
+        fromView: (({ storedValue }) => !storedValue),
       },
     });
 
     this.state = this.fil.mergeInitState({
       rememberMe: this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false,
     });
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    // if (state.fil) {
-    //   return state.fil.derivedFromProps(props, state);
-    // }
-
-    // // No state update necessary
-    return null;
   }
 
   handleSubmit = () => {
@@ -135,16 +145,16 @@ class LoginForm extends React.Component {
             label={translated.username}
             onKeyPress={this.handleEnterForTextField}
             {...this.fil
-              .getPropsForInputField('username', { translate })}
+              .renderProps('username', { translate })}
           />
           <FormSpace variant="content1" />
           <FormPasswordInput
             label={translated.password}
             onKeyPress={this.handleEnterForTextField}
             {...this.fil
-              .getPropsForInputField('password', { translate })}
+              .renderProps('password', { translate })}
             {...this.fil
-              .getPropsForInputField('password-visibility', { translate })}
+              .renderProps('password-visibility', { translate })}
           />
           <FormCheckbox
             dense="true"
