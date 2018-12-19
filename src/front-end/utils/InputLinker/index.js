@@ -1,65 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-export const FormTextFieldGetProps = ({
-  value,
-  link,
-  handleChange,
-  validateError,
-},
-{ translate } = {}) => {
-  const validateErrorMessage = validateError && (
-    (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
-    || validateError.message
-  );
-
-  return {
-    id: link.key,
-    value,
-    onChange: handleChange,
-    error: !!validateErrorMessage,
-    helperText: validateErrorMessage, // helperMessage,
-    ...link.props,
-  };
-};
-
-export const FormTextInputGetProps = ({
-  value,
-  link,
-  handleChange,
-  validateError,
-},
-{ translate } = {}) => {
-  const validateErrorMessage = validateError && (
-    (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
-    || validateError.message
-  );
-
-  return {
-    id: link.key,
-    value,
-    onChange: handleChange,
-    formProps: {
-      error: validateErrorMessage,
-    },
-    helperText: validateErrorMessage, // helperMessage,
-    ...link.props,
-  };
-};
-
-export const FormPasswordVisibilityGetProps = ({
-  value, link, handleChange, validateError,
-}, options = {}) => ({
-  type: value ? 'text' : 'password',
-  onShowPassswordClick: handleChange,
-});
-
-export const assert = (condition, message, i18n) => {
-  if (!condition) {
-    const error = new Error(message || 'Validation failed');
-    error.i18n = i18n;
-    throw error;
-  }
-};
-
 export class Converter {
   constructor(convertFuncMap = {}) {
     this.fromView = convertFuncMap.fromView || (([event]) => event.target.value);
@@ -68,10 +7,10 @@ export class Converter {
   }
 }
 
-export class StateLink {
+export class FieldLink {
   constructor(linker, link) {
     this.linker = linker;
-    this.component = this.linker.component;
+    this._owner = this.linker.component;
     this.namespace = this.linker.namespace;
     this.name = link.name;
     this.uniqueName = this.namespace ? `${this.namespace}-${this.name}` : this.name;
@@ -85,13 +24,13 @@ export class StateLink {
       }
       if (typeof this.handledByProps.value === 'string') {
         const valueProp = this.handledByProps.value;
-        this.handledByProps.value = ({ ownerProps }, options = {}) => ownerProps[valueProp];
+        this.handledByProps.value = ({ link: { ownerProps } }, options = {}) => ownerProps[valueProp];
       }
 
       if (typeof this.handledByProps.onChange === 'string') {
         const onChangeProp = this.handledByProps.onChange;
-        this.handledByProps.onChange = ({ value }, { ownerProps }, options = {}) => {
-          this.component.setState(this.linker._getUpdatedStateForResetError(this.name));
+        this.handledByProps.onChange = ({ value }, { link: { ownerProps } }, options = {}) => {
+          this.owner.setState(this.linker._getUpdatedStateForResetError(this.name));
           if (ownerProps[onChangeProp]) {
             ownerProps[onChangeProp](value);
           }
@@ -102,7 +41,7 @@ export class StateLink {
     this.converter = new Converter(link.converter);
 
     this._validate = link.validate;
-    this.getProps = link.getProps || (() => ({}));
+    this._getPropsMiddlewares = (Array.isArray(link.getProps) ? link.getProps : [link.getProps]) || [(() => ({}))];
     this.props = link.props;
     this.data = link.data;
 
@@ -112,26 +51,30 @@ export class StateLink {
     // functions
 
     this.getValue = targetState => this.linker.getValueFromState(this.name, targetState);
-    this.setValue = value => this.component.setState(this.linker._getUpdatedState(this.name, value));
+    this.setValue = value => this.owner.setState(this.linker._getUpdatedState(this.name, value));
     this.getOutput = targetState => this.converter.toOutput(this.getValue(targetState));
     this.getViewValue = targetState => this.converter.toView(this.getValue(targetState));
     this.validate = targetState => this._validate(this.getValue(targetState));
 
     if (this.handledByProps) {
-      this.getValue = () => {
-        const { props: ownerProps, state: ownerState } = this.component;
-        return this.handledByProps.value({ ownerProps, ownerState, link: this }, {});
-      };
-
-      this.setValue = (value, rawArgs) => {
-        const { props: ownerProps, state: ownerState } = this.component;
-        return this.handledByProps.onChange({ value, rawArgs }, { ownerProps, ownerState, link: this }, {});
-      };
+      this.getValue = () => this.handledByProps.value({ link: this }, {});
+      this.setValue = (value, rawArgs) => this.handledByProps.onChange({ value, rawArgs }, { link: this }, {});
     }
   }
+
+  getProps = (initProps, linkInfo, options) => this._getPropsMiddlewares.reduce(
+    (props, m) => m(props, linkInfo, options),
+    initProps
+  )
+
+  get owner() { return this._owner; }
+
+  get ownerProps() { return this.owner.props; }
+
+  get ownerState() { return this.owner.state; }
 }
 
-export default class FormInputLinker {
+export default class InputLinker {
   constructor(component, {
     namespace = '',
     fieldStateName = 'fields',
@@ -141,22 +84,22 @@ export default class FormInputLinker {
     this.namespace = namespace;
     this.fieldStateName = fieldStateName;
     this.fieldErrorStateName = fieldErrorStateName;
-    this.fields = {};
+    this.fieldLinks = {};
   }
 
   add(...fields) {
     fields.forEach((field) => {
-      this.fields[field.name] = new StateLink(this, field);
+      this.fieldLinks[field.name] = new FieldLink(this, field);
     });
   }
 
   getOutput(fieldName) {
-    return this.fields[fieldName].getOutput();
+    return this.fieldLinks[fieldName].getOutput();
   }
 
   getOutputs() {
     const values = {};
-    Object.keys(this.fields).forEach((fieldName) => {
+    Object.keys(this.fieldLinks).forEach((fieldName) => {
       const output = this.getOutput(fieldName);
       if (output !== undefined) {
         values[fieldName] = output;
@@ -167,7 +110,7 @@ export default class FormInputLinker {
 
   remove(...fieldNames) {
     fieldNames.forEach((fieldName) => {
-      delete this.fields[fieldName];
+      delete this.fieldLinks[fieldName];
     });
   }
 
@@ -195,10 +138,10 @@ export default class FormInputLinker {
       [this.fieldStateName]: { ...state[this.fieldStateName] },
       [this.fieldErrorStateName]: { ...state[this.fieldErrorStateName] },
     };
-    Object.keys(this.fields).forEach((fieldName) => {
-      const field = this.fields[fieldName];
+    Object.keys(this.fieldLinks).forEach((fieldName) => {
+      const field = this.fieldLinks[fieldName];
       if (!field.handledByProps) {
-        newState[this.fieldStateName][fieldName] = this.fields[fieldName].defaultValue;
+        newState[this.fieldStateName][fieldName] = this.fieldLinks[fieldName].defaultValue;
       }
       newState[this.fieldErrorStateName][fieldName] = undefined;
     });
@@ -230,8 +173,8 @@ export default class FormInputLinker {
   validate() {
     let passed = true;
     const newErrorState = {};
-    Object.keys(this.fields).forEach((fieldName) => {
-      const field = this.fields[fieldName];
+    Object.keys(this.fieldLinks).forEach((fieldName) => {
+      const field = this.fieldLinks[fieldName];
       if (field._validate) {
         let error;
         try {
@@ -242,11 +185,7 @@ export default class FormInputLinker {
         } catch (e) { error = e; }
         if (error) {
           newErrorState[fieldName] = error;
-          field.onValidateError(newErrorState[fieldName], {
-            ownerProps: this.component.props,
-            ownerState: this.component.state,
-            link: field,
-          });
+          field.onValidateError(newErrorState[fieldName], { link: field });
           passed = false;
         }
       }
@@ -263,38 +202,24 @@ export default class FormInputLinker {
     return passed;
   }
 
-  getErrorStatus(fieldName) {
-    const validateError = this.getErrorFromState(fieldName);
-    return {
-      validateError,
-    };
-  }
+  getErrorStatus = fieldName => ({ validateError: this.getErrorFromState(fieldName) });
 
   // handlers
   handleChange = field => (...rawArgs) => {
     const storedValue = field.getValue();
-    const { props: ownerProps, state: ownerState } = this.component;
-    const options = {
-      ownerProps,
-      ownerState,
-      storedValue,
-      link: field,
-    };
-    const value = field.converter.fromView(rawArgs, options);
-    field.onChange(value, rawArgs, options);
+    const linkInfo = { storedValue, link: field };
+    const value = field.converter.fromView(rawArgs, linkInfo);
+    field.onChange(value, rawArgs, linkInfo);
     field.setValue(value, rawArgs);
   };
 
   // render helper
   renderProps = (fieldName, options = {}) => {
-    const field = this.fields[fieldName];
-    const {
-      validateError,
-    } = this.getErrorStatus(fieldName);
+    const props = options.props || {};
+    const field = this.fieldLinks[fieldName];
+    const { validateError } = this.getErrorStatus(fieldName);
 
-    return field.getProps({
-      ownerProps: this.component.props,
-      ownerState: this.component.state,
+    return field.getProps(props, {
       value: field.getViewValue(),
       link: field,
       handleChange: this.handleChange(field),

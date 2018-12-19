@@ -15,11 +15,14 @@ import {
   FormCheckbox,
 } from '~/components/SignInSignUp';
 
-import FormInputLinker, {
+import InputLinker from '~/utils/InputLinker';
+import {
   FormTextFieldGetProps,
+  displayErrorFromPropsForTextField,
   FormPasswordVisibilityGetProps,
+  FormCheckboxInputGetProps,
   assert,
-} from '~/utils/FormInputLinker2';
+} from '~/utils/InputLinker/helpers';
 
 import createCommonStyles from '~/styles/common';
 import createFormPaperStyle from '~/styles/FormPaper';
@@ -32,10 +35,10 @@ const styles = theme => ({
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
-    this.fil = new FormInputLinker(this, {
+    this.il = new InputLinker(this, {
       namespace: 'login',
     });
-    this.fil.add({
+    this.il.add({
       name: 'username',
       handledByProps: {
         value: 'username',
@@ -44,22 +47,19 @@ class LoginForm extends React.Component {
       // onChange: (value, [e], { ownerProps }) => {
       //   ownerProps.onUsernameChange(e.target.value);
       // },
-      getProps: (__, options) => {
-        const props1 = FormTextFieldGetProps(__, options);
-        const {
-          ownerProps,
-          validateError,
-        } = __;
-        props1.placeholder = options.translate('usernameEmptyError', {
-          emailAddress: { key: 'emailAddress' },
-          phoneNumber: { key: 'phoneNumber' },
-        });
-        if (!validateError && ownerProps.passwordError) {
-          props1.error = true;
-          props1.helperText = undefined;
-        }
-        return props1;
-      },
+      getProps: [
+        FormTextFieldGetProps,
+        displayErrorFromPropsForTextField('passwordError', () => undefined),
+        (props, { link: { owner } }, { translate }) => ({
+          ...props,
+          onKeyPress: owner.handleEnterForTextField,
+          label: translate('username'),
+          placeholder: translate('usernameEmptyError', {
+            emailAddress: { key: 'emailAddress' },
+            phoneNumber: { key: 'phoneNumber' },
+          }),
+        }),
+      ],
       validate: value => assert(!!value, null, {
         key: 'usernameEmptyError',
         values: {
@@ -69,46 +69,56 @@ class LoginForm extends React.Component {
       }),
     }, {
       name: 'password',
-      getProps: (__, options) => {
-        const props1 = FormTextFieldGetProps(__, options);
-        const {
-          ownerProps,
-          validateError,
-        } = __;
-        if (!validateError && ownerProps.passwordError) {
-          props1.error = true;
-          props1.helperText = ownerProps.passwordError;
-        }
-        return props1;
-      },
+      getProps: [
+        FormTextFieldGetProps,
+        displayErrorFromPropsForTextField('passwordError'),
+        (props, { link: { owner } }, { translate }) => ({
+          ...props,
+          onKeyPress: owner.handleEnterForTextField,
+          label: translate('password'),
+        }),
+      ],
       validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
     }, {
-      name: 'password-visibility',
+      name: 'passwordVisibility',
       defaultValue: false,
       getProps: FormPasswordVisibilityGetProps,
       converter: {
         fromView: ((_, { storedValue }) => !storedValue),
         toOutput: () => undefined,
       },
+    }, {
+      name: 'rememberMe',
+      defaultValue: (this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false),
+      getProps: [
+        FormCheckboxInputGetProps,
+        (props, { link: { owner } }, { translate }) => ({
+          ...props,
+          onKeyPress: owner.handleEnterForTextField,
+          label: translate('rememberMe'),
+          dense: 'true',
+          color: 'primary',
+        }),
+      ],
+      converter: {
+        fromView: (([e, v]) => v),
+      },
     });
 
-    this.state = this.fil.mergeInitState({
-      rememberMe: this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false,
-    });
+    this.state = this.il.mergeInitState({});
   }
 
   handleSubmit = () => {
-    const {
-      onSubmit = () => {},
-    } = this.props;
+    const { onSubmit = () => {} } = this.props;
 
     const {
       username,
       password,
-    } = this.fil.getOutputs();
+      rememberMe,
+    } = this.il.getOutputs();
 
-    if (this.fil.validate()) {
-      onSubmit(username, password, this.state.rememberMe);
+    if (this.il.validate()) {
+      onSubmit(username, password, rememberMe);
     }
   }
 
@@ -119,14 +129,6 @@ class LoginForm extends React.Component {
     }
   };
 
-  handleRememberMeChange = (event, checked) => {
-    const {
-      onRememberMeChange = () => {},
-    } = this.props;
-    onRememberMeChange(checked);
-    this.setState({ rememberMe: checked });
-  };
-
   render() {
     const {
       intl,
@@ -135,10 +137,7 @@ class LoginForm extends React.Component {
     } = this.props;
     const translate = translateMessages.bind(null, intl, messages);
     const translated = translateMessages(intl, messages, [
-      'username',
-      'password',
       'login',
-      'rememberMe',
       'createAccount',
     ]);
 
@@ -147,27 +146,15 @@ class LoginForm extends React.Component {
         <FormSpace variant="top" />
         <FormContent>
           <FormTextField
-            label={translated.username}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .renderProps('username', { translate })}
+            {...this.il.renderProps('username', { translate })}
           />
           <FormSpace variant="content1" />
           <FormPasswordInput
-            label={translated.password}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .renderProps('password', { translate })}
-            {...this.fil
-              .renderProps('password-visibility', { translate })}
+            {...this.il.renderProps('password', { translate })}
+            {...this.il.renderProps('passwordVisibility', { translate })}
           />
           <FormCheckbox
-            label={translated.rememberMe}
-            dense="true"
-            color="primary"
-            checked={this.state.rememberMe}
-            onChange={this.handleRememberMeChange}
-            onKeyPress={this.handleEnterForTextField}
+            {...this.il.renderProps('rememberMe', { translate })}
           />
           <FormSpace variant="content1" />
           <Button
