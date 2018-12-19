@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DialogContent from '@material-ui/core/DialogContent';
-import { FormTextField, FormSpace } from '../SignInSignUp';
+import { FormTextField, FormSpace } from '../FormInputs';
 import ConfirmDialog from './ConfirmDialog';
 
 export default class InputDialog extends React.Component {

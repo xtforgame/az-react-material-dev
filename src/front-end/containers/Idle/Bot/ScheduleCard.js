@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
 import {
   InternalLink as Link,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 import ScheduleStepper from './ScheduleStepper';
 
 moment.locale('zh-TW');

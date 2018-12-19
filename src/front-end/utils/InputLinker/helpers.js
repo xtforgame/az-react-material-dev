@@ -3,7 +3,7 @@ import {
   FormTextField,
   FormTextInput,
   FormCheckbox,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 
 export const assert = (condition, message, i18n) => {
   if (!condition) {
@@ -97,6 +97,10 @@ export const FormPasswordVisibilityGetProps = (props, {
 export const FormPasswordVisibilityPreset = cfg => ({
   ...cfg,
   getProps: cfg.getProps.concat([FormPasswordVisibilityGetProps]),
+  converter: {
+    fromView: ((_, { storedValue }) => !storedValue),
+    toOutput: () => undefined,
+  },
 });
 
 export const FormCheckboxGetProps = (props, {

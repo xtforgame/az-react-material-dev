@@ -13,7 +13,7 @@ import {
   FormSpace,
   FormContent,
   FormCodeInput,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 
 import FormInputLinker, {
   FormTextFieldGetProps,

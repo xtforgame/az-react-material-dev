@@ -8,7 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import {
   FormTextField,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 
 const WrappedInput = (props) => {
   const {

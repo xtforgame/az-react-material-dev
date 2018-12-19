@@ -12,7 +12,7 @@ import createCommonStyles from '~/styles/common';
 import {
   FormSpace,
   FormContent,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 import MainAppBar from './MainAppBar';
 
 import modelMap from '~/containers/App/modelMap';

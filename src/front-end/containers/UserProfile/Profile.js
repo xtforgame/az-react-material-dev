@@ -29,7 +29,7 @@ import {
 
 import {
   FormTextField,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 
 import {
   makeMyUserSelector,

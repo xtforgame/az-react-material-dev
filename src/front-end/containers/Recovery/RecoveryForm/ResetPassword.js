@@ -14,7 +14,7 @@ import {
   FormSpace,
   FormContent,
   FormPasswordInput,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 
 import FormInputLinker, {
   FormTextFieldGetProps,

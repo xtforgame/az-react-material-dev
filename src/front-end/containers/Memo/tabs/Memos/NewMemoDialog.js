@@ -10,7 +10,7 @@ import createCommonStyles from '~/styles/common';
 import SimpleFullScreenDialog from '~/components/Dialogs/SimpleFullScreenDialog';
 import {
   FormTextField,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 import modelMap from '~/containers/App/modelMap';
 
 const {

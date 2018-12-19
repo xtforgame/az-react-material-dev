@@ -12,7 +12,7 @@ import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 
 const styles = theme => ({
   flexContainer: {

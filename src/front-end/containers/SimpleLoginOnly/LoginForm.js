@@ -12,7 +12,7 @@ import {
   FormTextField,
   FormPasswordInput,
   FormCheckbox,
-} from '~/components/SignInSignUp';
+} from '~/components/FormInputs';
 
 import FormInputLinker, {
   FormTextFieldGetProps,

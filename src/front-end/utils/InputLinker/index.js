@@ -90,37 +90,38 @@ export default class InputLinker {
     this.fieldLinks = {};
   }
 
+  getPreset = preset => preset;
+
   add(...cfgs) {
+    const evalulateConfig = (currentCfg, c) => {
+      let cfg;
+      if (typeof c === 'function') {
+        cfg = c(currentCfg);
+      } else {
+        cfg = currentCfg;
+        const { presets } = c;
+        if (presets) {
+          cfg = c.presets.map(this.getPreset).reduce(evalulateConfig, currentCfg);
+        }
+        cfg = { ...cfg, ...c };
+        delete cfg.presets;
+      }
+      if (!cfg) {
+        console.error('Wrong config', c);
+        throw new Error('Wrong config');
+      }
+      cfg.getProps = Array.isArray(cfg.getProps) ? cfg.getProps : [cfg.getProps].filter(f => f);
+      if (cfg.extraGetProps) {
+        cfg.extraGetProps = Array.isArray(cfg.extraGetProps) ? cfg.extraGetProps : [cfg.extraGetProps].filter(f => f);
+        cfg.getProps.push(...cfg.extraGetProps);
+        delete cfg.extraGetProps;
+      }
+      return cfg;
+    };
     cfgs.forEach((_c) => {
       const configChain = Array.isArray(_c) ? _c : [_c];
-      let cfg = {
-        getProps: [(_, { link }) => link.props],
-      };
-      cfg = configChain.reduce(
-        (currentCfg, c) => {
-          let cfg;
-          if (typeof c === 'function') {
-            cfg = c(currentCfg);
-          } else {
-            cfg = {
-              ...currentCfg,
-              ...c,
-            };
-          }
-          if (!cfg) {
-            console.error('Wrong config', c);
-            throw new Error('Wrong config');
-          }
-          cfg.getProps = Array.isArray(cfg.getProps) ? cfg.getProps : [cfg.getProps].filter(f => f);
-          if (cfg.extraGetProps) {
-            cfg.extraGetProps = Array.isArray(cfg.extraGetProps) ? cfg.extraGetProps : [cfg.extraGetProps].filter(f => f);
-            cfg.getProps.push(...cfg.extraGetProps);
-            delete cfg.extraGetProps;
-          }
-          return cfg;
-        },
-        cfg
-      );
+      let cfg = { getProps: [(_, { link }) => link.props] };
+      cfg = configChain.reduce(evalulateConfig, cfg);
       this.fieldLinks[cfg.name] = new FieldLink(this, cfg);
     });
   }

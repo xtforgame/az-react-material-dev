@@ -1,6 +1,6 @@
 import React from 'react';
 import { compose } from 'recompose';
-import { FormTextField, FormSpace } from '~/components/SignInSignUp';
+import { FormTextField, FormSpace } from '~/components/FormInputs';
 import ConfirmDialog from '~/components/Dialogs/ConfirmDialog';
 import { withStyles } from '@material-ui/core/styles';
 import DialogContent from '@material-ui/core/DialogContent';
