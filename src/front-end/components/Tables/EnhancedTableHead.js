@@ -35,10 +35,10 @@ export default class EnhancedTableHead extends React.Component {
           {columns.map((column, i) => {
             const sortProps = {};
             const style = (columnSizes && columnSizes[i] != null) ? { width: columnSizes[i] } : {};
-            let lable = column.label;
+            let Label = column.label;
             if (column.sortable !== false) {
               sortProps.sortDirection = orderBy === column.id ? order : false;
-              lable = (
+              Label = (
                 <TableSortLabel
                   active={orderBy === column.id}
                   direction={order}
@@ -64,7 +64,7 @@ export default class EnhancedTableHead extends React.Component {
                     placement={column.numeric ? 'bottom-end' : 'bottom-start'}
                     enterDelay={300}
                   >
-                    {lable}
+                    {Label}
                   </Tooltip>
                 )}
               </TableCell>

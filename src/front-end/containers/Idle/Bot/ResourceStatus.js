@@ -72,7 +72,7 @@ const resourceInfo = {
   },
 };
 
-class ResourceLable extends React.Component {
+class ResourceLabel extends React.Component {
   render() {
     const {
       value, max, delta, showMax,
@@ -155,7 +155,7 @@ class ResourceStatus extends React.Component { // eslint-disable-line react/no-m
                   segments={[
                     {
                       name: '1',
-                      label: <ResourceLable
+                      label: <ResourceLabel
                         value={value}
                         max={max}
                         delta={delta}

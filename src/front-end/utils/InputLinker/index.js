@@ -126,6 +126,18 @@ export default class InputLinker {
     });
   }
 
+  getValue(fieldName) {
+    return this.fieldLinks[fieldName].getValue();
+  }
+
+  getValues() {
+    const values = {};
+    Object.keys(this.fieldLinks).forEach((fieldName) => {
+      values[fieldName] = this.getValue(fieldName);
+    });
+    return values;
+  }
+
   getOutput(fieldName) {
     return this.fieldLinks[fieldName].getOutput();
   }

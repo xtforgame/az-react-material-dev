@@ -13,9 +13,9 @@ const loadMin = () => toSeqPromise([
   });
   return observer.load()
   .then(() => {
-    // console.log(`${value[0]}:${value[1]} is available`);
+    // console.log(`${value[0]}:${value[1]} is avaiLabel`);
   }, () => {
-    console.warn(`${value[0]}:${value[1]} is not available`);
+    console.warn(`${value[0]}:${value[1]} is not avaiLabel`);
   });
 });
 
@@ -38,9 +38,9 @@ const loadAll = () => toSeqPromise([
   });
   return observer.load()
   .then(() => {
-    // console.log(`${value[0]}:${value[1]} is available`);
+    // console.log(`${value[0]}:${value[1]} is avaiLabel`);
   }, () => {
-    console.warn(`${value[0]}:${value[1]} is not available`);
+    console.warn(`${value[0]}:${value[1]} is not avaiLabel`);
   });
 });
 

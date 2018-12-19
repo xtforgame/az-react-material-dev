@@ -60,14 +60,14 @@ class BotCard extends React.Component {
     heapStatistics = heapStatistics || {};
     const memoryLimit = (botInfo.memoryLimit && botInfo.memoryLimit * 1024 * 1024) || 0;
     const used_heap_size = heapStatistics.used_heap_size || 0;
-    const available_size = memoryLimit - used_heap_size;
-    const memoryPercent = memoryLimit ? Math.round(available_size / memoryLimit * 100) : 0;
+    const avaiLabel_size = memoryLimit - used_heap_size;
+    const memoryPercent = memoryLimit ? Math.round(avaiLabel_size / memoryLimit * 100) : 0;
 
     const limitMB = memoryLimit ? (memoryLimit / 1024 / 1024).toFixed(2) : null;
-    const availableMB = memoryLimit ? (available_size / 1024 / 1024).toFixed(2) : null;
+    const avaiLabelMB = memoryLimit ? (avaiLabel_size / 1024 / 1024).toFixed(2) : null;
     return {
       limitMB,
-      availableMB,
+      avaiLabelMB,
       memoryPercent,
     };
   }
@@ -81,10 +81,10 @@ class BotCard extends React.Component {
     const procTimePercent = procTimeLimit ? Math.round(procTime / procTimeLimit * 100) : 0;
 
     const limitProcTime = procTimeLimit ? Math.round(procTimeLimit / 1000) : null;
-    const availableProcTime = procTimeLimit ? Math.round(procTime / 1000) : null;
+    const avaiLabelProcTime = procTimeLimit ? Math.round(procTime / 1000) : null;
     return {
       limitProcTime,
-      availableProcTime,
+      avaiLabelProcTime,
       procTimePercent,
     };
   }
@@ -98,10 +98,10 @@ class BotCard extends React.Component {
     const bandwidthPercent = bandwidthLimit ? Math.round(bandwidth / bandwidthLimit * 100) : 0;
 
     const limitBandwidth = bandwidthLimit || null;
-    const availableBandwidth = bandwidthLimit ? bandwidth : null;
+    const avaiLabelBandwidth = bandwidthLimit ? bandwidth : null;
     return {
       limitBandwidth,
-      availableBandwidth,
+      avaiLabelBandwidth,
       bandwidthPercent,
     };
   }
@@ -115,10 +115,10 @@ class BotCard extends React.Component {
     const featurePercent = featureLimit ? Math.round(feature / featureLimit * 100) : 0;
 
     const limitFeature = featureLimit || null;
-    const availableFeature = featureLimit ? feature : null;
+    const avaiLabelFeature = featureLimit ? feature : null;
     return {
       limitFeature,
-      availableFeature,
+      avaiLabelFeature,
       featurePercent,
     };
   }
@@ -132,10 +132,10 @@ class BotCard extends React.Component {
     const storagePercent = storageLimit ? Math.round(storage / storageLimit * 100) : 0;
 
     const limitStorage = storageLimit ? (storageLimit / 1024 / 1024).toFixed(2) : null;
-    const availableStorage = storageLimit ? (storage / 1024 / 1024).toFixed(2) : null;
+    const avaiLabelStorage = storageLimit ? (storage / 1024 / 1024).toFixed(2) : null;
     return {
       limitStorage,
-      availableStorage,
+      avaiLabelStorage,
       storagePercent,
     };
   }
@@ -149,31 +149,31 @@ class BotCard extends React.Component {
 
     const {
       limitMB,
-      availableMB,
+      avaiLabelMB,
       memoryPercent,
     } = this.getMemoryUsage();
 
     const {
       limitProcTime,
-      availableProcTime,
+      avaiLabelProcTime,
       procTimePercent,
     } = this.getProcTimeUsage();
 
     const {
       limitBandwidth,
-      availableBandwidth,
+      avaiLabelBandwidth,
       bandwidthPercent,
     } = this.getBandwidthUsage();
 
     const {
       limitFeature,
-      availableFeature,
+      avaiLabelFeature,
       featurePercent,
     } = this.getFeatureUsage();
 
     const {
       limitStorage,
-      availableStorage,
+      avaiLabelStorage,
       storagePercent,
     } = this.getStorageUsage();
 
@@ -214,7 +214,7 @@ class BotCard extends React.Component {
             labelColor={labelColor}
             segments={[
               {
-                name: '1', label: limitMB != null ? `${availableMB} / ${limitMB} MB` : '', percent: memoryPercent, color: green[700],
+                name: '1', label: limitMB != null ? `${avaiLabelMB} / ${limitMB} MB` : '', percent: memoryPercent, color: green[700],
               },
               {
                 name: '2', label: '', percent: 100 - memoryPercent, color: grey[700],
@@ -228,7 +228,7 @@ class BotCard extends React.Component {
             labelColor={labelColor}
             segments={[
               {
-                name: '1', label: limitProcTime != null ? `${availableProcTime} / ${limitProcTime} Sec.` : '', percent: procTimePercent, color: lightBlue[700],
+                name: '1', label: limitProcTime != null ? `${avaiLabelProcTime} / ${limitProcTime} Sec.` : '', percent: procTimePercent, color: lightBlue[700],
               },
               {
                 name: '2', label: '', percent: 100 - procTimePercent, color: grey[700],
@@ -242,7 +242,7 @@ class BotCard extends React.Component {
             labelColor={labelColor}
             segments={[
               {
-                name: '1', label: limitBandwidth != null ? `${availableBandwidth} / ${limitBandwidth}` : '', percent: bandwidthPercent, color: yellow[700],
+                name: '1', label: limitBandwidth != null ? `${avaiLabelBandwidth} / ${limitBandwidth}` : '', percent: bandwidthPercent, color: yellow[700],
               },
               {
                 name: '2', label: '', percent: 100 - bandwidthPercent, color: grey[700],
@@ -256,7 +256,7 @@ class BotCard extends React.Component {
             labelColor={labelColor}
             segments={[
               {
-                name: '1', label: limitFeature != null ? `${availableFeature} / ${limitFeature}` : '', percent: featurePercent, color: orange[700],
+                name: '1', label: limitFeature != null ? `${avaiLabelFeature} / ${limitFeature}` : '', percent: featurePercent, color: orange[700],
               },
               {
                 name: '2', label: '', percent: 100 - featurePercent, color: grey[700],
@@ -270,7 +270,7 @@ class BotCard extends React.Component {
             labelColor={labelColor}
             segments={[
               {
-                name: '1', label: limitStorage != null ? `${availableStorage} / ${limitStorage} MB` : '', percent: storagePercent, color: red[700],
+                name: '1', label: limitStorage != null ? `${avaiLabelStorage} / ${limitStorage} MB` : '', percent: storagePercent, color: red[700],
               },
               {
                 name: '2', label: '', percent: 100 - storagePercent, color: grey[700],

@@ -135,7 +135,7 @@ class RegistrationForm extends React.Component {
       'privacyPolicy',
     ]);
 
-    const userAgreementLable = (
+    const userAgreementLabel = (
       <FormattedMessage
         {...messages.userAgreement}
         values={{
@@ -191,14 +191,14 @@ class RegistrationForm extends React.Component {
                 color="primary"
                 checked={this.state.agreed}
                 onChange={this.onAgreementChange}
-                label={userAgreementLable}
+                label={userAgreementLabel}
                 onKeyPress={this.handleEnterForTextField}
               />
             )
           }
           <FormSpace variant="content2" />
           {
-            !comfirmUserAgreement && (userAgreementLable)
+            !comfirmUserAgreement && (userAgreementLabel)
           }
           <SuccessButton
             variant="contained"

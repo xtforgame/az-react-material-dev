@@ -26,7 +26,7 @@ export default {
           total_heap_size: 3440640,
           total_heap_size_executable: 1048576,
           total_physical_size: 1291384,
-          total_available_size: 10035728,
+          total_avaiLabel_size: 10035728,
           used_heap_size: 1206392,
           heap_size_limit: 12936949,
           malloced_memory: 8192,

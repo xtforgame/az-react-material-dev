@@ -9,16 +9,19 @@ import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
-  FormTextField,
+  // FormTextField,
   FormPasswordInput,
-  FormCheckbox,
+  // FormCheckbox,
 } from '~/components/FormInputs';
 
-import FormInputLinker, {
-  FormTextFieldGetProps,
-  FormPasswordVisibilityGetProps,
+import InputLinker from '~/utils/InputLinker';
+import {
+  FormTextFieldPreset,
+  displayErrorFromPropsForTextField,
+  FormPasswordVisibilityPreset,
+  FormCheckboxPreset,
   assert,
-} from '~/utils/FormInputLinker';
+} from '~/utils/InputLinker/helpers';
 
 import createCommonStyles from '~/styles/common';
 import createFormPaperStyle from '~/styles/FormPaper';
@@ -31,74 +34,77 @@ const styles = theme => ({
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
-    this.fil = new FormInputLinker(this, {
+    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
+      extraGetProps: (props, { link: { owner } }, { translate }) => ({
+        ...props,
+        onKeyPress: owner.handleEnterForTextField,
+        label: i18nKey && translate(i18nKey),
+      }),
+    });
+
+    this.il = new InputLinker(this, {
       namespace: 'login',
     });
-    this.fil.add({
-      name: 'username',
-      exposed: {
-        onChange: 'onUsernameChange',
-        value: 'username',
-        error: 'usernameError',
-      },
-      getProps: (__, _) => ({
-        ...FormTextFieldGetProps(__, _),
-        placeholder: _.translate('usernameEmptyError', {
-          emailAddress: { key: 'emailAddress' },
-          phoneNumber: { key: 'phoneNumber' },
-        }),
-      }),
-      validate: value => assert(!!value, null, {
-        key: 'usernameEmptyError',
-        values: {
-          emailAddress: { key: 'emailAddress' },
-          phoneNumber: { key: 'phoneNumber' },
+    this.il.add(
+      {
+        name: 'username',
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username')],
+        handledByProps: {
+          value: 'username',
+          onChange: 'onUsernameChange',
         },
-      }),
-    }, {
-      name: 'password',
-      exposed: {
-        onChange: 'onPasswordChange',
-        error: 'passwordError',
+        extraGetProps: [
+          displayErrorFromPropsForTextField('passwordError', () => undefined),
+          (props, linkInfo, { translate }) => ({
+            ...props,
+            placeholder: translate('usernameEmptyError', {
+              emailAddress: { key: 'emailAddress' },
+              phoneNumber: { key: 'phoneNumber' },
+            }),
+          }),
+        ],
+        validate: value => assert(!!value, null, {
+          key: 'usernameEmptyError',
+          values: {
+            emailAddress: { key: 'emailAddress' },
+            phoneNumber: { key: 'phoneNumber' },
+          },
+        }),
       },
-      getProps: FormTextFieldGetProps,
-      validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
-    }, {
-      name: 'password-visibility',
-      defaultValue: false,
-      getProps: FormPasswordVisibilityGetProps,
-      converter: {
-        fromView: (({ valueInState }) => !valueInState),
+      {
+        name: 'password',
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password')],
+        InputComponent: FormPasswordInput,
+        extraGetProps: displayErrorFromPropsForTextField('passwordError'),
+        validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
       },
-    });
+      {
+        name: 'passwordVisibility',
+        presets: [FormPasswordVisibilityPreset],
+        defaultValue: false,
+      },
+      {
+        name: 'rememberMe',
+        presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent('rememberMe')],
+        props: { dense: 'true', color: 'primary' },
+        defaultValue: (this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false),
+      }
+    );
 
-    this.state = this.fil.mergeInitState({
-      fil: this.fil,
-      rememberMe: this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false,
-    });
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (state.fil) {
-      return state.fil.derivedFromProps(props, state);
-    }
-
-    // No state update necessary
-    return null;
+    this.state = this.il.mergeInitState({});
   }
 
   handleSubmit = () => {
-    const {
-      onSubmit = () => {},
-    } = this.props;
+    const { onSubmit = () => {} } = this.props;
 
     const {
       username,
       password,
-    } = this.fil.getOutputs();
+      rememberMe,
+    } = this.il.getOutputs();
 
-    if (this.fil.validate()) {
-      onSubmit(username, password, this.state.rememberMe);
+    if (this.il.validate()) {
+      onSubmit(username, password, rememberMe);
     }
   }
 
@@ -109,14 +115,6 @@ class LoginForm extends React.Component {
     }
   };
 
-  handleRememberMeChange = (event, checked) => {
-    const {
-      onRememberMeChange = () => {},
-    } = this.props;
-    onRememberMeChange(checked);
-    this.setState({ rememberMe: checked });
-  };
-
   render() {
     const {
       intl,
@@ -124,39 +122,20 @@ class LoginForm extends React.Component {
     } = this.props;
     const translate = translateMessages.bind(null, intl, messages);
     const translated = translateMessages(intl, messages, [
-      'username',
-      'password',
       'login',
-      'rememberMe',
     ]);
 
     return (
       <div>
         <FormSpace variant="top" />
         <FormContent>
-          <FormTextField
-            label={translated.username}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .getPropsForInputField('username', { translate })}
-          />
+          {this.il.renderComponent('username', { translate })}
           <FormSpace variant="content1" />
-          <FormPasswordInput
-            label={translated.password}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .getPropsForInputField('password', { translate })}
-            {...this.fil
-              .getPropsForInputField('password-visibility', { translate })}
-          />
-          <FormCheckbox
-            dense="true"
-            color="primary"
-            checked={this.state.rememberMe}
-            onChange={this.handleRememberMeChange}
-            label={translated.rememberMe}
-            onKeyPress={this.handleEnterForTextField}
-          />
+          {this.il.renderComponent('password', {
+            translate,
+            extraProps: this.il.renderProps('passwordVisibility', { translate }),
+          })}
+          {this.il.renderComponent('rememberMe', { translate })}
           <FormSpace variant="content1" />
           <Button
             variant="contained"

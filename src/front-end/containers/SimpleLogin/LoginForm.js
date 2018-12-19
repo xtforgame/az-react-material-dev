@@ -35,11 +35,11 @@ const styles = theme => ({
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
-    const translateLabelAndAdd = i18nKey => ({
+    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
       extraGetProps: (props, { link: { owner } }, { translate }) => ({
         ...props,
         onKeyPress: owner.handleEnterForTextField,
-        label: translate(i18nKey),
+        label: i18nKey && translate(i18nKey),
       }),
     });
 
@@ -49,7 +49,7 @@ class LoginForm extends React.Component {
     this.il.add(
       {
         name: 'username',
-        presets: [FormTextFieldPreset, translateLabelAndAdd('username')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username')],
         handledByProps: {
           value: 'username',
           onChange: 'onUsernameChange',
@@ -74,7 +74,7 @@ class LoginForm extends React.Component {
       },
       {
         name: 'password',
-        presets: [FormTextFieldPreset, translateLabelAndAdd('password')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password')],
         InputComponent: FormPasswordInput,
         extraGetProps: displayErrorFromPropsForTextField('passwordError'),
         validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
@@ -86,7 +86,7 @@ class LoginForm extends React.Component {
       },
       {
         name: 'rememberMe',
-        presets: [FormCheckboxPreset, translateLabelAndAdd('rememberMe')],
+        presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent('rememberMe')],
         props: { dense: 'true', color: 'primary' },
         defaultValue: (this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false),
       }
@@ -132,13 +132,13 @@ class LoginForm extends React.Component {
       <div>
         <FormSpace variant="top" />
         <FormContent>
-          {...this.il.renderComponent('username', { translate })}
+          {this.il.renderComponent('username', { translate })}
           <FormSpace variant="content1" />
-          {...this.il.renderComponent('password', {
+          {this.il.renderComponent('password', {
             translate,
             extraProps: this.il.renderProps('passwordVisibility', { translate }),
           })}
-          {...this.il.renderComponent('rememberMe', { translate })}
+          {this.il.renderComponent('rememberMe', { translate })}
           <FormSpace variant="content1" />
           <Button
             variant="contained"

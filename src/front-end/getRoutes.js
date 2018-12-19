@@ -26,7 +26,7 @@ import TestContent from '~/containers/Test/TestContent';
 import testCase00 from '~/test-cases/test-case-00';
 import testCase01 from '~/test-cases/test-case-01';
 
-import Login from '~/containers/SimpleLogin';
+import Login from '~/containers/SimpleLoginOnly';
 import Recovery from '~/containers/Recovery';
 
 import getListHierarchy from '~/containers/MainFrame/getListHierarchy';
