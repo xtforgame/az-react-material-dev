@@ -1,4 +1,10 @@
 /* eslint-disable no-underscore-dangle */
+import {
+  FormTextField,
+  FormTextInput,
+  FormCheckbox,
+} from '~/components/SignInSignUp';
+
 export const assert = (condition, message, i18n) => {
   if (!condition) {
     const error = new Error(message || 'Validation failed');
@@ -20,14 +26,20 @@ export const FormTextFieldGetProps = (props, {
   );
 
   return {
+    ...props,
     id: link.key,
     value,
     onChange: handleChange,
     error: !!validateErrorMessage,
     helperText: validateErrorMessage, // helperMessage,
-    ...link.props,
   };
 };
+
+export const FormTextFieldPreset = cfg => ({
+  ...cfg,
+  InputComponent: FormTextField,
+  getProps: cfg.getProps.concat([FormTextFieldGetProps]),
+});
 
 export const displayErrorFromPropsForTextField = (propKey, getMessageFunc = e => e) => (
   props,
@@ -43,7 +55,6 @@ export const displayErrorFromPropsForTextField = (propKey, getMessageFunc = e =>
   return newProps;
 };
 
-
 export const FormTextInputGetProps = (props, {
   value,
   link,
@@ -57,6 +68,7 @@ export const FormTextInputGetProps = (props, {
   );
 
   return {
+    ...props,
     id: link.key,
     value,
     onChange: handleChange,
@@ -64,26 +76,47 @@ export const FormTextInputGetProps = (props, {
       error: validateErrorMessage,
     },
     helperText: validateErrorMessage, // helperMessage,
-    ...link.props,
   };
 };
+
+export const FormTextInputPreset = cfg => ({
+  ...cfg,
+  InputComponent: FormTextInput,
+  getProps: cfg.getProps.concat([FormTextInputGetProps]),
+});
 
 export const FormPasswordVisibilityGetProps = (props, {
   value, link, handleChange, validateError,
 }, options = {}) => ({
+  ...props,
   type: value ? 'text' : 'password',
   onShowPassswordClick: handleChange,
 });
 
-export const FormCheckboxInputGetProps = (props, {
+
+export const FormPasswordVisibilityPreset = cfg => ({
+  ...cfg,
+  getProps: cfg.getProps.concat([FormPasswordVisibilityGetProps]),
+});
+
+export const FormCheckboxGetProps = (props, {
   value,
   link,
   handleChange,
   validateError,
 },
 { translate } = {}) => ({
+  ...props,
   id: link.key,
   onChange: handleChange,
   checked: value,
-  ...link.props,
+});
+
+export const FormCheckboxPreset = cfg => ({
+  ...cfg,
+  InputComponent: FormCheckbox,
+  getProps: cfg.getProps.concat([FormCheckboxGetProps]),
+  converter: {
+    fromView: (([e, v]) => v),
+  },
 });

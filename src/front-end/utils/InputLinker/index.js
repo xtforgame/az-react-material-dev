@@ -1,4 +1,6 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle, react/no-this-in-sfc */
+import React from 'react';
+
 export class Converter {
   constructor(convertFuncMap = {}) {
     this.fromView = convertFuncMap.fromView || (([event]) => event.target.value);
@@ -8,16 +10,17 @@ export class Converter {
 }
 
 export class FieldLink {
-  constructor(linker, link) {
+  constructor(linker, cfg) {
     this.linker = linker;
     this._owner = this.linker.component;
     this.namespace = this.linker.namespace;
-    this.name = link.name;
+    this.name = cfg.name;
     this.uniqueName = this.namespace ? `${this.namespace}-${this.name}` : this.name;
     this.key = this.uniqueName;
-    this.defaultValue = link.defaultValue;
+    this.defaultValue = cfg.defaultValue;
+    this.InputComponent = cfg.InputComponent;
 
-    this.handledByProps = link.handledByProps;
+    this.handledByProps = cfg.handledByProps;
     if (this.handledByProps) {
       if (!this.handledByProps.value || !this.handledByProps.onChange) {
         throw new Error('Wrong options: handledByProps');
@@ -38,15 +41,15 @@ export class FieldLink {
       }
     }
 
-    this.converter = new Converter(link.converter);
+    this.converter = new Converter(cfg.converter);
 
-    this._validate = link.validate;
-    this._getPropsMiddlewares = (Array.isArray(link.getProps) ? link.getProps : [link.getProps]) || [(() => ({}))];
-    this.props = link.props;
-    this.data = link.data;
+    this._validate = cfg.validate;
+    this._getPropsMiddlewares = Array.isArray(cfg.getProps) ? cfg.getProps : [cfg.getProps].filter(f => f);
+    this.props = cfg.props;
+    this.data = cfg.data;
 
-    this.onChange = link.onChange || (() => {});
-    this.onValidateError = link.onValidateError || (() => {});
+    this.onChange = cfg.onChange || (() => {});
+    this.onValidateError = cfg.onValidateError || (() => {});
 
     // functions
 
@@ -63,7 +66,7 @@ export class FieldLink {
   }
 
   getProps = (initProps, linkInfo, options) => this._getPropsMiddlewares.reduce(
-    (props, m) => m(props, linkInfo, options),
+    (props, m) => (typeof m === 'function' ? m(props, linkInfo, options) : { ...props, ...m }),
     initProps
   )
 
@@ -87,9 +90,38 @@ export default class InputLinker {
     this.fieldLinks = {};
   }
 
-  add(...fields) {
-    fields.forEach((field) => {
-      this.fieldLinks[field.name] = new FieldLink(this, field);
+  add(...cfgs) {
+    cfgs.forEach((_c) => {
+      const configChain = Array.isArray(_c) ? _c : [_c];
+      let cfg = {
+        getProps: [(_, { link }) => link.props],
+      };
+      cfg = configChain.reduce(
+        (currentCfg, c) => {
+          let cfg;
+          if (typeof c === 'function') {
+            cfg = c(currentCfg);
+          } else {
+            cfg = {
+              ...currentCfg,
+              ...c,
+            };
+          }
+          if (!cfg) {
+            console.error('Wrong config', c);
+            throw new Error('Wrong config');
+          }
+          cfg.getProps = Array.isArray(cfg.getProps) ? cfg.getProps : [cfg.getProps].filter(f => f);
+          if (cfg.extraGetProps) {
+            cfg.extraGetProps = Array.isArray(cfg.extraGetProps) ? cfg.extraGetProps : [cfg.extraGetProps].filter(f => f);
+            cfg.getProps.push(...cfg.extraGetProps);
+            delete cfg.extraGetProps;
+          }
+          return cfg;
+        },
+        cfg
+      );
+      this.fieldLinks[cfg.name] = new FieldLink(this, cfg);
     });
   }
 
@@ -213,7 +245,7 @@ export default class InputLinker {
     field.setValue(value, rawArgs);
   };
 
-  // render helper
+  // render helpers
   renderProps = (fieldName, options = {}) => {
     const props = options.props || {};
     const field = this.fieldLinks[fieldName];
@@ -225,5 +257,20 @@ export default class InputLinker {
       handleChange: this.handleChange(field),
       validateError,
     }, options);
+  };
+
+  renderComponent = (fieldName, options = {}) => {
+    const field = this.fieldLinks[fieldName];
+    const { InputComponent } = field;
+    if (!InputComponent) {
+      throw new Error(`No InputComponent provided :${field.name}`);
+    }
+
+    return (
+      <InputComponent
+        {...this.renderProps(fieldName, options)}
+        {...options.extraProps}
+      />
+    );
   };
 }
