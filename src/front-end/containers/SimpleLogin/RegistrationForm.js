@@ -9,9 +9,7 @@ import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
-  // FormTextField,
   FormPasswordInput,
-  // FormCheckbox,
   InternalLink as Link,
 } from '~/components/FormInputs';
 
@@ -22,6 +20,7 @@ import {
   FormPasswordVisibilityPreset,
   FormCheckboxPreset,
   assert,
+  translateLabelAndAddOnKeyPressEvent,
 } from '~/utils/InputLinker/helpers';
 
 import SuccessButton from '~/components/Buttons/SuccessButton';
@@ -34,21 +33,13 @@ import {
 class RegistrationForm extends React.Component {
   constructor(props) {
     super(props);
-    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
-      extraGetProps: (props, { link: { owner } }, { translate }) => ({
-        ...props,
-        onKeyPress: owner.handleEnterForTextField,
-        label: i18nKey && translate(i18nKey),
-      }),
-    });
-
     this.il = new InputLinker(this, {
       namespace: 'register',
     });
     this.il.add(
       {
         name: 'username',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
         handledByProps: {
           value: 'username',
           onChange: 'onUsernameChange',
@@ -73,7 +64,7 @@ class RegistrationForm extends React.Component {
       },
       {
         name: 'password',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password', this.handleEnterForTextField)],
         InputComponent: FormPasswordInput,
         extraGetProps: displayErrorFromPropsForTextField('passwordError'),
         validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
@@ -85,7 +76,7 @@ class RegistrationForm extends React.Component {
       },
       {
         name: 'agreed',
-        presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent()],
+        presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent(undefined, this.handleEnterForTextField)],
         props: { dense: 'true', color: 'primary' },
         defaultValue: false,
       }

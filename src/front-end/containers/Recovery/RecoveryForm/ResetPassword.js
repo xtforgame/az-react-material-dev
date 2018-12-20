@@ -21,8 +21,8 @@ import {
   FormTextFieldPreset,
   displayErrorFromPropsForTextField,
   FormPasswordVisibilityPreset,
-  FormCheckboxPreset,
   assert,
+  translateLabelAndAddOnKeyPressEvent,
 } from '~/utils/InputLinker/helpers';
 import {
   isValidPassword,
@@ -54,28 +54,20 @@ class ResetPassword extends React.Component {
 
   constructor(props) {
     super(props);
-    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
-      extraGetProps: (props, { link: { owner } }, { translate }) => ({
-        ...props,
-        onKeyPress: owner.handleEnterForTextField,
-        label: i18nKey && translate(i18nKey),
-      }),
-    });
-
     this.il = new InputLinker(this, {
       namespace: 'reset-password',
     });
     this.il.add(
       {
         name: 'password',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('enterNewPassword')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('enterNewPassword', this.handleEnterForTextField)],
         InputComponent: FormPasswordInput,
         extraGetProps: displayErrorFromPropsForTextField('passwordError'),
         validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
       },
       {
         name: 'confrimPassword',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('reenterNewPassword')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('reenterNewPassword', this.handleEnterForTextField)],
         InputComponent: FormPasswordInput,
         extraGetProps: displayErrorFromPropsForTextField('passwordError'),
         validate: (value) => {

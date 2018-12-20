@@ -20,6 +20,7 @@ import {
   FormTextFieldPreset,
   displayErrorFromPropsForTextField,
   assert,
+  translateLabelAndAddOnKeyPressEvent,
 } from '~/utils/InputLinker/helpers';
 
 import modelMap from '~/containers/App/modelMap';
@@ -44,21 +45,13 @@ class SendRecoveryCode extends React.Component {
 
   constructor(props) {
     super(props);
-    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
-      extraGetProps: (props, { link: { owner } }, { translate }) => ({
-        ...props,
-        onKeyPress: owner.handleEnterForTextField,
-        label: i18nKey && translate(i18nKey),
-      }),
-    });
-
     this.il = new InputLinker(this, {
       namespace: 'forgot-password',
     });
     this.il.add(
       {
         name: 'username',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
         InputComponent: FormPhoneOrEmailInput,
         props: { enablePhone: false },
         handledByProps: {

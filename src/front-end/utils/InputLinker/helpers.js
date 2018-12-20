@@ -3,6 +3,7 @@ import {
   FormTextField,
   FormTextInput,
   FormCheckbox,
+  FormPhoneOrEmailInput,
 } from '~/components/FormInputs';
 
 export const assert = (condition, message, i18n) => {
@@ -125,6 +126,16 @@ export const FormCheckboxPreset = cfg => ({
   },
 });
 
+export const FormPhoneOrEmailInputPreset = cfg => ({
+  ...FormTextFieldPreset(cfg),
+  InputComponent: FormPhoneOrEmailInput,
+  props: { enablePhone: false },
+  converter: {
+    toView: (value => (value && value.rawInput) || ''),
+    fromView: (([value]) => value),
+    toOutput: (value => value && value.value),
+  },
+});
 
 export const translateLabelAndAddOnKeyPressEvent = (i18nKey, onKeyPress = (() => {})) => ({
   extraGetProps: (props, { link: { owner } }, { translate }) => ({

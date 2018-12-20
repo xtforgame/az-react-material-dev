@@ -10,9 +10,7 @@ import {
   FormSpace,
   FormContent,
   FormPhoneOrEmailInput,
-  // FormTextField,
   FormPasswordInput,
-  // FormCheckbox,
   InternalLink as Link,
 } from '~/components/FormInputs';
 

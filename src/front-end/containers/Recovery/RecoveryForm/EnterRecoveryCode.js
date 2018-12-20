@@ -19,9 +19,8 @@ import InputLinker from '~/utils/InputLinker';
 import {
   FormTextFieldPreset,
   displayErrorFromPropsForTextField,
-  FormPasswordVisibilityPreset,
-  FormCheckboxPreset,
   assert,
+  translateLabelAndAddOnKeyPressEvent,
 } from '~/utils/InputLinker/helpers';
 
 import {
@@ -65,21 +64,13 @@ class EnterRecoveryCode extends React.Component {
 
   constructor(props) {
     super(props);
-    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
-      extraGetProps: (props, { link: { owner } }, { translate }) => ({
-        ...props,
-        onKeyPress: owner.handleEnterForTextField,
-        label: i18nKey && translate(i18nKey),
-      }),
-    });
-
     this.il = new InputLinker(this, {
       namespace: 'forgot-password',
     });
     this.il.add(
       {
         name: 'recoveryCode',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('recoveryCode')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('recoveryCode', this.handleEnterForTextField)],
         InputComponent: FormCodeInput,
         converter: {
           fromView: (([e], { storedValue }) => (

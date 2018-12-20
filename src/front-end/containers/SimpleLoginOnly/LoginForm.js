@@ -9,9 +9,7 @@ import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
-  // FormTextField,
   FormPasswordInput,
-  // FormCheckbox,
 } from '~/components/FormInputs';
 
 import InputLinker from '~/utils/InputLinker';
@@ -21,6 +19,7 @@ import {
   FormPasswordVisibilityPreset,
   FormCheckboxPreset,
   assert,
+  translateLabelAndAddOnKeyPressEvent,
 } from '~/utils/InputLinker/helpers';
 
 import createCommonStyles from '~/styles/common';
@@ -34,21 +33,13 @@ const styles = theme => ({
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
-    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
-      extraGetProps: (props, { link: { owner } }, { translate }) => ({
-        ...props,
-        onKeyPress: owner.handleEnterForTextField,
-        label: i18nKey && translate(i18nKey),
-      }),
-    });
-
     this.il = new InputLinker(this, {
       namespace: 'login',
     });
     this.il.add(
       {
         name: 'username',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
         handledByProps: {
           value: 'username',
           onChange: 'onUsernameChange',
@@ -73,7 +64,7 @@ class LoginForm extends React.Component {
       },
       {
         name: 'password',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password')],
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password', this.handleEnterForTextField)],
         InputComponent: FormPasswordInput,
         extraGetProps: displayErrorFromPropsForTextField('passwordError'),
         validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
@@ -85,7 +76,7 @@ class LoginForm extends React.Component {
       },
       {
         name: 'rememberMe',
-        presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent('rememberMe')],
+        presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent('rememberMe', this.handleEnterForTextField)],
         props: { dense: 'true', color: 'primary' },
         defaultValue: (this.props.defaultRememberMe !== undefined ? this.props.defaultRememberMe : false),
       }
