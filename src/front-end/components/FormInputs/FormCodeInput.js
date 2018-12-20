@@ -25,7 +25,9 @@ const FormCodeInput = (props) => {
     <FormTextField
       id={id}
       type={type}
-      startAdornment={startAdornment}
+      InputProps={{
+        startAdornment,
+      }}
       {...rest}
     />
   );

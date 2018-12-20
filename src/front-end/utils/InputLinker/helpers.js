@@ -124,3 +124,12 @@ export const FormCheckboxPreset = cfg => ({
     fromView: (([e, v]) => v),
   },
 });
+
+
+export const translateLabelAndAddOnKeyPressEvent = (i18nKey, onKeyPress = (() => {})) => ({
+  extraGetProps: (props, { link: { owner } }, { translate }) => ({
+    ...props,
+    onKeyPress,
+    label: i18nKey && translate(i18nKey),
+  }),
+});

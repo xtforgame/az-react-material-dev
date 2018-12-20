@@ -25,7 +25,7 @@ import {
   makeUserSessionSelector,
   makeRememberUserSelector,
 } from '~/containers/App/selectors';
-import EnterRecovryCode from './RecoveryForm/EnterRecovryCode';
+import EnterRecoveryCode from './RecoveryForm/EnterRecoveryCode';
 
 const {
   postSessions,
@@ -133,7 +133,7 @@ class Recovery extends React.Component {
             )}
             {((!this.state.codeVerifyState) || this.state.codeVerifyState === 'wrong' || this.state.codeVerifyState === 'error')
               && (
-                <EnterRecovryCode
+                <EnterRecoveryCode
                   recoveringUsername={recoveringUsername}
                   onChallenge={this.challenge}
                   recoveryCodeError={recoveryCodeError}

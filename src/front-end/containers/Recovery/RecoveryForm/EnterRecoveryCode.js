@@ -15,10 +15,14 @@ import {
   FormCodeInput,
 } from '~/components/FormInputs';
 
-import FormInputLinker, {
-  FormTextFieldGetProps,
+import InputLinker from '~/utils/InputLinker';
+import {
+  FormTextFieldPreset,
+  displayErrorFromPropsForTextField,
+  FormPasswordVisibilityPreset,
+  FormCheckboxPreset,
   assert,
-} from '~/utils/FormInputLinker';
+} from '~/utils/InputLinker/helpers';
 
 import {
   isAllDigital,
@@ -50,7 +54,7 @@ const styles = theme => ({
   },
 });
 
-class EnterRecovryCode extends React.Component {
+class EnterRecoveryCode extends React.Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     onChallenge: PropTypes.func.isRequired,
@@ -61,39 +65,36 @@ class EnterRecovryCode extends React.Component {
 
   constructor(props) {
     super(props);
-    this.fil = new FormInputLinker(this, {
+    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
+      extraGetProps: (props, { link: { owner } }, { translate }) => ({
+        ...props,
+        onKeyPress: owner.handleEnterForTextField,
+        label: i18nKey && translate(i18nKey),
+      }),
+    });
+
+    this.il = new InputLinker(this, {
       namespace: 'forgot-password',
     });
-    this.fil.add({
-      name: 'recoveryCode',
-      exposed: {
-        onChange: 'onRecoveryCodeChange',
-        error: 'recoveryCodeError',
+    this.il.add(
+      {
+        name: 'recoveryCode',
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('recoveryCode')],
+        InputComponent: FormCodeInput,
+        converter: {
+          fromView: (([e], { storedValue }) => (
+            (
+              !e.target.value
+              || (isAllDigital(e.target.value) && e.target.value.length <= 6)
+            ) ? e.target.value : storedValue)
+          ),
+        },
+        extraGetProps: displayErrorFromPropsForTextField('recoveryCodeError'),
+        validate: value => assert(value, null),
       },
-      converter: {
-        fromView: (({ valueInState }, e) => (
-          (
-            !e.target.value
-            || (isAllDigital(e.target.value) && e.target.value.length <= 6)
-          ) ? e.target.value : valueInState)
-        ),
-      },
-      getProps: FormTextFieldGetProps,
-      validate: value => assert(value, null),
-    });
+    );
 
-    this.state = this.fil.mergeInitState({
-      fil: this.fil,
-    });
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (state.fil) {
-      return state.fil.derivedFromProps(props, state);
-    }
-
-    // No state update necessary
-    return null;
+    this.state = this.il.mergeInitState({});
   }
 
   handleEnterForTextField = (event) => {
@@ -104,15 +105,11 @@ class EnterRecovryCode extends React.Component {
   };
 
   challengeRecoveryToken = () => {
-    const {
-      recoveringUsername,
-    } = this.props;
+    const { recoveringUsername } = this.props;
 
-    const {
-      recoveryCode,
-    } = this.fil.getOutputs();
+    const { recoveryCode } = this.il.getOutputs();
 
-    if (this.fil.validate()) {
+    if (this.il.validate()) {
       this.props.onChallenge({
         username: recoveringUsername,
         code: recoveryCode,
@@ -127,16 +124,13 @@ class EnterRecovryCode extends React.Component {
       onResend,
     } = this.props;
 
-    const {
-      recoveryCode,
-    } = this.fil.getOutputs();
+    const { recoveryCode } = this.il.getOutputs();
 
     const translate = translateMessages.bind(null, intl, messages);
     const translated = translateMessages(intl, messages, [
       'username',
       'sendCode',
       'resendCode',
-      'recoveryCode',
       'enterCode',
     ]);
 
@@ -177,12 +171,7 @@ class EnterRecovryCode extends React.Component {
           <FormSpace variant="content2" />
           <FormSpace variant="content2" />
           <FormSpace variant="content2" />
-          <FormCodeInput
-            label={translated.recoveryCode}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .getPropsForInputField('recoveryCode', { translate })}
-          />
+          {this.il.renderComponent('recoveryCode', { translate })}
           <FormSpace variant="content2" />
           <FormSpace variant="content2" />
           <div className={classes.flexContainer}>
@@ -220,4 +209,4 @@ export default compose(
   }),
   injectIntl,
   withStyles(styles),
-)(EnterRecovryCode);
+)(EnterRecoveryCode);

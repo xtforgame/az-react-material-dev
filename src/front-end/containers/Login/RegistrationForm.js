@@ -10,16 +10,21 @@ import {
   FormSpace,
   FormContent,
   FormPhoneOrEmailInput,
+  // FormTextField,
   FormPasswordInput,
-  FormCheckbox,
+  // FormCheckbox,
   InternalLink as Link,
 } from '~/components/FormInputs';
 
-import FormInputLinker, {
-  FormTextFieldGetProps,
-  FormPasswordVisibilityGetProps,
+import InputLinker from '~/utils/InputLinker';
+import {
+  FormTextFieldPreset,
+  displayErrorFromPropsForTextField,
+  FormPasswordVisibilityPreset,
+  FormCheckboxPreset,
   assert,
-} from '~/utils/FormInputLinker';
+  translateLabelAndAddOnKeyPressEvent,
+} from '~/utils/InputLinker/helpers';
 
 import SuccessButton from '~/components/Buttons/SuccessButton';
 
@@ -31,69 +36,63 @@ import {
 class RegistrationForm extends React.Component {
   constructor(props) {
     super(props);
-    this.fil = new FormInputLinker(this, {
+    this.il = new InputLinker(this, {
       namespace: 'register',
     });
-    this.fil.add({
-      name: 'username',
-      exposed: {
-        onChange: 'onUsernameChange',
-        value: 'username',
-        error: 'usernameError',
-      },
-      converter: {
-        toView: (valueInState => (valueInState && valueInState.rawInput) || ''),
-        fromView: ((_, value) => value),
-        toOutput: (value => value && value.value),
-      },
-      getProps: (__, _) => ({
-        ...FormTextFieldGetProps(__, _),
-        placeholder: _.translate('usernameEmptyError', {
-          emailAddress: { key: 'emailAddress' },
-          phoneNumber: { key: 'phoneNumber' },
-        }),
-      }),
-      validate: value => assert(value && value.type, null, {
-        key: 'usernameEmptyError',
-        values: {
-          emailAddress: { key: 'emailAddress' },
-          phoneNumber: { key: 'phoneNumber' },
+    this.il.add(
+      {
+        name: 'username',
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
+        InputComponent: FormPhoneOrEmailInput,
+        props: { enablePhone: false },
+        handledByProps: {
+          value: 'username',
+          onChange: 'onUsernameChange',
         },
-      }),
-    }, {
-      name: 'password',
-      exposed: {
-        onChange: 'onPasswordChange',
-        error: 'passwordError',
+        converter: {
+          toView: (value => (value && value.rawInput) || ''),
+          fromView: (([value]) => value),
+          toOutput: (value => value && value.value),
+        },
+        extraGetProps: [
+          displayErrorFromPropsForTextField('passwordError', () => undefined),
+          (props, linkInfo, { translate }) => ({
+            ...props,
+            placeholder: translate('usernameEmptyError', {
+              emailAddress: { key: 'emailAddress' },
+              phoneNumber: { key: 'phoneNumber' },
+            }),
+          }),
+        ],
+        validate: value => assert(value && value.type, null, {
+          key: 'usernameEmptyError',
+          values: {
+            emailAddress: { key: 'emailAddress' },
+            phoneNumber: { key: 'phoneNumber' },
+          },
+        }),
       },
-      getProps: FormTextFieldGetProps,
-      validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
-    }, {
-      name: 'password-visibility',
-      defaultValue: false,
-      getProps: FormPasswordVisibilityGetProps,
-      converter: {
-        fromView: (({ valueInState }) => !valueInState),
+      {
+        name: 'password',
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password', this.handleEnterForTextField)],
+        InputComponent: FormPasswordInput,
+        extraGetProps: displayErrorFromPropsForTextField('passwordError'),
+        validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
       },
-    });
+      {
+        name: 'passwordVisibility',
+        presets: [FormPasswordVisibilityPreset],
+        defaultValue: false,
+      },
+      {
+        name: 'agreed',
+        presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent(undefined, this.handleEnterForTextField)],
+        props: { dense: 'true', color: 'primary' },
+        defaultValue: false,
+      }
+    );
 
-    this.state = this.fil.mergeInitState({
-      fil: this.fil,
-      agreed: false,
-    });
-  }
-
-  onAgreementChange = () => {
-    this.setState({ agreed: !this.state.agreed });
-  };
-
-  static getDerivedStateFromProps(props, state) {
-    if (state.fil) {
-      return state.fil.derivedFromProps(props, state);
-    }
-
-    // No state update necessary
-    return null;
+    this.state = this.il.mergeInitState({});
   }
 
   handleSubmit = () => {
@@ -105,9 +104,10 @@ class RegistrationForm extends React.Component {
     const {
       username,
       password,
-    } = this.fil.getOutputs();
+    } = this.il.getOutputs();
 
-    if ((!comfirmUserAgreement || this.state.agreed) && this.fil.validate()) {
+    const agreed = this.il.getValue('agreed');
+    if ((!comfirmUserAgreement || agreed) && this.il.validate()) {
       onSubmit(username, password);
     }
   }
@@ -125,10 +125,9 @@ class RegistrationForm extends React.Component {
       comfirmUserAgreement = false,
       classes,
     } = this.props;
+    const agreed = this.il.getValue('agreed');
     const translate = translateMessages.bind(null, intl, messages);
     const translated = translateMessages(intl, messages, [
-      'username',
-      'password',
       'createAccount',
       'createAccountV',
       'terms',
@@ -167,33 +166,19 @@ class RegistrationForm extends React.Component {
       <div>
         <FormSpace variant="top" />
         <FormContent>
-          <FormPhoneOrEmailInput
-            enablePhone={false}
-            label={translated.username}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .getPropsForInputField('username', { translate })}
-          />
+          {this.il.renderComponent('username', { translate })}
           <FormSpace variant="content1" />
-          <FormPasswordInput
-            label={translated.password}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .getPropsForInputField('password', { translate })}
-            {...this.fil
-              .getPropsForInputField('password-visibility', { translate })}
-          />
+          {this.il.renderComponent('password', {
+            translate,
+            extraProps: this.il.renderProps('passwordVisibility', { translate }),
+          })}
           <FormSpace variant="content2" />
           {
             !!comfirmUserAgreement && (
-              <FormCheckbox
-                dense="true"
-                color="primary"
-                checked={this.state.agreed}
-                onChange={this.onAgreementChange}
-                label={userAgreementLabel}
-                onKeyPress={this.handleEnterForTextField}
-              />
+              this.il.renderComponent('agreed', {
+                translate,
+                extraProps: { label: userAgreementLabel },
+              })
             )
           }
           <FormSpace variant="content2" />
@@ -204,7 +189,7 @@ class RegistrationForm extends React.Component {
             variant="contained"
             fullWidth
             color="primary"
-            disabled={comfirmUserAgreement && !this.state.agreed}
+            disabled={comfirmUserAgreement && !agreed}
             className={classes.loginBtn}
             onClick={this.handleSubmit}
           >

@@ -16,11 +16,14 @@ import {
   FormPasswordInput,
 } from '~/components/FormInputs';
 
-import FormInputLinker, {
-  FormTextFieldGetProps,
-  FormPasswordVisibilityGetProps,
+import InputLinker from '~/utils/InputLinker';
+import {
+  FormTextFieldPreset,
+  displayErrorFromPropsForTextField,
+  FormPasswordVisibilityPreset,
+  FormCheckboxPreset,
   assert,
-} from '~/utils/FormInputLinker';
+} from '~/utils/InputLinker/helpers';
 import {
   isValidPassword,
 } from 'common/utils/validators';
@@ -51,47 +54,48 @@ class ResetPassword extends React.Component {
 
   constructor(props) {
     super(props);
-    this.fil = new FormInputLinker(this, {
+    const translateLabelAndAddOnKeyPressEvent = i18nKey => ({
+      extraGetProps: (props, { link: { owner } }, { translate }) => ({
+        ...props,
+        onKeyPress: owner.handleEnterForTextField,
+        label: i18nKey && translate(i18nKey),
+      }),
+    });
+
+    this.il = new InputLinker(this, {
       namespace: 'reset-password',
     });
-    this.fil.add({
-      name: 'password',
-      exposed: {
-        onChange: 'onPasswordChange',
+    this.il.add(
+      {
+        name: 'password',
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('enterNewPassword')],
+        InputComponent: FormPasswordInput,
+        extraGetProps: displayErrorFromPropsForTextField('passwordError'),
+        validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
       },
-      getProps: FormTextFieldGetProps,
-      validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
-    }, {
-      name: 'confrimPassword',
-      getProps: FormTextFieldGetProps,
-      validate: (value) => {
-        const {
-          password,
-          confrimPassword,
-        } = this.fil.getOutputs();
-        assert(password === confrimPassword, null, { key: 'confirmPasswordError' });
+      {
+        name: 'confrimPassword',
+        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('reenterNewPassword')],
+        InputComponent: FormPasswordInput,
+        extraGetProps: displayErrorFromPropsForTextField('passwordError'),
+        validate: (value) => {
+          const {
+            password,
+            confrimPassword,
+          } = this.il.getOutputs();
+          assert(password === confrimPassword, null, { key: 'confirmPasswordError' });
+        },
       },
-    }, {
-      name: 'password-visibility',
-      defaultValue: false,
-      getProps: FormPasswordVisibilityGetProps,
-      converter: {
-        fromView: (({ valueInState }) => !valueInState),
+      {
+        name: 'passwordVisibility',
+        presets: [FormPasswordVisibilityPreset],
+        defaultValue: false,
       },
+    );
+
+    this.state = this.il.mergeInitState({
+      fil: this.il,
     });
-
-    this.state = this.fil.mergeInitState({
-      fil: this.fil,
-    });
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (state.fil) {
-      return state.fil.derivedFromProps(props, state);
-    }
-
-    // No state update necessary
-    return null;
   }
 
   handleEnterForTextField = (event) => {
@@ -109,9 +113,9 @@ class ResetPassword extends React.Component {
 
     const {
       password,
-    } = this.fil.getOutputs();
+    } = this.il.getOutputs();
 
-    if (this.fil.validate()) {
+    if (this.il.validate()) {
       this.props.onResetPassword({
         username: recoveringUsername,
         code: recoveringCode,
@@ -129,12 +133,10 @@ class ResetPassword extends React.Component {
 
     const {
       password,
-    } = this.fil.getOutputs();
+    } = this.il.getOutputs();
 
     const translate = translateMessages.bind(null, intl, messages);
     const translated = translateMessages(intl, messages, [
-      'enterNewPassword',
-      'reenterNewPassword',
       'setNewPassword',
       'resetPassword',
     ]);
@@ -154,23 +156,15 @@ class ResetPassword extends React.Component {
               </React.Fragment>
             )
           }
-          <FormPasswordInput
-            label={translated.enterNewPassword}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .getPropsForInputField('password', { translate })}
-            {...this.fil
-              .getPropsForInputField('password-visibility', { translate })}
-          />
+          {this.il.renderComponent('password', {
+            translate,
+            extraProps: this.il.renderProps('passwordVisibility', { translate }),
+          })}
           <FormSpace variant="content4" />
-          <FormPasswordInput
-            label={translated.reenterNewPassword}
-            onKeyPress={this.handleEnterForTextField}
-            {...this.fil
-              .getPropsForInputField('confrimPassword', { translate })}
-            {...this.fil
-              .getPropsForInputField('password-visibility', { translate })}
-          />
+          {this.il.renderComponent('confrimPassword', {
+            translate,
+            extraProps: this.il.renderProps('passwordVisibility', { translate }),
+          })}
           <FormSpace variant="content4" />
           <div className={classes.flexContainer}>
             <div className={classes.flex1} />

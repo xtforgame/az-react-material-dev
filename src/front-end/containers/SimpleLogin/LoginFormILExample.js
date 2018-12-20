@@ -42,7 +42,7 @@ class LoginForm extends React.Component {
       [FormTextFieldPreset, cfg => ({
         ...cfg,
         name: 'username',
-        // onChange: (value, [e], { ownerProps }) => {
+        // onChange: (value, [e], { link: { ownerProps } }) => {
         //   ownerProps.onUsernameChange(e.target.value);
         // },
         handledByProps: {

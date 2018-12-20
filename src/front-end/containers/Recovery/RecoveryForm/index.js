@@ -6,8 +6,8 @@ import { push } from 'react-router-redux';
 import { injectIntl } from 'react-intl';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import SendRecovryCode from './SendRecovryCode';
-import EnterRecovryCode from './EnterRecovryCode';
+import SendRecoveryCode from './SendRecoveryCode';
+import EnterRecoveryCode from './EnterRecoveryCode';
 import ResetCompleted from './ResetCompleted';
 import ResetPassword from './ResetPassword';
 import { messages } from '~/containers/App/translation';
@@ -61,12 +61,11 @@ class RecoveryForm extends React.Component {
 
   handleCodeSent = ({
     recoveringUsername,
-    remainingTime,
+    nextTimeToSend,
   }) => {
     this.setState({
       recoveringUsername,
-      lastUpdatedTime: new Date().getTime(),
-      remainingTime,
+      nextTimeToSend,
       lastSentUsername: recoveringUsername,
     });
   }
@@ -153,8 +152,7 @@ class RecoveryForm extends React.Component {
       recoveringUsername,
       recoveringCode,
       lastSentUsername,
-      lastUpdatedTime = 0,
-      remainingTime = 0,
+      nextTimeToSend = 0,
       recoveryCodeError,
       resetCompleted,
     } = this.state;
@@ -176,7 +174,7 @@ class RecoveryForm extends React.Component {
       );
     } else if (recoveringUsername) {
       return (
-        <EnterRecovryCode
+        <EnterRecoveryCode
           recoveringUsername={recoveringUsername}
           onResend={this.handleResend}
           onChallenge={this.handleChallenge}
@@ -185,13 +183,12 @@ class RecoveryForm extends React.Component {
       );
     }
     return (
-      <SendRecovryCode
+      <SendRecoveryCode
         onUsernameChange={onUsernameChange}
         username={username}
         usernameError={usernameError}
         lastSentUsername={lastSentUsername}
-        lastUpdatedTime={lastUpdatedTime}
-        remainingTime={remainingTime}
+        nextTimeToSend={nextTimeToSend}
         onCodeSent={this.handleCodeSent}
         onBackToEnterTheCode={this.handleBackToEnterTheCode}
       />
