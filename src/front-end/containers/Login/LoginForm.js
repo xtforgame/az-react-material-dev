@@ -11,7 +11,6 @@ import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
-  FormPhoneOrEmailInput,
   FormPasswordInput,
 } from '~/components/FormInputs';
 
@@ -21,6 +20,7 @@ import {
   displayErrorFromPropsForTextField,
   FormPasswordVisibilityPreset,
   FormCheckboxPreset,
+  FormPhoneOrEmailInputPreset,
   assert,
   translateLabelAndAddOnKeyPressEvent,
 } from '~/utils/InputLinker/helpers';
@@ -42,17 +42,10 @@ class LoginForm extends React.Component {
     this.il.add(
       {
         name: 'username',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
-        InputComponent: FormPhoneOrEmailInput,
-        props: { enablePhone: false },
+        presets: [FormPhoneOrEmailInputPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
         handledByProps: {
           value: 'username',
           onChange: 'onUsernameChange',
-        },
-        converter: {
-          toView: (value => (value && value.rawInput) || ''),
-          fromView: (([value]) => value),
-          toOutput: (value => value && value.value),
         },
         extraGetProps: [
           displayErrorFromPropsForTextField('passwordError', () => undefined),

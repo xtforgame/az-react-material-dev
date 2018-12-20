@@ -12,12 +12,11 @@ import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
-  FormPhoneOrEmailInput,
 } from '~/components/FormInputs';
 
 import InputLinker from '~/utils/InputLinker';
 import {
-  FormTextFieldPreset,
+  FormPhoneOrEmailInputPreset,
   displayErrorFromPropsForTextField,
   assert,
   translateLabelAndAddOnKeyPressEvent,
@@ -51,17 +50,10 @@ class SendRecoveryCode extends React.Component {
     this.il.add(
       {
         name: 'username',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
-        InputComponent: FormPhoneOrEmailInput,
-        props: { enablePhone: false },
+        presets: [FormPhoneOrEmailInputPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
         handledByProps: {
           value: 'username',
           onChange: 'onUsernameChange',
-        },
-        converter: {
-          toView: (value => (value && value.rawInput) || ''),
-          fromView: (([value]) => value),
-          toOutput: (value => value && value.value),
         },
         extraGetProps: [
           displayErrorFromPropsForTextField('passwordError', () => undefined),
@@ -80,7 +72,7 @@ class SendRecoveryCode extends React.Component {
             phoneNumber: { key: 'phoneNumber' },
           },
         }),
-      }
+      },
     );
 
     const now = new Date().getTime();
