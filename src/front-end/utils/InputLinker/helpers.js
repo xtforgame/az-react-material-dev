@@ -29,6 +29,7 @@ export const FormTextFieldGetProps = (props, {
   return {
     ...props,
     id: link.key,
+    key: link.key,
     value,
     onChange: handleChange,
     error: !!validateErrorMessage,
@@ -71,6 +72,7 @@ export const FormTextInputGetProps = (props, {
   return {
     ...props,
     id: link.key,
+    key: link.key,
     value,
     onChange: handleChange,
     formProps: {
@@ -113,6 +115,7 @@ export const FormCheckboxGetProps = (props, {
 { translate } = {}) => ({
   ...props,
   id: link.key,
+  key: link.key,
   onChange: handleChange,
   checked: value,
 });
@@ -153,10 +156,31 @@ export const FormPhoneOrEmailInputPreset = {
   }),
 };
 
-export const translateLabelAndAddOnKeyPressEvent = (i18nKey, onKeyPress = (() => {})) => ({
+export const translateLabel = i18nKey => ({
+  extraGetProps: (props, { link: { owner } }, { translate }) => ({
+    ...props,
+    label: i18nKey && translate(i18nKey),
+  }),
+});
+
+export const addOnKeyPressEvent = (onKeyPress = undefined) => ({
+  extraGetProps: (props, { link: { owner } }, { translate }) => ({
+    ...props,
+    onKeyPress,
+  }),
+});
+
+export const translateLabelAndAddOnKeyPressEvent = (i18nKey, onKeyPress = undefined) => ({
   extraGetProps: (props, { link: { owner } }, { translate }) => ({
     ...props,
     onKeyPress,
     label: i18nKey && translate(i18nKey),
   }),
+});
+
+export const propagateOnChangeEvent = (parentOnChangePropName = 'onChange') => ({
+  onChange: (value, rawArgs, { link: { name, linker, ownerProps } }) => {
+    const onChange = ownerProps[parentOnChangePropName] || (() => {});
+    onChange(name, value, rawArgs, linker);
+  },
 });

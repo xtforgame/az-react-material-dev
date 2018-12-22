@@ -12,17 +12,20 @@ export class Converter {
 const toArray = value => (Array.isArray(value) ? value : [value].filter(i => i));
 
 export class FieldLink {
-  constructor(linker, cfg) {
+  constructor(linker, config) {
     this.linker = linker;
+    this.config = config;
+    this.childLinks = [];
     this._owner = this.linker.component;
     this.namespace = this.linker.namespace;
-    this.name = cfg.name;
+    this.name = config.name;
     this.uniqueName = this.namespace ? `${this.namespace}-${this.name}` : this.name;
     this.key = this.uniqueName;
-    this.defaultValue = cfg.defaultValue;
-    this.InputComponent = cfg.InputComponent;
+    this.defaultValue = config.defaultValue;
+    this.InputComponent = config.InputComponent;
+    this.options = config.options || {};
 
-    this.handledByProps = cfg.handledByProps;
+    this.handledByProps = config.handledByProps;
     if (this.handledByProps) {
       if (!this.handledByProps.value || !this.handledByProps.onChange) {
         throw new Error('Wrong options: handledByProps');
@@ -43,15 +46,15 @@ export class FieldLink {
       }
     }
 
-    this.converter = new Converter(cfg.converter);
+    this.converter = new Converter(config.converter);
 
-    this._validate = cfg.validate;
-    this._getPropsMiddlewares = toArray(cfg.getProps);
-    this.props = cfg.props;
-    this.data = cfg.data;
+    this._validate = config.validate;
+    this._getPropsMiddlewares = toArray(config.getProps);
+    this.props = config.props;
+    this.data = config.data;
 
-    this.onChange = cfg.onChange || (() => {});
-    this.onValidateError = cfg.onValidateError || (() => {});
+    this.onChange = config.onChange || (() => {});
+    this.onValidateError = config.onValidateError || (() => {});
 
     this.visible = true;
 
@@ -69,10 +72,23 @@ export class FieldLink {
     }
   }
 
+  addChild(...children) {
+    this.childLinks.push(...children);
+  }
+
+  // handlers
+  handleChange = (...rawArgs) => {
+    const storedValue = this.getValue();
+    const linkInfo = { storedValue, link: this };
+    const value = this.converter.fromView(rawArgs, linkInfo);
+    this.onChange(value, rawArgs, linkInfo);
+    this.setValue(value, rawArgs);
+  };
+
   getProps = (initProps, linkInfo, options) => this._getPropsMiddlewares.reduce(
     (props, m) => (typeof m === 'function' ? m(props, linkInfo, options) : { ...props, ...m }),
     initProps
-  )
+  );
 
   get owner() { return this._owner; }
 
@@ -91,78 +107,75 @@ export default class InputLinker {
     this.namespace = namespace;
     this.fieldStateName = fieldStateName;
     this.fieldErrorStateName = fieldErrorStateName;
-    this.fieldLinks = {};
+    this.fieldMap = {};
   }
 
   getPreset = preset => preset;
 
-  add(...cfgs) {
+  add(...configs) {
     const evaluateConfig = (currentCfg, c) => {
-      let cfg;
+      let config;
       if (typeof c === 'function') {
-        cfg = c(currentCfg);
+        config = c(currentCfg);
       } else {
-        cfg = currentCfg;
-        const { preset, presets } = c;
-        if (preset) {
-          cfg = toArray(preset).map(this.getPreset).reduce(evaluateConfig, currentCfg);
-        }
-        if (presets) {
-          cfg = toArray(presets).map(this.getPreset).reduce(evaluateConfig, currentCfg);
-        }
-        const evaluateFunction = c.evaluate || (_cfg => ({ ..._cfg, ...c }));
-        cfg = evaluateFunction(cfg);
-        delete cfg.preset;
-        delete cfg.presets;
-        delete cfg.evaluate;
+        config = currentCfg;
+        const { preset, presets, evaluate = _config => ({ ..._config, ...c }) } = c;
+        config = toArray(preset).concat(toArray(presets)).concat(toArray(evaluate))
+          .map(this.getPreset)
+          .reduce(evaluateConfig, config);
+
+        delete config.preset;
+        delete config.presets;
+        delete config.evaluate;
       }
-      if (!cfg) {
+      if (!config) {
         console.error('Wrong config', c);
         throw new Error('Wrong config');
       }
-      cfg.getProps = toArray(cfg.getProps);
-      if (cfg.extraGetProps) {
-        cfg.extraGetProps = toArray(cfg.extraGetProps);
-        cfg.getProps.push(...cfg.extraGetProps);
-        delete cfg.extraGetProps;
+      config.getProps = toArray(config.getProps);
+      if (config.extraGetProps) {
+        config.extraGetProps = toArray(config.extraGetProps);
+        config.getProps.push(...config.extraGetProps);
+        delete config.extraGetProps;
       }
-      return cfg;
+      if (config.extraChildLinks) {
+        config.extraChildLinks = toArray(config.extraChildLinks);
+        config.childLinks.push(...config.extraChildLinks);
+        delete config.extraChildLinks;
+      }
+      return config;
     };
-    cfgs.forEach((_c) => {
+    return configs.map((_c) => {
       const configChain = toArray(_c);
-      let cfg = { getProps: [(_, { link }) => link.props] };
-      cfg = configChain.reduce(evaluateConfig, cfg);
-      this.fieldLinks[cfg.name] = new FieldLink(this, cfg);
+      let config = { getProps: [(_, { link }) => link.props], childLinks: [] };
+      config = configChain.reduce(evaluateConfig, config);
+      const fieldLink = this.fieldMap[config.name] = new FieldLink(this, config); // eslint-disable-line no-multi-assign
+      if (config.childLinks) {
+        fieldLink.addChild(...this.add(...config.childLinks));
+      }
+      return fieldLink;
     });
   }
 
-  getField(fieldName) {
-    return this.fieldLinks[fieldName];
-  }
+  getField = fieldName => this.fieldMap[fieldName];
 
-  getFields() {
-    return this.fieldLinks;
-  }
+  getFields = () => this.fieldMap;
 
-  getValue(fieldName) {
-    return this.fieldLinks[fieldName].getValue();
-  }
+  getValue = fieldName => this.fieldMap[fieldName].getValue();
 
-  getValues() {
+  getValues = () => {
     const values = {};
-    Object.keys(this.fieldLinks).forEach((fieldName) => {
+    Object.keys(this.fieldMap).forEach((fieldName) => {
       values[fieldName] = this.getValue(fieldName);
     });
     return values;
   }
 
-  getOutput(fieldName) {
-    return this.fieldLinks[fieldName].getOutput();
-  }
+  getOutput = fieldName => this.fieldMap[fieldName].getOutput()
 
-  getOutputs() {
+  getOutputs = () => {
     const values = {};
-    Object.keys(this.fieldLinks).forEach((fieldName) => {
+    Object.keys(this.fieldMap).forEach((fieldName) => {
       const output = this.getOutput(fieldName);
       if (output !== undefined) {
         values[fieldName] = output;
@@ -171,29 +184,28 @@ export default class InputLinker {
     return values;
   }
 
-  remove(...fieldNames) {
-    fieldNames.forEach((fieldName) => {
-      delete this.fieldLinks[fieldName];
-    });
-  }
+  getFieldsFromState = targetState => (targetState || this.component.state)[this.fieldStateName];
 
-  // ==========================
+  getValueFromState = (fieldName, targetState) => this.getFieldsFromState(targetState)[fieldName];
 
-  getFieldsFromState(targetState) {
-    return (targetState || this.component.state)[this.fieldStateName];
-  }
+  getErrorsFromState = targetState => (targetState || this.component.state)[this.fieldErrorStateName];
 
-  getValueFromState(fieldName, targetState) {
-    return this.getFieldsFromState(targetState)[fieldName];
-  }
+  getErrorFromState = (fieldName, targetState) => this.getErrorsFromState(targetState)[fieldName];
 
-  getErrorsFromState(targetState) {
-    return (targetState || this.component.state)[this.fieldErrorStateName];
-  }
+  _getUpdatedStateForResetError = (fieldName, targetState) => ({
+    [this.fieldErrorStateName]: {
+      ...this.getErrorsFromState(targetState),
+      [fieldName]: undefined,
+    },
+  });
 
-  getErrorFromState(fieldName, targetState) {
-    return this.getErrorsFromState(targetState)[fieldName];
-  }
+  _getUpdatedState = (fieldName, value, targetState) => ({
+    [this.fieldStateName]: {
+      ...this.getFieldsFromState(targetState),
+      [fieldName]: value,
+    },
+    [this.fieldErrorStateName]: this._getUpdatedStateForResetError(fieldName, targetState),
+  });
 
   mergeInitState(state = {}) {
     const newState = {
@@ -201,43 +213,21 @@ export default class InputLinker {
       [this.fieldStateName]: { ...state[this.fieldStateName] },
       [this.fieldErrorStateName]: { ...state[this.fieldErrorStateName] },
     };
-    Object.keys(this.fieldLinks).forEach((fieldName) => {
-      const field = this.fieldLinks[fieldName];
+    Object.keys(this.fieldMap).forEach((fieldName) => {
+      const field = this.fieldMap[fieldName];
       if (!field.handledByProps) {
-        newState[this.fieldStateName][fieldName] = this.fieldLinks[fieldName].defaultValue;
+        newState[this.fieldStateName][fieldName] = this.fieldMap[fieldName].defaultValue;
       }
       newState[this.fieldErrorStateName][fieldName] = undefined;
     });
     return newState;
   }
 
-  _getUpdatedStateForResetError(fieldName, targetState) {
-    return {
-      [this.fieldErrorStateName]: {
-        ...this.getErrorsFromState(targetState),
-        [fieldName]: undefined,
-      },
-    };
-  }
-
-  _getUpdatedState(fieldName, value, targetState) {
-    return {
-      [this.fieldStateName]: {
-        ...this.getFieldsFromState(targetState),
-        [fieldName]: value,
-      },
-      [this.fieldErrorStateName]: {
-        ...this.getErrorsFromState(targetState),
-        [fieldName]: undefined,
-      },
-    };
-  }
-
-  validate() {
+  validate(keepErrors = true) {
     let passed = true;
     const newErrorState = {};
-    Object.keys(this.fieldLinks).forEach((fieldName) => {
-      const field = this.fieldLinks[fieldName];
+    Object.keys(this.fieldMap).forEach((fieldName) => {
+      const field = this.fieldMap[fieldName];
       if (field._validate) {
         let error;
         try {
@@ -254,7 +244,7 @@ export default class InputLinker {
       }
     });
 
-    if (!passed) {
+    if (!passed && keepErrors) {
       this.component.setState({
         [this.fieldErrorStateName]: {
           ...this.getErrorsFromState(),
@@ -267,31 +257,27 @@ export default class InputLinker {
 
   getErrorStatus = fieldName => ({ validateError: this.getErrorFromState(fieldName) });
 
-  // handlers
-  handleChange = field => (...rawArgs) => {
-    const storedValue = field.getValue();
-    const linkInfo = { storedValue, link: field };
-    const value = field.converter.fromView(rawArgs, linkInfo);
-    field.onChange(value, rawArgs, linkInfo);
-    field.setValue(value, rawArgs);
-  };
-
   // render helpers
   renderProps = (fieldName, options = {}) => {
     const props = options.props || {};
-    const field = this.fieldLinks[fieldName];
+    const field = this.fieldMap[fieldName];
     const { validateError } = this.getErrorStatus(fieldName);
 
-    return field.getProps(props, {
+    const myProps = field.getProps(props, {
       value: field.getViewValue(),
       link: field,
-      handleChange: this.handleChange(field),
+      handleChange: field.handleChange,
       validateError,
     }, options);
+    const { childLinks } = field;
+    return childLinks.reduce((props, childLink) => ({
+      ...props,
+      ...this.renderProps(childLink.name, options),
+    }), myProps);
   };
 
   renderComponent = (fieldName, options = {}) => {
-    const field = this.fieldLinks[fieldName];
+    const field = this.fieldMap[fieldName];
     const { InputComponent } = field;
     if (!InputComponent) {
       throw new Error(`No InputComponent provided :${field.name}`);
