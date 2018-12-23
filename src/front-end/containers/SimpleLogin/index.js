@@ -1,19 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
-import { injectIntl, FormattedMessage } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
-import formatMessage from '~/utils/formatMessage';
+import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
+import translateMessages from '~/utils/translateMessages';
 import {
   Redirect,
 } from 'react-router-dom';
 import {
   rememberMe,
 } from '../App/actions';
-import { messages } from '../App/translation';
 import Typography from '@material-ui/core/Typography';
 import LocaleDropdown from '~/containers/LocaleDropdown';
 
@@ -23,10 +24,18 @@ import createCommonStyles from '~/styles/common';
 import createFormPaperStyle from '~/styles/FormPaper';
 
 import SwipeableViews from 'react-swipeable-views';
-import LoginForm from './LoginForm';
-import RegistrationForm from './RegistrationForm';
 
 import { createStructuredSelector } from 'reselect';
+
+import {
+  FormContent,
+} from '~/components/FormInputs';
+import LoginForm from '~/containers/LoginForms/LoginForm';
+import RegistrationForm from '~/containers/LoginForms/RegistrationForm';
+import createSimpleLoginInputConfigs from '~/containers/LoginForms/createSimpleLoginInputConfigs';
+import createSimpleRegistrationInputConfigs from '~/containers/LoginForms/createSimpleRegistrationInputConfigs';
+import { messages } from '~/containers/App/translation';
+
 import modelMap from '~/containers/App/modelMap';
 import {
   makeUserSessionSelector,
@@ -71,69 +80,62 @@ class Login extends React.PureComponent {
     this.setState({ tabIndex });
   };
 
-  render() {
-    const {
-      location, intl, postSessions, postUsers, session, rememberUser, classes,
-    } = this.props;
-    let fromPath = location.state && location.state.from.pathname;
-    const wrongUsernameOrPassword = formatMessage(intl, messages.wrongUsernameOrPassword, {});
-    const usernameIsTaken = formatMessage(intl, messages.usernameIsTaken, {});
 
-    if (session) {
-      fromPath = fromPath || '/';
-      return (
-        <Redirect to={{
-          pathname: fromPath,
-        }}
-        />
-      );
-    }
+  login = ({ username, password, rememberMe }) => {
+    const { postSessions, rememberMe: remember } = this.props;
+    remember(rememberMe);
+    // popup('/auth-popup.html');
+    // return ;
+    postSessions({
+      auth_type: 'basic',
+      username,
+      password,
+    })
+    .catch((action) => {
+      this.setState({
+        loginError: action.data.error,
+      });
+    });
+  };
 
-    const login = (username, password, rememberUser) => {
-      const { rememberMe } = this.props;
-      rememberMe(rememberUser);
-      // popup('/auth-popup.html');
-      // return ;
-      postSessions({
+  register = ({ username, password }) => {
+    const { postUsers } = this.props;
+    postUsers({
+      name: username,
+      privilege: 'admin',
+      accountLinks: [{
         auth_type: 'basic',
         username,
         password,
-      })
-      .catch((action) => {
-        this.setState({
-          loginError: action.data.error,
-        });
+      }],
+    })
+    .catch((action) => {
+      this.setState({
+        postUsersError: action.data.error,
       });
-    };
+    });
+  };
 
-    const register = (username, password) => {
-      postUsers({
-        name: username,
-        privilege: 'admin',
-        accountLinks: [{
-          auth_type: 'basic',
-          username,
-          password,
-        }],
-      })
-      .catch((action) => {
-        this.setState({
-          postUsersError: action.data.error,
-        });
-      });
-    };
+  render() {
+    const {
+      location, intl, session, classes,
+    } = this.props;
+    let fromPath = location.state && location.state.from.pathname;
+    const translated = translateMessages(intl, messages, [
+      'login',
+      'wrongUsernameOrPassword',
+      'usernameIsTaken',
+      'createAccount',
+      'forgotPasswordQuestion',
+    ]);
 
-    let title = null;
-    switch (this.state.tabIndex) {
-      case 0:
-        title = <FormattedMessage {...messages.login} />;
-        break;
-
-      case 1:
-        title = <FormattedMessage {...messages.createAccount} />;
-        break;
-      default:
+    if (session) {
+      fromPath = fromPath || '/';
+      return <Redirect to={{ pathname: fromPath }} />;
     }
+
+    const titles = [translated.login, translated.createAccount, translated.forgotPasswordQuestion];
+    const title = titles[this.state.tabIndex];
 
     return (
       <div className={classes.flexContainerFH}>
@@ -158,21 +160,30 @@ class Login extends React.PureComponent {
             disabled
           >
             <LoginForm
+              namespace="login"
+              fields={createSimpleLoginInputConfigs()}
+              i18nMessages={messages}
               username={this.state.username}
               onUsernameChange={username => this.setState({ username })}
               usernameError={this.state.tabIndex === 0 && !!this.state.loginError}
-              passwordError={this.state.tabIndex === 0 && this.state.loginError && wrongUsernameOrPassword}
-              defaultRememberMe={rememberUser}
-              onSubmit={login}
-              handleCreateAccount={() => this.swipeTo(1)}
-            />
+              passwordError={this.state.tabIndex === 0 && this.state.loginError && translated.wrongUsernameOrPassword}
+              onSubmit={this.login}
+            >
+              <Divider />
+              <FormContent>
+                <Button fullWidth className={classes.loginBtn} onClick={() => this.swipeTo(1)}>
+                  {translated.createAccount}
+                </Button>
+              </FormContent>
+            </LoginForm>
             <RegistrationForm
+              namespace="register"
+              fields={createSimpleRegistrationInputConfigs()}
+              i18nMessages={messages}
               username={this.state.username}
-              onUsernameChange={username => this.setState({
-                username,
-              })}
-              usernameError={this.state.tabIndex === 1 && this.state.postUsersError && usernameIsTaken}
-              onSubmit={register}
+              onUsernameChange={username => this.setState({ username })}
+              usernameError={this.state.tabIndex === 1 && this.state.postUsersError && translated.usernameIsTaken}
+              onSubmit={this.register}
               comfirmUserAgreement
             />
           </SwipeableViews>

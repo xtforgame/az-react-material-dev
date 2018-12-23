@@ -29,7 +29,6 @@ export const FormTextFieldGetProps = (props, {
   return {
     ...props,
     id: link.key,
-    key: link.key,
     value,
     onChange: handleChange,
     error: !!validateErrorMessage,
@@ -72,7 +71,6 @@ export const FormTextInputGetProps = (props, {
   return {
     ...props,
     id: link.key,
-    key: link.key,
     value,
     onChange: handleChange,
     formProps: {
@@ -115,7 +113,6 @@ export const FormCheckboxGetProps = (props, {
 { translate } = {}) => ({
   ...props,
   id: link.key,
-  key: link.key,
   onChange: handleChange,
   checked: value,
 });
@@ -173,7 +170,7 @@ export const addOnKeyPressEvent = (onKeyPress = undefined) => ({
 export const translateLabelAndAddOnKeyPressEvent = (i18nKey, onKeyPress = undefined) => ({
   extraGetProps: (props, { link: { owner } }, { translate }) => ({
     ...props,
-    onKeyPress,
+    onKeyPress: typeof onKeyPress === 'string' ? owner[onKeyPress] : onKeyPress,
     label: i18nKey && translate(i18nKey),
   }),
 });

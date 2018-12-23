@@ -133,10 +133,7 @@ class EnterRecoveryCode extends React.PureComponent {
             {...messages.enterRecoveryCodeFor}
             values={{
               accountName: (
-                <a
-                  key="accountName"
-                  className={classes.link}
-                >
+                <a key="accountName" className={classes.link}>
                   {this.props.recoveringUsername}
                 </a>
               ),
@@ -159,11 +156,8 @@ class EnterRecoveryCode extends React.PureComponent {
               </Typography>
             )}
           </FormattedMessage>
-          <FormSpace variant="content2" />
-          <FormSpace variant="content2" />
-          <FormSpace variant="content2" />
+          <FormSpace variant="content8" />
           {this.il.renderComponent('recoveryCode', { translate })}
-          <FormSpace variant="content2" />
           <FormSpace variant="content2" />
           <div className={classes.flexContainer}>
             {onResend && (

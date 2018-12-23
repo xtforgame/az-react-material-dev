@@ -204,7 +204,7 @@ export default class InputLinker {
       ...this.getFieldsFromState(targetState),
       [fieldName]: value,
     },
-    [this.fieldErrorStateName]: this._getUpdatedStateForResetError(fieldName, targetState),
+    ...this._getUpdatedStateForResetError(fieldName, targetState),
   });
 
   mergeInitState(state = {}) {
@@ -259,8 +259,11 @@ export default class InputLinker {
 
   // render helpers
   renderProps = (fieldName, options = {}) => {
-    const props = options.props || {};
     const field = this.fieldMap[fieldName];
+    const props = {
+      key: field.key,
+      ...options.props,
+    };
     const { validateError } = this.getErrorStatus(fieldName);
 
     const myProps = field.getProps(props, {

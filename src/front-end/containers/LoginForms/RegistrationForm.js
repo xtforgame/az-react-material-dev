@@ -1,13 +1,16 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { compose } from 'recompose';
-import { injectIntl } from 'react-intl';
+import { injectIntl, FormattedMessage } from 'react-intl';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import SuccessButton from '~/components/Buttons/SuccessButton';
 
 import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
+  InternalLink as Link,
 } from '~/components/FormInputs';
 
 import InputLinker from '~/utils/InputLinker';
@@ -22,7 +25,7 @@ const styles = theme => ({
   ...createFormPaperStyle(theme),
 });
 
-class SimpleLayout extends React.PureComponent {
+class RegistrationForm extends React.PureComponent {
   constructor(props) {
     super(props);
     const { fields, namespace = '' } = props;
@@ -57,11 +60,49 @@ class SimpleLayout extends React.PureComponent {
       classes,
       i18nMessages,
       i18nTranslate,
-      submitButtonText,
+      comfirmUserAgreement,
       children,
     } = this.props;
     const translate = i18nTranslate
       || (i18nMessages ? translateMessages.bind(null, intl, i18nMessages) : undefined);
+    const translated = translateMessages(intl, i18nMessages, [
+      'terms',
+      'createAccount',
+      'createAccountV',
+      'privacyPolicy',
+    ]);
+
+    const agreedField = this.il.getField('agreed');
+    agreedField.visible = comfirmUserAgreement;
+    const agreed = agreedField.getValue();
+
+    const userAgreementLabel = (
+      <FormattedMessage
+        {...i18nMessages.userAgreement}
+        values={{
+          createAccountV: translated.createAccountV,
+          terms: (<Link key="terms" text={translated.terms} />),
+          privacyPolicy: (<Link key="privacyPolicy" text={translated.privacyPolicy} />),
+        }}
+      >
+        {(...parts) => (
+          <Typography
+            variant="body1"
+            className={classes.textContainer}
+            onClick={(event) => {
+              event.stopPropagation();
+              event.preventDefault();
+            }}
+            onMouseDown={(event) => {
+              event.stopPropagation();
+              event.preventDefault();
+            }}
+          >
+            {parts}
+          </Typography>
+        )}
+      </FormattedMessage>
+    );
 
     return (
       <div>
@@ -72,21 +113,26 @@ class SimpleLayout extends React.PureComponent {
               const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content1" />;
               return (
                 <React.Fragment key={filedLink.name}>
-                  {this.il.renderComponent(filedLink.name, { translate })}
+                  {this.il.renderComponent(filedLink.name, { translate, userAgreementLabel })}
                   {space}
                 </React.Fragment>
               );
             })
           }
-          <Button
+          <FormSpace variant="content2" />
+          {
+            !comfirmUserAgreement && (userAgreementLabel)
+          }
+          <SuccessButton
             variant="contained"
             fullWidth
             color="primary"
+            disabled={comfirmUserAgreement && !agreed}
             className={classes.loginBtn}
             onClick={this.handleSubmit}
           >
-            {submitButtonText}
-          </Button>
+            {translated.createAccount}
+          </SuccessButton>
           <FormSpace variant="content1" />
         </FormContent>
         {children}
@@ -98,4 +144,4 @@ class SimpleLayout extends React.PureComponent {
 export default compose(
   injectIntl,
   withStyles(styles),
-)(SimpleLayout);
+)(RegistrationForm);

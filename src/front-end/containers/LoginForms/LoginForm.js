@@ -22,7 +22,7 @@ const styles = theme => ({
   ...createFormPaperStyle(theme),
 });
 
-class SimpleLayout extends React.PureComponent {
+class LoginForm extends React.PureComponent {
   constructor(props) {
     super(props);
     const { fields, namespace = '' } = props;
@@ -57,11 +57,14 @@ class SimpleLayout extends React.PureComponent {
       classes,
       i18nMessages,
       i18nTranslate,
-      submitButtonText,
+      extraContents,
       children,
     } = this.props;
     const translate = i18nTranslate
       || (i18nMessages ? translateMessages.bind(null, intl, i18nMessages) : undefined);
+    const translated = translateMessages(intl, i18nMessages, [
+      'login',
+    ]);
 
     return (
       <div>
@@ -85,9 +88,10 @@ class SimpleLayout extends React.PureComponent {
             className={classes.loginBtn}
             onClick={this.handleSubmit}
           >
-            {submitButtonText}
+            {translated.login}
           </Button>
           <FormSpace variant="content1" />
+          {extraContents}
         </FormContent>
         {children}
       </div>
@@ -98,4 +102,4 @@ class SimpleLayout extends React.PureComponent {
 export default compose(
   injectIntl,
   withStyles(styles),
-)(SimpleLayout);
+)(LoginForm);

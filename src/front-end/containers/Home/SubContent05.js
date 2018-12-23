@@ -88,8 +88,8 @@ class SubContent02 extends React.PureComponent { // eslint-disable-line react/pr
           fields={fileds}
           username={username}
           onUsernameChange={username => this.setState({ username })}
-          onChange={(...agrs) => { console.log('agrs :', agrs); }}
-          onSubmit={(value) => { console.log('value :', value); }}
+          // onChange={(...agrs) => { console.log('agrs :', agrs); }}
+          // onSubmit={(value) => { console.log('value :', value); }}
           submitButtonText="登入"
           i18nMessages={messages}
         />
