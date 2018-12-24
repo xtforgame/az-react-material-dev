@@ -22,7 +22,8 @@ import {
   displayErrorFromPropsForTextField,
   FormPasswordVisibilityPreset,
   assert,
-  translateLabelAndAddOnKeyPressEvent,
+  translateLabel,
+  addOnPressEnterEvent,
 } from '~/utils/InputLinker/helpers';
 import {
   isValidPassword,
@@ -60,14 +61,14 @@ class ResetPassword extends React.PureComponent {
     this.il.add(
       {
         name: 'password',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('enterNewPassword', this.handleEnterForTextField)],
+        presets: [FormTextFieldPreset, translateLabel('enterNewPassword'), addOnPressEnterEvent(this.resetPassword)],
         InputComponent: FormPasswordInput,
         extraGetProps: displayErrorFromPropsForTextField('passwordError'),
         validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
       },
       {
         name: 'confrimPassword',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('reenterNewPassword', this.handleEnterForTextField)],
+        presets: [FormTextFieldPreset, translateLabel('reenterNewPassword'), addOnPressEnterEvent(this.resetPassword)],
         InputComponent: FormPasswordInput,
         extraGetProps: displayErrorFromPropsForTextField('passwordError'),
         validate: (value) => {
@@ -89,13 +90,6 @@ class ResetPassword extends React.PureComponent {
       fil: this.il,
     });
   }
-
-  handleEnterForTextField = (event) => {
-    if (event.key === 'Enter') {
-      this.resetPassword();
-      event.preventDefault();
-    }
-  };
 
   resetPassword = () => {
     const {

@@ -4,7 +4,7 @@ import {
 } from '~/components/FormInputs';
 import {
   FormCheckboxPreset,
-  translateLabelAndAddOnKeyPressEvent,
+  addOnPressEnterEvent,
 } from '~/utils/InputLinker/helpers';
 
 import {
@@ -22,9 +22,10 @@ export default (defaultRememberMe = false) => [
   },
   {
     name: 'agreed',
-    presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent(undefined, 'handleEnterForTextField')],
+    presets: [FormCheckboxPreset, addOnPressEnterEvent('handleSubmit')],
     props: { dense: 'true', color: 'primary' },
     defaultValue: false,
+    getVisibility: ({ link: { ownerProps } }) => ownerProps.comfirmUserAgreement,
     extraGetProps: (props, { link: { ownerProps } }, { translate, userAgreementLabel }) => ({
       ...props,
       label: ownerProps.comfirmUserAgreement && userAgreementLabel,

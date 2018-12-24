@@ -7,6 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
+import withOnPressEnterEvent from './withOnPressEnterEvent';
 
 const styles = theme => ({
 });
@@ -46,5 +47,6 @@ FormTextField.propTypes = {
 };
 
 export default compose(
+  withOnPressEnterEvent,
   withStyles(styles),
 )(FormTextField);

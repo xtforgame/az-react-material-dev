@@ -9,15 +9,9 @@ import SuccessButton from '~/components/Buttons/SuccessButton';
 import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
-  FormContent,
   InternalLink as Link,
 } from '~/components/FormInputs';
-
-import InputLinker from '~/utils/InputLinker';
-import {
-  addOnKeyPressEvent,
-  propagateOnChangeEvent,
-} from '~/utils/InputLinker/helpers';
+import FormBaseType001 from './FormBaseType001';
 
 import createFormPaperStyle from '~/styles/FormPaper';
 
@@ -26,55 +20,21 @@ const styles = theme => ({
 });
 
 class RegistrationForm extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    const { fields, namespace = '' } = props;
-
-    this.il = new InputLinker(this, { namespace });
-
-    this.fieldLinks = this.il.add(...(fields.map(field => ({
-      presets: [field, addOnKeyPressEvent(this.handleEnterForTextField), propagateOnChangeEvent()],
-    }))));
-
-    this.state = this.il.mergeInitState({});
-  }
-
-  handleSubmit = () => {
-    const { onSubmit = () => {} } = this.props;
-    if (this.il.validate()) {
-      const outputs = this.il.getOutputs();
-      onSubmit(outputs);
-    }
-  }
-
-  handleEnterForTextField = (event) => {
-    if (event.key === 'Enter') {
-      this.handleSubmit();
-      event.preventDefault();
-    }
-  };
-
   render() {
     const {
       intl,
       classes,
       i18nMessages,
-      i18nTranslate,
+      renderOptions,
+      fields,
       comfirmUserAgreement,
-      children,
     } = this.props;
-    const translate = i18nTranslate
-      || (i18nMessages ? translateMessages.bind(null, intl, i18nMessages) : undefined);
     const translated = translateMessages(intl, i18nMessages, [
       'terms',
       'createAccount',
       'createAccountV',
       'privacyPolicy',
     ]);
-
-    const agreedField = this.il.getField('agreed');
-    agreedField.visible = comfirmUserAgreement;
-    const agreed = agreedField.getValue();
 
     const userAgreementLabel = (
       <FormattedMessage
@@ -105,38 +65,38 @@ class RegistrationForm extends React.PureComponent {
     );
 
     return (
-      <div>
-        <FormSpace variant="top" />
-        <FormContent>
-          {
-            this.fieldLinks.map((filedLink) => {
-              const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content1" />;
-              return (
-                <React.Fragment key={filedLink.name}>
-                  {this.il.renderComponent(filedLink.name, { translate, userAgreementLabel })}
-                  {space}
-                </React.Fragment>
-              );
-            })
-          }
-          <FormSpace variant="content2" />
-          {
-            !comfirmUserAgreement && (userAgreementLabel)
-          }
-          <SuccessButton
-            variant="contained"
-            fullWidth
-            color="primary"
-            disabled={comfirmUserAgreement && !agreed}
-            className={classes.loginBtn}
-            onClick={this.handleSubmit}
-          >
-            {translated.createAccount}
-          </SuccessButton>
-          <FormSpace variant="content1" />
-        </FormContent>
-        {children}
-      </div>
+      <FormBaseType001
+        {...this.props}
+        renderOptions={{
+          ...renderOptions,
+          userAgreementLabel,
+        }}
+        fields={[
+          ...fields,
+          () => ({
+            InputComponent: React.Fragment,
+            ignoredFromOutputs: true,
+            getProps: (props, { link: { owner, linker } }) => ({
+              children: !comfirmUserAgreement && (userAgreementLabel),
+            }),
+            options: { space: null },
+          }),
+          () => ({
+            InputComponent: SuccessButton,
+            ignoredFromOutputs: true,
+            getProps: (props, { link: { owner, linker } }) => ({
+              variant: 'contained',
+              fullWidth: true,
+              color: 'primary',
+              className: classes.login,
+              onClick: owner.handleSubmit,
+              children: translated.createAccount,
+              disabled: comfirmUserAgreement && !linker.getValue('agreed'),
+            }),
+            options: { space: <FormSpace variant="content1" /> },
+          }),
+        ]}
+      />
     );
   }
 }

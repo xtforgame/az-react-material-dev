@@ -6,8 +6,10 @@ import {
   FormPhoneOrEmailInputPreset,
   FormTextFieldPreset,
   FormPasswordVisibilityPreset,
+  FormCodeInputPreset,
   assert,
-  translateLabelAndAddOnKeyPressEvent,
+  translateLabel,
+  addOnPressEnterEvent,
   displayErrorFromPropsForTextField,
 } from '~/utils/InputLinker/helpers';
 
@@ -17,7 +19,7 @@ import {
 
 export const createSimpleAccountInput = () => ({
   name: 'username',
-  presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('username', 'handleEnterForTextField')],
+  presets: [FormTextFieldPreset, translateLabel('username'), addOnPressEnterEvent('handleSubmit')],
   handledByProps: {
     value: 'username',
     onChange: 'onUsernameChange',
@@ -43,7 +45,7 @@ export const createSimpleAccountInput = () => ({
 
 export const createPhoneOrEmailAccountInput = () => ({
   name: 'username',
-  presets: [FormPhoneOrEmailInputPreset, translateLabelAndAddOnKeyPressEvent('username', 'handleEnterForTextField')],
+  presets: [FormPhoneOrEmailInputPreset, translateLabel('username'), addOnPressEnterEvent('handleSubmit')],
   handledByProps: {
     value: 'username',
     onChange: 'onUsernameChange',
@@ -69,7 +71,7 @@ export const createPhoneOrEmailAccountInput = () => ({
 
 export const createNonemptyPasswordInput = () => ({
   name: 'password',
-  presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password', 'handleEnterForTextField')],
+  presets: [FormTextFieldPreset, translateLabel('password'), addOnPressEnterEvent('handleSubmit')],
   InputComponent: FormPasswordInput,
   extraGetProps: displayErrorFromPropsForTextField('passwordError'),
   validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
@@ -84,7 +86,7 @@ export const createNonemptyPasswordInput = () => ({
 
 export const createValidPasswordInput = () => ({
   name: 'password',
-  presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('password', 'handleEnterForTextField')],
+  presets: [FormTextFieldPreset, translateLabel('password'), addOnPressEnterEvent('handleSubmit')],
   InputComponent: FormPasswordInput,
   extraGetProps: displayErrorFromPropsForTextField('passwordError'),
   validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
@@ -95,4 +97,10 @@ export const createValidPasswordInput = () => ({
       defaultValue: false,
     },
   ],
+});
+
+export const createRecoveryCodeInput = () => ({
+  name: 'recoveryCode',
+  presets: [FormCodeInputPreset, translateLabel('recoveryCode'), addOnPressEnterEvent('challengeRecoveryToken')],
+  extraGetProps: displayErrorFromPropsForTextField('recoveryCodeError'),
 });

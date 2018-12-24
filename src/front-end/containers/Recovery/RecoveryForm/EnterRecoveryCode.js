@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types, react/forbid-prop-types, jsx-a11y/anchor-is-valid */
 import React from 'react';
-import { connect } from 'react-redux';
 import { compose } from 'recompose';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -12,26 +11,10 @@ import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
   FormContent,
-  FormCodeInput,
 } from '~/components/FormInputs';
 
 import InputLinker from '~/utils/InputLinker';
-import {
-  FormTextFieldPreset,
-  displayErrorFromPropsForTextField,
-  assert,
-  translateLabelAndAddOnKeyPressEvent,
-} from '~/utils/InputLinker/helpers';
-
-import {
-  isAllDigital,
-} from 'common/utils/validators';
-
-import modelMap from '~/containers/App/modelMap';
-
-const {
-  postRecoveryTokens,
-} = modelMap.waitableActions;
+import createRecoveryCodeInputConfigs from '~/containers/LoginForms/createRecoveryCodeInputConfigs';
 
 const styles = theme => ({
   flexContainer: {
@@ -68,32 +51,11 @@ class EnterRecoveryCode extends React.PureComponent {
       namespace: 'forgot-password',
     });
     this.il.add(
-      {
-        name: 'recoveryCode',
-        presets: [FormTextFieldPreset, translateLabelAndAddOnKeyPressEvent('recoveryCode', this.handleEnterForTextField)],
-        InputComponent: FormCodeInput,
-        converter: {
-          fromView: (([e], { storedValue }) => (
-            (
-              !e.target.value
-              || (isAllDigital(e.target.value) && e.target.value.length <= 6)
-            ) ? e.target.value : storedValue)
-          ),
-        },
-        extraGetProps: displayErrorFromPropsForTextField('recoveryCodeError'),
-        validate: value => assert(value, null),
-      },
+      createRecoveryCodeInputConfigs()
     );
 
     this.state = this.il.mergeInitState({});
   }
-
-  handleEnterForTextField = (event) => {
-    if (event.key === 'Enter') {
-      this.challengeRecoveryToken();
-      event.preventDefault();
-    }
-  };
 
   challengeRecoveryToken = () => {
     const { recoveringUsername } = this.props;
@@ -189,9 +151,6 @@ class EnterRecoveryCode extends React.PureComponent {
 
 
 export default compose(
-  connect(null, {
-    postRecoveryTokens,
-  }),
   injectIntl,
   withStyles(styles),
 )(EnterRecoveryCode);

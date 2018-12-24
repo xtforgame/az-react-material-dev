@@ -1,7 +1,8 @@
-// import Divider from '@material-ui/core/Divider';
 import {
   FormCheckboxPreset,
-  translateLabelAndAddOnKeyPressEvent,
+  // DividerPreset,
+  translateLabel,
+  addOnPressEnterEvent,
 } from '~/utils/InputLinker/helpers';
 
 import {
@@ -14,12 +15,12 @@ export default (defaultRememberMe = false) => [
   createNonemptyPasswordInput(),
   {
     name: 'rememberMe',
-    presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent('rememberMe', 'handleEnterForTextField')],
+    presets: [FormCheckboxPreset, translateLabel('rememberMe'), addOnPressEnterEvent('handleSubmit')],
     props: { dense: 'true', color: 'primary' },
     defaultValue: defaultRememberMe || false,
   },
-  // { name: 'd1', InputComponent: Divider },
-  // { name: 'd2', InputComponent: Divider },
-  // { name: 'd3', InputComponent: Divider },
-  // { name: 'd4', InputComponent: Divider },
+  // DividerPreset,
+  // DividerPreset,
+  // DividerPreset,
+  // DividerPreset,
 ];

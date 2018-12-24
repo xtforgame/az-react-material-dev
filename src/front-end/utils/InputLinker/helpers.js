@@ -1,10 +1,15 @@
 /* eslint-disable no-underscore-dangle */
+import Divider from '@material-ui/core/Divider';
 import {
   FormTextField,
   FormTextInput,
+  FormCodeInput,
   FormCheckbox,
   FormPhoneOrEmailInput,
 } from '~/components/FormInputs';
+import {
+  isAllDigital,
+} from 'common/utils/validators';
 
 export const assert = (condition, message, i18n) => {
   if (!condition) {
@@ -94,13 +99,12 @@ export const FormPasswordVisibilityGetProps = (props, {
   onShowPassswordClick: handleChange,
 });
 
-
 export const FormPasswordVisibilityPreset = cfg => ({
   ...cfg,
   getProps: cfg.getProps.concat([FormPasswordVisibilityGetProps]),
+  ignoredFromOutputs: true,
   converter: {
     fromView: ((_, { storedValue }) => !storedValue),
-    toOutput: () => undefined,
   },
 });
 
@@ -125,7 +129,6 @@ export const FormCheckboxPreset = cfg => ({
     fromView: (([e, v]) => v),
   },
 });
-
 
 // // the short version
 // export const FormPhoneOrEmailInputPreset = {
@@ -153,6 +156,29 @@ export const FormPhoneOrEmailInputPreset = {
   }),
 };
 
+export const FormCodeInputPreset = {
+  presets: [FormTextFieldPreset],
+  evaluate: cfg => ({
+    ...cfg,
+    InputComponent: FormCodeInput,
+    converter: {
+      fromView: (([e], { storedValue }) => (
+        (
+          !e.target.value
+          || (isAllDigital(e.target.value) && e.target.value.length <= 6)
+        ) ? e.target.value : storedValue)
+      ),
+    },
+    validate: value => assert(value, null),
+  }),
+};
+
+export const DividerPreset = cfg => ({
+  ...cfg,
+  InputComponent: Divider,
+  ignoredFromOutputs: true,
+});
+
 export const translateLabel = i18nKey => ({
   extraGetProps: (props, { link: { owner } }, { translate }) => ({
     ...props,
@@ -160,18 +186,10 @@ export const translateLabel = i18nKey => ({
   }),
 });
 
-export const addOnKeyPressEvent = (onKeyPress = undefined) => ({
-  extraGetProps: (props, { link: { owner } }, { translate }) => ({
+export const addOnPressEnterEvent = (onPressEnter = undefined) => ({
+  extraGetProps: (props, { link: { owner } }) => ({
     ...props,
-    onKeyPress,
-  }),
-});
-
-export const translateLabelAndAddOnKeyPressEvent = (i18nKey, onKeyPress = undefined) => ({
-  extraGetProps: (props, { link: { owner } }, { translate }) => ({
-    ...props,
-    onKeyPress: typeof onKeyPress === 'string' ? owner[onKeyPress] : onKeyPress,
-    label: i18nKey && translate(i18nKey),
+    onPressEnter: typeof onPressEnter === 'string' ? owner[onPressEnter] : onPressEnter,
   }),
 });
 

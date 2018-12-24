@@ -23,6 +23,7 @@ export class FieldLink {
     this.key = this.uniqueName;
     this.defaultValue = config.defaultValue;
     this.InputComponent = config.InputComponent;
+    this.ignoredFromOutputs = config.ignoredFromOutputs;
     this.options = config.options || {};
 
     this.handledByProps = config.handledByProps;
@@ -56,7 +57,7 @@ export class FieldLink {
     this.onChange = config.onChange || (() => {});
     this.onValidateError = config.onValidateError || (() => {});
 
-    this.visible = true;
+    this.getVisibility = config.getVisibility || (() => true);
 
     // functions
 
@@ -108,7 +109,10 @@ export default class InputLinker {
     this.fieldStateName = fieldStateName;
     this.fieldErrorStateName = fieldErrorStateName;
     this.fieldMap = {};
+    this._idCounter = 0;
   }
+
+  getUniqueName = () => (this.namespace ? `${this.namespace}-unnamed-${++this._idCounter}` : `unnamed-${++this._idCounter}`);
 
   getPreset = preset => preset;
 
@@ -149,6 +153,7 @@ export default class InputLinker {
       const configChain = toArray(_c);
       let config = { getProps: [(_, { link }) => link.props], childLinks: [] };
       config = configChain.reduce(evaluateConfig, config);
+      config.name = config.name || this.getUniqueName();
       const fieldLink = this.fieldMap[config.name] = new FieldLink(this, config); // eslint-disable-line no-multi-assign
       if (config.childLinks) {
         fieldLink.addChild(...this.add(...config.childLinks));
@@ -177,7 +182,8 @@ export default class InputLinker {
     const values = {};
     Object.keys(this.fieldMap).forEach((fieldName) => {
       const output = this.getOutput(fieldName);
-      if (output !== undefined) {
+      const field = this.fieldMap[fieldName];
+      if (!field.ignoredFromOutputs) {
         values[fieldName] = output;
       }
     });
@@ -286,7 +292,7 @@ export default class InputLinker {
       throw new Error(`No InputComponent provided :${field.name}`);
     }
 
-    return field.visible ? (
+    return field.getVisibility({ link: field }) ? (
       <InputComponent
         {...this.renderProps(fieldName, options)}
         {...options.extraProps}

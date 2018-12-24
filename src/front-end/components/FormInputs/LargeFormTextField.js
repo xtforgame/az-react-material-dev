@@ -2,6 +2,7 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
+import withOnPressEnterEvent from './withOnPressEnterEvent';
 
 const paddingSize = 20;
 
@@ -67,4 +68,4 @@ const LargeFormTextField = ({
   />
 );
 
-export default withStyles(styles)(LargeFormTextField);
+export default withOnPressEnterEvent(withStyles(styles)(LargeFormTextField));

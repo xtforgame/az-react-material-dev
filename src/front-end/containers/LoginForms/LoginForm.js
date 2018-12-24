@@ -7,14 +7,8 @@ import Button from '@material-ui/core/Button';
 import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
-  FormContent,
 } from '~/components/FormInputs';
-
-import InputLinker from '~/utils/InputLinker';
-import {
-  addOnKeyPressEvent,
-  propagateOnChangeEvent,
-} from '~/utils/InputLinker/helpers';
+import FormBaseType001 from './FormBaseType001';
 
 import createFormPaperStyle from '~/styles/FormPaper';
 
@@ -23,78 +17,37 @@ const styles = theme => ({
 });
 
 class LoginForm extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    const { fields, namespace = '' } = props;
-
-    this.il = new InputLinker(this, { namespace });
-
-    this.fieldLinks = this.il.add(...(fields.map(field => ({
-      presets: [field, addOnKeyPressEvent(this.handleEnterForTextField), propagateOnChangeEvent()],
-    }))));
-
-    this.state = this.il.mergeInitState({});
-  }
-
-  handleSubmit = () => {
-    const { onSubmit = () => {} } = this.props;
-    if (this.il.validate()) {
-      const outputs = this.il.getOutputs();
-      onSubmit(outputs);
-    }
-  }
-
-  handleEnterForTextField = (event) => {
-    if (event.key === 'Enter') {
-      this.handleSubmit();
-      event.preventDefault();
-    }
-  };
-
   render() {
     const {
       intl,
       classes,
+      fields,
       i18nMessages,
-      i18nTranslate,
-      extraContents,
-      children,
     } = this.props;
-    const translate = i18nTranslate
-      || (i18nMessages ? translateMessages.bind(null, intl, i18nMessages) : undefined);
     const translated = translateMessages(intl, i18nMessages, [
       'login',
     ]);
 
     return (
-      <div>
-        <FormSpace variant="top" />
-        <FormContent>
-          {
-            this.fieldLinks.map((filedLink) => {
-              const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content1" />;
-              return (
-                <React.Fragment key={filedLink.name}>
-                  {this.il.renderComponent(filedLink.name, { translate })}
-                  {space}
-                </React.Fragment>
-              );
-            })
-          }
-          <Button
-            variant="contained"
-            fullWidth
-            color="primary"
-            className={classes.loginBtn}
-            onClick={this.handleSubmit}
-          >
-            {translated.login}
-          </Button>
-          <FormSpace variant="content1" />
-          {extraContents}
-        </FormContent>
-        {children}
-      </div>
+      <FormBaseType001
+        {...this.props}
+        fields={[
+          ...fields,
+          () => ({
+            InputComponent: Button,
+            ignoredFromOutputs: true,
+            getProps: (props, { link: { owner } }) => ({
+              variant: 'contained',
+              fullWidth: true,
+              color: 'primary',
+              className: classes.loginBtn,
+              onClick: owner.handleSubmit,
+              children: translated.login,
+            }),
+            options: { space: <FormSpace variant="content1" /> },
+          }),
+        ]}
+      />
     );
   }
 }

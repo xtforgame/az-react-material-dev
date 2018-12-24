@@ -1,9 +1,6 @@
 import React from 'react';
 import { compose } from 'recompose';
 import { injectIntl } from 'react-intl';
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-
 import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
@@ -12,17 +9,10 @@ import {
 
 import InputLinker from '~/utils/InputLinker';
 import {
-  addOnPressEnterEvent,
   propagateOnChangeEvent,
 } from '~/utils/InputLinker/helpers';
 
-import createFormPaperStyle from '~/styles/FormPaper';
-
-const styles = theme => ({
-  ...createFormPaperStyle(theme),
-});
-
-class SimpleLayout extends React.PureComponent {
+class FormBaseType001 extends React.PureComponent {
   constructor(props) {
     super(props);
     const { fields, namespace = '' } = props;
@@ -47,10 +37,10 @@ class SimpleLayout extends React.PureComponent {
   render() {
     const {
       intl,
-      classes,
       i18nMessages,
       i18nTranslate,
-      submitButtonText,
+      extraContents,
+      renderOptions,
       children,
     } = this.props;
     const translate = i18nTranslate
@@ -65,22 +55,13 @@ class SimpleLayout extends React.PureComponent {
               const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content1" />;
               return (
                 <React.Fragment key={filedLink.name}>
-                  {this.il.renderComponent(filedLink.name, { translate })}
+                  {this.il.renderComponent(filedLink.name, { translate, ...renderOptions })}
                   {space}
                 </React.Fragment>
               );
             })
           }
-          <Button
-            variant="contained"
-            fullWidth
-            color="primary"
-            className={classes.loginBtn}
-            onClick={this.handleSubmit}
-          >
-            {submitButtonText}
-          </Button>
-          <FormSpace variant="content1" />
+          {extraContents}
         </FormContent>
         {children}
       </div>
@@ -90,5 +71,4 @@ class SimpleLayout extends React.PureComponent {
 
 export default compose(
   injectIntl,
-  withStyles(styles),
-)(SimpleLayout);
+)(FormBaseType001);

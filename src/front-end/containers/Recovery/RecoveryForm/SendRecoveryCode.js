@@ -19,7 +19,8 @@ import {
   FormPhoneOrEmailInputPreset,
   displayErrorFromPropsForTextField,
   assert,
-  translateLabelAndAddOnKeyPressEvent,
+  translateLabel,
+  addOnPressEnterEvent,
 } from '~/utils/InputLinker/helpers';
 
 import modelMap from '~/containers/App/modelMap';
@@ -50,7 +51,7 @@ class SendRecoveryCode extends React.PureComponent {
     this.il.add(
       {
         name: 'username',
-        presets: [FormPhoneOrEmailInputPreset, translateLabelAndAddOnKeyPressEvent('username', this.handleEnterForTextField)],
+        presets: [FormPhoneOrEmailInputPreset, translateLabel('username'), addOnPressEnterEvent(this.recover)],
         handledByProps: {
           value: 'username',
           onChange: 'onUsernameChange',
@@ -149,13 +150,6 @@ class SendRecoveryCode extends React.PureComponent {
       });
     }
   }
-
-  handleEnterForTextField = (event) => {
-    if (event.key === 'Enter') {
-      this.recover();
-      event.preventDefault();
-    }
-  };
 
   render() {
     const {

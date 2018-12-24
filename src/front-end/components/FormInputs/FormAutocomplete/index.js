@@ -6,9 +6,7 @@ import Downshift from 'downshift';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
-import {
-  FormTextField,
-} from '~/components/FormInputs';
+import FormTextField from '../FormTextField';
 
 const WrappedInput = (props) => {
   const {

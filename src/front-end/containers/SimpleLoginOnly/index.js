@@ -71,7 +71,6 @@ class Login extends React.PureComponent {
     this.setState({ tabIndex });
   };
 
-
   login = ({ username, password, rememberMe }) => {
     const { postSessions, rememberMe: remember } = this.props;
     remember(rememberMe);

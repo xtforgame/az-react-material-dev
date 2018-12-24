@@ -1,7 +1,8 @@
 // import InputLinker from '~/utils/InputLinker';
 import {
   FormCheckboxPreset,
-  translateLabelAndAddOnKeyPressEvent,
+  translateLabel,
+  addOnPressEnterEvent,
 } from '~/utils/InputLinker/helpers';
 
 import {
@@ -14,7 +15,7 @@ export default (defaultRememberMe = false) => [
   createNonemptyPasswordInput(),
   {
     name: 'rememberMe',
-    presets: [FormCheckboxPreset, translateLabelAndAddOnKeyPressEvent('rememberMe', 'handleEnterForTextField')],
+    presets: [FormCheckboxPreset, translateLabel('rememberMe'), addOnPressEnterEvent('handleSubmit')],
     props: { dense: 'true', color: 'primary' },
     defaultValue: defaultRememberMe || false,
   },

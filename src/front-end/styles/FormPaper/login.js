@@ -28,7 +28,7 @@ export default theme => ({
     width: '100%',
     paddingRight: 0,
     paddingLeft: 0,
-    height: 500,
+    height: 550,
     [theme.breakpoints.up('sm')]: {
       width: 500,
       margin: 80,

@@ -5,6 +5,7 @@ import { compose } from 'recompose';
 import { withStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import withOnPressEnterEvent from './withOnPressEnterEvent';
 
 const styles = theme => ({
 });
@@ -35,5 +36,6 @@ FormCheckbox.propTypes = {
 };
 
 export default compose(
+  withOnPressEnterEvent,
   withStyles(styles),
 )(FormCheckbox);
