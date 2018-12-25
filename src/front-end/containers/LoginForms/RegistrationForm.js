@@ -4,15 +4,12 @@ import { compose } from 'recompose';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import SuccessButton from '~/components/Buttons/SuccessButton';
 
 import translateMessages from '~/utils/translateMessages';
 import {
-  FormSpace,
   InternalLink as Link,
 } from '~/components/FormInputs';
-import FormBaseType001 from './FormBaseType001';
-
+import FormBaseType001 from '~/containers/LoginForms/FormBaseType001';
 import createFormPaperStyle from '~/styles/FormPaper';
 
 const styles = theme => ({
@@ -25,13 +22,11 @@ class RegistrationForm extends React.PureComponent {
       intl,
       classes,
       i18nMessages,
-      renderOptions,
       fields,
       comfirmUserAgreement,
     } = this.props;
     const translated = translateMessages(intl, i18nMessages, [
       'terms',
-      'createAccount',
       'createAccountV',
       'privacyPolicy',
     ]);
@@ -67,35 +62,9 @@ class RegistrationForm extends React.PureComponent {
     return (
       <FormBaseType001
         {...this.props}
-        renderOptions={{
-          ...renderOptions,
-          userAgreementLabel,
-        }}
-        fields={[
-          ...fields,
-          () => ({
-            InputComponent: React.Fragment,
-            ignoredFromOutputs: true,
-            getProps: (props, { link: { owner, linker } }) => ({
-              children: !comfirmUserAgreement && (userAgreementLabel),
-            }),
-            options: { space: null },
-          }),
-          () => ({
-            InputComponent: SuccessButton,
-            ignoredFromOutputs: true,
-            getProps: (props, { link: { owner, linker } }) => ({
-              variant: 'contained',
-              fullWidth: true,
-              color: 'primary',
-              className: classes.login,
-              onClick: owner.handleSubmit,
-              children: translated.createAccount,
-              disabled: comfirmUserAgreement && !linker.getValue('agreed'),
-            }),
-            options: { space: <FormSpace variant="content1" /> },
-          }),
-        ]}
+        comfirmUserAgreement={comfirmUserAgreement}
+        userAgreementLabel={userAgreementLabel}
+        fields={fields}
       />
     );
   }

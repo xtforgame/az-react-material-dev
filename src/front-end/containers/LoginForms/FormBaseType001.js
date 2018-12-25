@@ -18,8 +18,7 @@ class FormBaseType001 extends React.PureComponent {
     const { fields, namespace = '' } = props;
 
     this.il = new InputLinker(this, { namespace });
-
-    this.fieldLinks = this.il.add(...(fields.map(field => ({
+    this.il.add(...(fields.map(field => ({
       presets: [field, propagateOnChangeEvent()],
     }))));
 
@@ -30,41 +29,43 @@ class FormBaseType001 extends React.PureComponent {
     const { onSubmit = () => {} } = this.props;
     if (this.il.validate()) {
       const outputs = this.il.getOutputs();
-      onSubmit(outputs);
+      onSubmit(outputs, this.il);
     }
   }
 
   render() {
     const {
       intl,
+      space: defaultSpace = <FormSpace variant="content1" />,
+      topSpace = <FormSpace variant="top" />,
+      Content = FormContent,
       i18nMessages,
       i18nTranslate,
       extraContents,
-      renderOptions,
       children,
     } = this.props;
     const translate = i18nTranslate
       || (i18nMessages ? translateMessages.bind(null, intl, i18nMessages) : undefined);
 
     return (
-      <div>
-        <FormSpace variant="top" />
-        <FormContent>
+      <React.Fragment>
+        {topSpace}
+        <Content>
           {
-            this.fieldLinks.map((filedLink) => {
-              const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content1" />;
+            this.il.fieldLinks.map((filedLink) => {
+              const space = 'space' in filedLink.options ? filedLink.options.space : defaultSpace;
               return (
                 <React.Fragment key={filedLink.name}>
-                  {this.il.renderComponent(filedLink.name, { translate, ...renderOptions })}
+                  {this.il.renderComponent(filedLink.name, { translate })}
                   {space}
                 </React.Fragment>
               );
             })
           }
           {extraContents}
-        </FormContent>
+        </Content>
         {children}
-      </div>
+      </React.Fragment>
     );
   }
 }

@@ -12,14 +12,6 @@ import ResetCompleted from './ResetCompleted';
 import ResetPassword from './ResetPassword';
 import { messages } from '~/containers/App/translation';
 import translateMessages from '~/utils/translateMessages';
-import {
-  FormSpace,
-  FormContent,
-} from '~/components/FormInputs';
-import LoginForm from '~/containers/LoginForms/LoginForm';
-import RegistrationForm from '~/containers/LoginForms/RegistrationForm';
-import createLoginInputConfigs from '~/containers/LoginForms/createLoginInputConfigs';
-import createRegistrationInputConfigs from '~/containers/LoginForms/createRegistrationInputConfigs';
 
 import {
   clearSensitiveData,
@@ -147,6 +139,7 @@ class RecoveryForm extends React.PureComponent {
 
     this.setState({
       resetCompleted: false,
+      recoveringUsername: '',
     });
     clearSensitiveData();
     push('/login');

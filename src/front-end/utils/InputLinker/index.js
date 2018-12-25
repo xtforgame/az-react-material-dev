@@ -26,7 +26,7 @@ export class FieldLink {
     this.ignoredFromOutputs = config.ignoredFromOutputs;
     this.options = config.options || {};
 
-    this.handledByProps = config.handledByProps;
+    this.handledByProps = config.handledByProps && { ...config.handledByProps };
     if (this.handledByProps) {
       if (!this.handledByProps.value || !this.handledByProps.onChange) {
         throw new Error('Wrong options: handledByProps');
@@ -38,10 +38,18 @@ export class FieldLink {
 
       if (typeof this.handledByProps.onChange === 'string') {
         const onChangeProp = this.handledByProps.onChange;
-        this.handledByProps.onChange = ({ value }, { link: { ownerProps } }, options = {}) => {
+        this.handledByProps.onChange = ({ value, rawArgs }, { link, link: { ownerProps } }, options = {}) => {
           this.owner.setState(this.linker._getUpdatedStateForResetError(this.name));
           if (ownerProps[onChangeProp]) {
-            ownerProps[onChangeProp](value);
+            ownerProps[onChangeProp](value, rawArgs, link);
+          }
+        };
+      } else {
+        const { onChange } = this.handledByProps;
+        this.handledByProps.onChange = ({ value, rawArgs }, { link, link: { ownerProps } }, options = {}) => {
+          this.owner.setState(this.linker._getUpdatedStateForResetError(this.name));
+          if (onChange) {
+            onChange(value, rawArgs, link);
           }
         };
       }
@@ -60,12 +68,15 @@ export class FieldLink {
     this.getVisibility = config.getVisibility || (() => true);
 
     // functions
+    const linkInfo = { link: this };
 
     this.getValue = targetState => this.linker.getValueFromState(this.name, targetState);
     this.setValue = value => this.owner.setState(this.linker._getUpdatedState(this.name, value));
-    this.getOutput = targetState => this.converter.toOutput(this.getValue(targetState));
-    this.getViewValue = targetState => this.converter.toView(this.getValue(targetState));
-    this.validate = targetState => this._validate(this.getValue(targetState));
+    this.getCustomState = targetState => this.linker.getCustomStateFromState(this.name, targetState);
+    this.setCustomState = value => this.owner.setState(this.linker.getMergedCustomState({ [this.name]: value }));
+    this.getOutput = targetState => this.converter.toOutput(this.getValue(targetState), { ...linkInfo });
+    this.getViewValue = targetState => this.converter.toView(this.getValue(targetState), { ...linkInfo });
+    this.validate = targetState => this._validate(this.getValue(targetState), { ...linkInfo });
 
     if (this.handledByProps) {
       this.getValue = () => this.handledByProps.value({ link: this }, {});
@@ -99,67 +110,73 @@ export class FieldLink {
 }
 
 export default class InputLinker {
-  constructor(component, {
-    namespace = '',
-    fieldStateName = 'fields',
-    fieldErrorStateName = 'errors',
-  }) {
+  constructor(component, options = {}) {
     this.component = component;
-    this.namespace = namespace;
-    this.fieldStateName = fieldStateName;
-    this.fieldErrorStateName = fieldErrorStateName;
+    this.namespace = options.namespace || '';
+    this.fieldStateName = options.fieldStateName || 'fields';
+    this.fieldCustomStateName = options.fieldCustomStateName;
+    this.fieldErrorStateName = options.fieldErrorStateName || 'errors';
+    this.presets = options.presets || {};
+    this.fieldLinks = [];
     this.fieldMap = {};
     this._idCounter = 0;
   }
 
   getUniqueName = () => (this.namespace ? `${this.namespace}-unnamed-${++this._idCounter}` : `unnamed-${++this._idCounter}`);
 
-  getPreset = preset => preset;
+  getPreset = preset => (typeof preset === 'string' ? this.presets[preset] : preset);
 
-  add(...configs) {
-    const evaluateConfig = (currentCfg, c) => {
-      let config;
-      if (typeof c === 'function') {
-        config = c(currentCfg);
-      } else {
-        config = currentCfg;
-        const { preset, presets, evaluate = _config => ({ ..._config, ...c }) } = c;
-        config = toArray(preset).concat(toArray(presets)).concat(toArray(evaluate))
-          .map(this.getPreset)
-          .reduce(evaluateConfig, config);
+  evaluateConfig = (currentCfg, c) => {
+    let config;
+    if (typeof c === 'function') {
+      config = c(currentCfg);
+    } else {
+      config = currentCfg;
+      const { preset, presets, evaluate = _config => ({ ..._config, ...c }) } = c;
+      config = toArray(preset).concat(toArray(presets)).concat(toArray(evaluate))
+        .map(this.getPreset)
+        .reduce(this.evaluateConfig, config);
 
-        delete config.preset;
-        delete config.presets;
-        delete config.evaluate;
-      }
-      if (!config) {
-        console.error('Wrong config', c);
-        throw new Error('Wrong config');
-      }
-      config.getProps = toArray(config.getProps);
-      if (config.extraGetProps) {
-        config.extraGetProps = toArray(config.extraGetProps);
-        config.getProps.push(...config.extraGetProps);
-        delete config.extraGetProps;
-      }
-      if (config.extraChildLinks) {
-        config.extraChildLinks = toArray(config.extraChildLinks);
-        config.childLinks.push(...config.extraChildLinks);
-        delete config.extraChildLinks;
-      }
-      return config;
-    };
+      delete config.preset;
+      delete config.presets;
+      delete config.evaluate;
+    }
+    if (!config) {
+      console.error('Wrong config', c);
+      throw new Error('Wrong config');
+    }
+    config.getProps = toArray(config.getProps);
+    if (config.extraGetProps) {
+      config.extraGetProps = toArray(config.extraGetProps);
+      config.getProps.push(...config.extraGetProps);
+      delete config.extraGetProps;
+    }
+    if (config.extraChildLinks) {
+      config.extraChildLinks = toArray(config.extraChildLinks);
+      config.childLinks.push(...config.extraChildLinks);
+      delete config.extraChildLinks;
+    }
+    return config;
+  };
+
+  _add(configs) {
     return configs.map((_c) => {
       const configChain = toArray(_c);
       let config = { getProps: [(_, { link }) => link.props], childLinks: [] };
-      config = configChain.reduce(evaluateConfig, config);
+      config = configChain.reduce(this.evaluateConfig, config);
       config.name = config.name || this.getUniqueName();
       const fieldLink = this.fieldMap[config.name] = new FieldLink(this, config); // eslint-disable-line no-multi-assign
       if (config.childLinks) {
-        fieldLink.addChild(...this.add(...config.childLinks));
+        fieldLink.addChild(...this._add(config.childLinks));
       }
       return fieldLink;
     });
+  }
+
+  add(...configs) {
+    const result = this._add(configs);
+    this.fieldLinks.push(...result);
+    return result;
   }
 
   getField = fieldName => this.fieldMap[fieldName];
@@ -181,10 +198,9 @@ export default class InputLinker {
   getOutputs = () => {
     const values = {};
     Object.keys(this.fieldMap).forEach((fieldName) => {
-      const output = this.getOutput(fieldName);
       const field = this.fieldMap[fieldName];
       if (!field.ignoredFromOutputs) {
-        values[fieldName] = output;
+        values[fieldName] = field.getOutput();
       }
     });
     return values;
@@ -197,6 +213,17 @@ export default class InputLinker {
   getErrorsFromState = targetState => (targetState || this.component.state)[this.fieldErrorStateName];
 
   getErrorFromState = (fieldName, targetState) => this.getErrorsFromState(targetState)[fieldName];
+
+  getCustomStatesFromState = targetState => (targetState || this.component.state)[this.fieldCustomStateName];
+
+  getCustomStateFromState = (fieldName, targetState) => this.getCustomStatesFromState(targetState)[fieldName];
+
+  getMergedCustomState = (newCustomStates, targetState) => ({
+    [this.fieldCustomStateName]: {
+      ...this.getCustomStatesFromState(targetState),
+      ...newCustomStates,
+    },
+  });
 
   _getUpdatedStateForResetError = (fieldName, targetState) => ({
     [this.fieldErrorStateName]: {
@@ -218,6 +245,7 @@ export default class InputLinker {
       ...state,
       [this.fieldStateName]: { ...state[this.fieldStateName] },
       [this.fieldErrorStateName]: { ...state[this.fieldErrorStateName] },
+      ...(this.fieldCustomStateName ? { [this.fieldCustomStateName]: { ...state[this.fieldCustomStateName] } } : {}),
     };
     Object.keys(this.fieldMap).forEach((fieldName) => {
       const field = this.fieldMap[fieldName];

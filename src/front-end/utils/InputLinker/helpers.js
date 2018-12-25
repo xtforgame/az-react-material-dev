@@ -1,5 +1,8 @@
 /* eslint-disable no-underscore-dangle */
+import React from 'react';
 import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
+import SuccessButton from '~/components/Buttons/SuccessButton';
 import {
   FormTextField,
   FormTextInput,
@@ -88,7 +91,7 @@ export const FormTextInputGetProps = (props, {
 export const FormTextInputPreset = cfg => ({
   ...cfg,
   InputComponent: FormTextInput,
-  getProps: cfg.getProps.concat([FormTextInputGetProps]),
+  extraGetProps: FormTextInputGetProps,
 });
 
 export const FormPasswordVisibilityGetProps = (props, {
@@ -101,7 +104,7 @@ export const FormPasswordVisibilityGetProps = (props, {
 
 export const FormPasswordVisibilityPreset = cfg => ({
   ...cfg,
-  getProps: cfg.getProps.concat([FormPasswordVisibilityGetProps]),
+  extraGetProps: FormPasswordVisibilityGetProps,
   ignoredFromOutputs: true,
   converter: {
     fromView: ((_, { storedValue }) => !storedValue),
@@ -124,7 +127,7 @@ export const FormCheckboxGetProps = (props, {
 export const FormCheckboxPreset = cfg => ({
   ...cfg,
   InputComponent: FormCheckbox,
-  getProps: cfg.getProps.concat([FormCheckboxGetProps]),
+  extraGetProps: FormCheckboxGetProps,
   converter: {
     fromView: (([e, v]) => v),
   },
@@ -179,6 +182,24 @@ export const DividerPreset = cfg => ({
   ignoredFromOutputs: true,
 });
 
+export const BottonPreset = cfg => ({
+  ...cfg,
+  InputComponent: Button,
+  ignoredFromOutputs: true,
+});
+
+export const SuccessBottonPreset = cfg => ({
+  ...cfg,
+  InputComponent: SuccessButton,
+  ignoredFromOutputs: true,
+});
+
+export const FragmentPreset = cfg => ({
+  ...cfg,
+  InputComponent: React.Fragment,
+  ignoredFromOutputs: true,
+});
+
 export const translateLabel = i18nKey => ({
   extraGetProps: (props, { link: { owner } }, { translate }) => ({
     ...props,
@@ -193,9 +214,15 @@ export const addOnPressEnterEvent = (onPressEnter = undefined) => ({
   }),
 });
 
-export const propagateOnChangeEvent = (parentOnChangePropName = 'onChange') => ({
-  onChange: (value, rawArgs, { link: { name, linker, ownerProps } }) => {
-    const onChange = ownerProps[parentOnChangePropName] || (() => {});
-    onChange(name, value, rawArgs, linker);
-  },
-});
+export const propagateOnChangeEvent = (parentOnChangePropName = 'onChange') => (props) => {
+  const originalOnChange = props.onChange || (() => {});
+  return {
+    ...props,
+    onChange: (value, rawArgs, linkInfo) => {
+      originalOnChange(value, rawArgs, linkInfo);
+      const { link: { name, linker, ownerProps } } = linkInfo;
+      const onChange = ownerProps[parentOnChangePropName] || (() => {});
+      onChange(name, value, rawArgs, linker);
+    },
+  };
+};

@@ -4,6 +4,8 @@ import {
 } from '~/components/FormInputs';
 import {
   FormCheckboxPreset,
+  FragmentPreset,
+  SuccessBottonPreset,
   addOnPressEnterEvent,
 } from '~/utils/InputLinker/helpers';
 
@@ -26,9 +28,29 @@ export default (defaultRememberMe = false) => [
     props: { dense: 'true', color: 'primary' },
     defaultValue: false,
     getVisibility: ({ link: { ownerProps } }) => ownerProps.comfirmUserAgreement,
-    extraGetProps: (props, { link: { ownerProps } }, { translate, userAgreementLabel }) => ({
+    extraGetProps: (props, { link: { ownerProps } }, { translate }) => ({
       ...props,
-      label: ownerProps.comfirmUserAgreement && userAgreementLabel,
+      label: ownerProps.comfirmUserAgreement && ownerProps.userAgreementLabel,
     }),
+  },
+  {
+    presets: [FragmentPreset],
+    getProps: (props, { link: { ownerProps, linker } }) => ({
+      children: !ownerProps.comfirmUserAgreement && (ownerProps.userAgreementLabel),
+    }),
+    options: { space: null },
+  },
+  {
+    presets: [SuccessBottonPreset],
+    extraGetProps: (props, { link: { owner, ownerProps, linker } }, { translate }) => ({
+      variant: 'contained',
+      fullWidth: true,
+      color: 'primary',
+      className: ownerProps.classes.login,
+      onClick: owner.handleSubmit,
+      children: translate('createAccount'),
+      disabled: ownerProps.comfirmUserAgreement && !linker.getValue('agreed'),
+    }),
+    options: { space: <FormSpace variant="content1" /> },
   },
 ];

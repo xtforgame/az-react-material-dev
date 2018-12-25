@@ -6,22 +6,11 @@ import { injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import jsonPtr from 'jsonpointer';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import { messages } from '~/containers/App/translation';
 import translateMessages from '~/utils/translateMessages';
-import {
-  FormSpace,
-  FormContent,
-} from '~/components/FormInputs';
 
-import InputLinker from '~/utils/InputLinker';
-import {
-  FormPhoneOrEmailInputPreset,
-  displayErrorFromPropsForTextField,
-  assert,
-  translateLabel,
-  addOnPressEnterEvent,
-} from '~/utils/InputLinker/helpers';
+import FormBaseType001 from '~/containers/LoginForms/FormBaseType001';
+import createSendRecoveryCodeInputConfigs from '~/containers/LoginForms/createSendRecoveryCodeInputConfigs';
 
 import modelMap from '~/containers/App/modelMap';
 
@@ -31,7 +20,6 @@ const {
 
 const styles = theme => ({
 });
-
 class SendRecoveryCode extends React.PureComponent {
   static propTypes = {
     onCodeSent: PropTypes.func.isRequired,
@@ -45,42 +33,11 @@ class SendRecoveryCode extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.il = new InputLinker(this, {
-      namespace: 'forgot-password',
-    });
-    this.il.add(
-      {
-        name: 'username',
-        presets: [FormPhoneOrEmailInputPreset, translateLabel('username'), addOnPressEnterEvent(this.recover)],
-        handledByProps: {
-          value: 'username',
-          onChange: 'onUsernameChange',
-        },
-        extraGetProps: [
-          displayErrorFromPropsForTextField('passwordError', () => undefined),
-          (props, linkInfo, { translate }) => ({
-            ...props,
-            placeholder: translate('usernameEmptyError', {
-              emailAddress: { key: 'emailAddress' },
-              phoneNumber: { key: 'phoneNumber' },
-            }),
-          }),
-        ],
-        validate: value => assert(value && value.type, null, {
-          key: 'usernameEmptyError',
-          values: {
-            emailAddress: { key: 'emailAddress' },
-            phoneNumber: { key: 'phoneNumber' },
-          },
-        }),
-      },
-    );
-
     const now = new Date().getTime();
-    this.state = this.il.mergeInitState({
+    this.state = {
       remainingTime: (this.props.nextTimeToSend && (this.props.nextTimeToSend > now))
         ? this.props.nextTimeToSend - now : 0,
-    });
+    };
   }
 
   componentDidMount() {
@@ -108,97 +65,62 @@ class SendRecoveryCode extends React.PureComponent {
     }, 200);
   }
 
-  recover = () => {
+  recover = ({ username }, linker) => {
     const { postRecoveryTokens, onCodeSent } = this.props;
-    const userNameState = this.il.getValue('username');
+    const userNameState = linker.getValue('username');
 
-    if (this.il.validate()) {
-      const { username } = this.il.getOutputs();
-      postRecoveryTokens({
-        type: userNameState.type,
-        username: userNameState.value,
-      })
-      .then(({ data }) => {
+    postRecoveryTokens({
+      type: userNameState.type,
+      username: userNameState.value,
+    })
+    .then(({ data }) => {
+      onCodeSent({
+        recoveringUsername: username,
+        nextTimeToSend: new Date().getTime() + data.remainingTime,
+      });
+    })
+    .catch((e) => {
+      const resData = jsonPtr.get(e, '/data/error/response/data');
+      if (resData) {
         onCodeSent({
           recoveringUsername: username,
-          nextTimeToSend: new Date().getTime() + data.remainingTime,
+          nextTimeToSend: new Date().getTime() + resData.remainingTime,
         });
-      })
-      .catch((e) => {
-        const resData = jsonPtr.get(e, '/data/error/response/data');
-        if (resData) {
-          onCodeSent({
-            recoveringUsername: username,
-            nextTimeToSend: new Date().getTime() + resData.remainingTime,
-          });
-        } else {
-          throw e;
-        }
-      });
-    }
+      } else {
+        throw e;
+      }
+    });
   }
 
   backToEnterTheCode = () => {
-    const { onBackToEnterTheCode } = this.props;
-
-    if (this.il.validate()) {
-      const {
-        username,
-      } = this.il.getOutputs();
-      onBackToEnterTheCode({
-        recoveringUsername: username,
-      });
-    }
+    const { onBackToEnterTheCode, lastSentUsername } = this.props;
+    onBackToEnterTheCode({
+      recoveringUsername: lastSentUsername,
+    });
   }
 
   render() {
-    const {
-      intl,
-      classes,
-      lastSentUsername,
-    } = this.props;
-
-    const { username } = this.il.getOutputs();
-
-    const { remainingTime = 0 } = this.state;
-
-    const remainingSec = Math.round(remainingTime / 1000);
-
-    const translate = translateMessages.bind(null, intl, messages);
+    const { intl } = this.props;
     const translated = translateMessages(intl, messages, [
       'sendCode',
       'enterCode',
     ]);
 
+    const { remainingTime = 0 } = this.state;
+    const remainingSec = Math.round(remainingTime / 1000);
+
     return (
-      <div>
-        <FormSpace variant="top" />
-        <FormContent>
-          {this.il.renderComponent('username', { translate })}
-          <FormSpace variant="content8" />
-          <Button
-            variant="contained"
-            fullWidth
-            color="secondary"
-            disabled={!username || remainingTime > 0}
-            className={classes.loginBtn}
-            onClick={this.recover}
-          >
-            {`${translated.sendCode}${remainingTime > 0 ? `, Remaining Time : ${remainingSec}` : ''}`}
-          </Button>
-          <FormSpace variant="content4" />
-          {lastSentUsername && lastSentUsername === username && (
-            <Button
-              fullWidth
-              disabled={!username}
-              className={classes.loginBtn}
-              onClick={this.backToEnterTheCode}
-            >
-              {translated.enterCode}
-            </Button>
-          )}
-        </FormContent>
-      </div>
+      <FormBaseType001
+        {...this.props}
+        namespace="forgot-password"
+        countDownText={`${translated.sendCode}${remainingTime > 0 ? `, Remaining Time : ${remainingSec}` : ''}`}
+        backToEnterTheCode={this.backToEnterTheCode}
+        remainingTime={remainingTime}
+        enterCodeText={translated.enterCode}
+        i18nMessages={messages}
+        onSubmit={this.recover}
+        fields={createSendRecoveryCodeInputConfigs(this.recover)}
+      />
     );
   }
 }

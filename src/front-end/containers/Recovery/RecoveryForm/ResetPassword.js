@@ -12,11 +12,11 @@ import { messages } from '~/containers/App/translation';
 import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
-  FormContent,
   FormPasswordInput,
 } from '~/components/FormInputs';
+import FormBaseType001 from '~/containers/LoginForms/FormBaseType001';
+import createResetPasswordInputConfigs from '~/containers/LoginForms/createResetPasswordInputConfigs';
 
-import InputLinker from '~/utils/InputLinker';
 import {
   FormTextFieldPreset,
   displayErrorFromPropsForTextField,
@@ -42,8 +42,6 @@ const styles = theme => ({
   flex1: {
     flex: 1,
   },
-  actionBtn: {
-  },
 });
 
 class ResetPassword extends React.PureComponent {
@@ -53,119 +51,40 @@ class ResetPassword extends React.PureComponent {
     onResetPassword: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-    this.il = new InputLinker(this, {
-      namespace: 'reset-password',
-    });
-    this.il.add(
-      {
-        name: 'password',
-        presets: [FormTextFieldPreset, translateLabel('enterNewPassword'), addOnPressEnterEvent(this.resetPassword)],
-        InputComponent: FormPasswordInput,
-        extraGetProps: displayErrorFromPropsForTextField('passwordError'),
-        validate: value => assert(isValidPassword(value), null, { key: 'wrongPasswordFormatError' }),
-      },
-      {
-        name: 'confrimPassword',
-        presets: [FormTextFieldPreset, translateLabel('reenterNewPassword'), addOnPressEnterEvent(this.resetPassword)],
-        InputComponent: FormPasswordInput,
-        extraGetProps: displayErrorFromPropsForTextField('passwordError'),
-        validate: (value) => {
-          const {
-            password,
-            confrimPassword,
-          } = this.il.getOutputs();
-          assert(password === confrimPassword, null, { key: 'confirmPasswordError' });
-        },
-      },
-      {
-        name: 'passwordVisibility',
-        presets: [FormPasswordVisibilityPreset],
-        defaultValue: false,
-      },
-    );
-
-    this.state = this.il.mergeInitState({
-      fil: this.il,
-    });
-  }
-
-  resetPassword = () => {
+  resetPassword = ({ newPassword }) => {
     const {
       recoveringUsername,
       recoveringCode,
     } = this.props;
 
-    const {
-      password,
-    } = this.il.getOutputs();
-
-    if (this.il.validate()) {
-      this.props.onResetPassword({
-        username: recoveringUsername,
-        code: recoveringCode,
-        newPassword: password,
-      });
-    }
+    this.props.onResetPassword({
+      username: recoveringUsername,
+      code: recoveringCode,
+      newPassword,
+    });
   }
 
   render() {
     const {
       intl,
       classes,
-      recoveryCodeError,
+      ...porps
+      // recoveryCodeError,
     } = this.props;
 
-    const {
-      password,
-    } = this.il.getOutputs();
-
-    const translate = translateMessages.bind(null, intl, messages);
     const translated = translateMessages(intl, messages, [
       'setNewPassword',
-      'resetPassword',
     ]);
 
     return (
-      <div>
-        <FormSpace variant="top" />
-        <FormContent>
-          <FormSpace variant="content2" />
-          {recoveryCodeError
-            && (
-              <React.Fragment>
-                <Typography variant="body1" color="secondary">
-                  {recoveryCodeError}
-                </Typography>
-                <FormSpace variant="content4" />
-              </React.Fragment>
-            )
-          }
-          {this.il.renderComponent('password', {
-            translate,
-            extraProps: this.il.renderProps('passwordVisibility', { translate }),
-          })}
-          <FormSpace variant="content4" />
-          {this.il.renderComponent('confrimPassword', {
-            translate,
-            extraProps: this.il.renderProps('passwordVisibility', { translate }),
-          })}
-          <FormSpace variant="content4" />
-          <div className={classes.flexContainer}>
-            <div className={classes.flex1} />
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={!password}
-              className={classes.actionBtn}
-              onClick={this.resetPassword}
-            >
-              {translated.setNewPassword}
-            </Button>
-          </div>
-        </FormContent>
-      </div>
+      <FormBaseType001
+        {...porps}
+        namespace="reset-password"
+        i18nMessages={messages}
+        setNewPasswordText={translated.setNewPassword}
+        onSubmit={this.resetPassword}
+        fields={createResetPasswordInputConfigs(classes)}
+      />
     );
   }
 }

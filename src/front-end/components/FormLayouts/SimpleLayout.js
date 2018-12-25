@@ -29,7 +29,7 @@ class SimpleLayout extends React.PureComponent {
 
     this.il = new InputLinker(this, { namespace });
 
-    this.fieldLinks = this.il.add(...(fields.map(field => ({
+    this.il.add(...(fields.map(field => ({
       presets: [field, propagateOnChangeEvent()],
     }))));
 
@@ -61,7 +61,7 @@ class SimpleLayout extends React.PureComponent {
         <FormSpace variant="top" />
         <FormContent>
           {
-            this.fieldLinks.map((filedLink) => {
+            this.il.fieldLinks.map((filedLink) => {
               const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content1" />;
               return (
                 <React.Fragment key={filedLink.name}>

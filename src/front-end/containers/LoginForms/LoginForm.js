@@ -2,13 +2,13 @@ import React from 'react';
 import { compose } from 'recompose';
 import { injectIntl } from 'react-intl';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import { BottonPreset } from '~/utils/InputLinker/helpers';
 
 import translateMessages from '~/utils/translateMessages';
 import {
   FormSpace,
 } from '~/components/FormInputs';
-import FormBaseType001 from './FormBaseType001';
+import FormBaseType001 from '~/containers/LoginForms/FormBaseType001';
 
 import createFormPaperStyle from '~/styles/FormPaper';
 
@@ -20,7 +20,6 @@ class LoginForm extends React.PureComponent {
   render() {
     const {
       intl,
-      classes,
       fields,
       i18nMessages,
     } = this.props;
@@ -33,19 +32,18 @@ class LoginForm extends React.PureComponent {
         {...this.props}
         fields={[
           ...fields,
-          () => ({
-            InputComponent: Button,
-            ignoredFromOutputs: true,
-            getProps: (props, { link: { owner } }) => ({
+          {
+            presets: [BottonPreset],
+            getProps: (props, { link: { owner, ownerProps } }) => ({
               variant: 'contained',
               fullWidth: true,
               color: 'primary',
-              className: classes.loginBtn,
+              className: ownerProps.classes.loginBtn,
               onClick: owner.handleSubmit,
               children: translated.login,
             }),
             options: { space: <FormSpace variant="content1" /> },
-          }),
+          },
         ]}
       />
     );
