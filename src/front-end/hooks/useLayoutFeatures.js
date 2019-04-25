@@ -14,6 +14,7 @@ export const defaultIlOnInit = props => (il) => {
   }))));
 
   il.setDefaultValues(defaultValues || {});
+  il.resetDirtyFlags();
 };
 
 export default (props, ilOnInit) => {
@@ -21,6 +22,8 @@ export default (props, ilOnInit) => {
     value,
     namespace,
     ignoredUndefinedFromOutputs = true,
+    Linker,
+    linkerOptions,
 
     i18nNs = [],
     styleNs = [],
@@ -49,7 +52,13 @@ export default (props, ilOnInit) => {
 
   const ilResults = useInputLinker(
     {/* props */},
-    { namespace, ignoredUndefinedFromOutputs, controlled: !!value },
+    {
+      Linker,
+      ...linkerOptions,
+      namespace,
+      ignoredUndefinedFromOutputs,
+      controlled: !!value,
+    },
     createInitFunc,
   );
   const { il } = ilResults;

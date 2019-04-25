@@ -21,6 +21,7 @@ export default class FieldLink {
     this.ignoredFromOutputs = config.ignoredFromOutputs;
     this._mergeChildren = config.mergeChildren || ((children1, children2) => children1.concat(children2));
     this.options = config.options;
+    this.dirty = false;
 
     this.converter = {
       fromView: config.converter.fromView || (([event]) => event.target.value),
@@ -104,6 +105,7 @@ export default class FieldLink {
     const linkInfo = { storedValue, link: this };
     const value = getValue(rawArgs, linkInfo);
     this.onChange(value, rawArgs, linkInfo);
+    this.linker.onFieldValueChange(this, value, rawArgs, linkInfo);
     this.setValue(value, rawArgs);
   };
 

@@ -16,10 +16,17 @@ export default class PropsProxy {
               ...this.linker.getValues(),
               [this.name]: value,
             });
-          } else if (hostProps.onChanges) {
-            linker.addPendingChange(hostProps.onChanges, {
-              value, rawArgs, link,
-            });
+          }
+          if (hostProps.onChanges) {
+            if (this.linker.options.applyChangesSync) {
+              linker.changeValues({
+                [this.name]: value,
+              });
+            } else {
+              linker.addPendingChange(hostProps.onChanges, {
+                value, rawArgs, link,
+              });
+            }
           }
         },
       };
