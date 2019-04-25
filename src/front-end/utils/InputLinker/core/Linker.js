@@ -32,9 +32,18 @@ export default class InputLinker {
     this.fieldMap = {};
     this._idCounter = 0;
     this._pendingChanges = { changes: [] };
+    this.customData = {};
   }
 
   get hostProps() { return this.host.props; }
+
+  resetDirtyFlags = (flag = false) => {
+    Object.values(this.fieldMap).forEach(f => (f.dirty = flag));
+  }
+
+  onFieldValueChange = (field, value, rawArgs, linkInfo) => {
+    field.dirty = true;
+  }
 
   addPendingChange = (cb, change) => {
     if (!this._pendingChanges.nextTick) {
@@ -213,6 +222,27 @@ export default class InputLinker {
     if (field) {
       field.changeValue(value);
     }
+  };
+
+  changeValues = (changeMap) => {
+    const changes = [];
+    Object.keys(changeMap).forEach((fieldName) => {
+      const value = changeMap[fieldName];
+      const field = this.getField(fieldName);
+      if (field && this.host.props.onChanges) {
+        changes.push({
+          value, rawArgs: [], link: field,
+        });
+      }
+    });
+    this.host.props.onChanges(
+      changes,
+      this,
+      changes.reduce((v, change) => ({
+        ...v,
+        [change.link.name]: change.value,
+      }), this.getValues()),
+    );
   };
 
   validate(keepErrors = true) {

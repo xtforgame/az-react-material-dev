@@ -348,6 +348,19 @@ export const propagateOnChangeEvent = (parentOnChangePropName = 'onChange') => (
   };
 };
 
+export const raiseDirtyFlagOnChangeEvent = (cfg) => {
+  const originalOnChange = cfg.onChange || (() => {});
+  return {
+    ...cfg,
+    onChange: (value, rawArgs, linkInfo) => {
+      originalOnChange(value, rawArgs, linkInfo);
+      const { link } = linkInfo;
+      console.log('link :', link);
+      link.dirty = true;
+    },
+  };
+};
+
 export const createDefaultContainer = getSpace => extraChildElements => ({
   ignoredFromOutputs: true,
   mergeChildren: (_, childrenElements, linkInfo) => childrenElements.reduce(
