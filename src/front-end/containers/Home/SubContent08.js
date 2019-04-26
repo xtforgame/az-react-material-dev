@@ -35,15 +35,7 @@ const fileds = [
   },
   {
     name: 'usernameX',
-    presets: ['text', translateLabel('rememberMe')],
-    mwRender: [
-      ({ value, link: { hostProps }, options: { translate, renderSession: rs } }) => {
-        const usernameX = rs.calculated && rs.calculated.usernameX;
-        return {
-          value: usernameX || value,
-        };
-      },
-    ],
+    presets: ['autoCalculableText', translateLabel('rememberMe')],
   },
   {
     name: 'password',

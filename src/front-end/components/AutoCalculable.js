@@ -11,12 +11,13 @@ export default (props) => {
       isEqual = (r, v, p) => r === v,
       getExtraProps = () => undefined,
       onAutoCalcChanged = () => undefined,
+      normalize = (v => v || ''),
     } = {},
     ...rest
   } = props;
 
   const [value, setValue] = useState(v);
-  const [lastAutoCalc, setLastAutoCalc] = useState(v == null || isEqual(calculatedValue, v));
+  const [lastAutoCalc, setLastAutoCalc] = useState(v == null || isEqual(calculatedValue, v, props));
   const [lastMatchedValue, setLastMatchedValue] = useState(null);
   const [extraProps, setExtraProps] = useState(getExtraProps(lastAutoCalc));
 
@@ -24,8 +25,10 @@ export default (props) => {
     || isEqual(calculatedValue, v, props)
     || (lastAutoCalc && lastMatchedValue === v);
 
+  const currentValue = autoCalc ? calculatedValue : v;
+
   useEffect(() => {
-    setValue(autoCalc ? calculatedValue : v);
+    setValue(currentValue);
     setLastAutoCalc(autoCalc);
     setLastMatchedValue(autoCalc ? v : null);
     setExtraProps(getExtraProps(autoCalc));
@@ -34,7 +37,7 @@ export default (props) => {
 
   return (
     <Component
-      value={value}
+      value={normalize(currentValue)}
       {...rest}
       {...extraProps}
     />

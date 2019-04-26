@@ -310,6 +310,7 @@ export default class InputLinker {
       link: field,
       props: {},
       nonProps: mwDynamicNonPropsFilter(field),
+      options,
     });
 
     if (!newCtx.nonProps.shouldRender) {
