@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Button from '@material-ui/core/Button';
 import { FormSpace, FormContent } from '~/components/FormInputs';
 import useLayoutFeatures from '~/hooks/useLayoutFeatures';
@@ -12,12 +12,13 @@ export class JsonFormLinker extends Linker {
   }
 }
 class RenderSession {
-  constructor(parent, name, linker, host) {
+  constructor(parent, name, linker, host, options = {}) {
     this.parent = parent;
     this.name = name;
     this.linker = linker;
     this.host = host;
     this.state = 'rendering';
+    this.prevRenderSession = options.prevRenderSession;
   }
 
   beforeRender() {
@@ -68,13 +69,19 @@ const JsonFormLayout = (props) => {
   //   t = () => '';
   // }
 
-  const renderSession = new RenderSession(rsp, rsName, il, host);
+  const ref = useRef();
+
+  const renderSession = new RenderSession(rsp, rsName, il, host, {
+    prevRenderSession: ref.current && ref.current.prevRenderSession,
+  });
 
   il.updateHost(host);
 
   renderSession.beforeRender();
   useEffect(() => {
+    ref.current = { prevRenderSession: renderSession };
     renderSession.afterRender();
+    renderSession.prevRenderSession = null;
   });
 
   return (

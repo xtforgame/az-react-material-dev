@@ -12,11 +12,11 @@ import {
 
 // import InputLinker from '~/utils/InputLinker';
 import {
-  // FormTextFieldPreset,
-  // FormPasswordVisibilityPreset,
-  // FormCheckboxPreset,
-  // assert,
-  translateLabel,
+// FormTextFieldPreset,
+// FormPasswordVisibilityPreset,
+// FormCheckboxPreset,
+// assert,
+// translateLabel,
 } from '~/utils/InputLinker/helpers';
 
 
@@ -28,26 +28,52 @@ const styles = theme => ({
   },
 });
 
-const fileds = [
-  {
-    name: 'username',
-    presets: ['text', translateLabel('username')],
+const jsonFormData = {
+  namespace: 'form1',
+  preRender: (rs, {
+    $dirtyMap,
+    $inputChanged,
+  }) => {
+    const username = rs.linker.getValue('username');
+    if (rs.prevRenderSession && !$inputChanged) {
+      return (rs.calculated = rs.calculated || rs.prevRenderSession.calculated); // eslint-disable-line no-param-reassign
+    }
+
+    console.log('rs.calculated');
+
+    return (rs.calculated = { // eslint-disable-line no-param-reassign
+      ...rs.calculated,
+      usernameX: username && `${rs.linker.getValue('username')}pp`,
+    });
   },
-  {
-    name: 'usernameX',
-    presets: ['autoCalculableText', translateLabel('rememberMe')],
-  },
-  {
-    name: 'password',
-    presets: ['password', translateLabel('password')],
-    extraOptions: { space: <div /> },
-  },
-  {
-    name: 'rememberMe',
-    presets: ['checkbox', translateLabel('rememberMe')],
-    defaultValue: false,
-  },
-];
+  fileds: [
+    {
+      name: 'username',
+      presets: [
+        'text',
+        ['translateProp', 'label', 'username'],
+        ['translateProp', 'placeholder', 'usernameEmptyError', {
+          emailAddress: '$t(emailAddress)',
+          phoneNumber: '$t(phoneNumber)',
+        }],
+      ],
+    },
+    {
+      name: 'usernameX',
+      presets: ['autoCalculableText', ['translateProp', 'label', 'rememberMe']],
+    },
+    {
+      name: 'password',
+      presets: ['password', ['translateProp', 'label', 'password']],
+      extraOptions: { space: <div /> },
+    },
+    {
+      name: 'rememberMe',
+      presets: ['checkbox', ['translateProp', 'label', 'rememberMe']],
+      defaultValue: false,
+    },
+  ],
+};
 
 class SubContent08 extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -99,23 +125,28 @@ class SubContent08 extends React.PureComponent { // eslint-disable-line react/pr
           }}
           rsBeforeRender={(rs) => {
             // console.log('RenderSession.beforeRender()');
+            let $inputChanged = false;
+            const $dirtyMap = {};
             Object.values(rs.linker.getFields())
-            .filter(f => f.dirty)
+            .filter(f => f.dirty && !f.name.startsWith('~'))
             .forEach((f) => {
-              // console.log('f :', f);
+              $dirtyMap[f.name] = true;
+              $inputChanged = true;
             });
-            const username = rs.linker.getValue('username');
-            rs.calculated = {
-              ...rs.calculated,
-              usernameX: username && `${rs.linker.getValue('username')}pp`,
-            };
+
+            jsonFormData.preRender(rs, {
+              $dirtyMap,
+              $inputChanged,
+            });
+
             rs.linker.resetDirtyFlags();
           }}
           rsAfterRender={(rs) => {
+            // console.log('rs :', rs);
             // console.log('RenderSession.afterRender()');
           }}
-          namespace="form1"
-          fields={fileds}
+          namespace={jsonFormData.namespace}
+          fields={jsonFormData.fileds}
           styleNs={['login']}
           i18nNs={['app-common']}
           // onChange={(...agrs) => { console.log('agrs :', agrs); }}

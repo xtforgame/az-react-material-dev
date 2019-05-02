@@ -70,14 +70,21 @@ export default class InputLinker {
   getUniqueName = () => (this.namespace ? `${this.namespace}-unnamed-${++this._idCounter}` : `unnamed-${++this._idCounter}`);
 
   getPreset = (preset) => {
-    if (typeof preset !== 'string') {
-      return preset;
+    if (typeof preset === 'string') {
+      const result = this.presets[preset];
+      if (!result) {
+        throw new Error(`preset: '${preset}' not found in Linker`);
+      }
+      return result;
+    } else if (Array.isArray(preset) && preset.length > 0) {
+      const [funcName, ...args] = preset;
+      const func = this.getPreset(funcName);
+      if (!func) {
+        throw new Error(`preset: '${funcName}' not found in Linker`);
+      }
+      return func(...args);
     }
-    const result = this.presets[preset];
-    if (!result) {
-      throw new Error(`preset: '${preset}' not found in Linker`);
-    }
-    return result;
+    return preset;
   };
 
   evaluateConfig = ({ config: currentCfg, lastQueue = [] }, c) => {

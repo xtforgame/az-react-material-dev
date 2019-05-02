@@ -317,11 +317,19 @@ export const mwpListItemDisplayer = (ctx) => {
   };
 };
 
-export const translateLabel = i18nKey => ({
-  mwRender: ({ options: { translate } }) => ({
-    label: i18nKey && translate(i18nKey),
-  }),
-});
+export const translateProp = (propName, i18nKey, i8nValues = {}) => {
+  let iV = i8nValues;
+  if (typeof iV === 'string') {
+    iV = JSON.parse(iV);
+  }
+  return {
+    mwRender: ({ options: { translate } }) => ({
+      [propName]: i18nKey && translate(i18nKey, iV),
+    }),
+  };
+};
+
+export const translateLabel = (i18nKey, i8nValues) => translateProp('label', i18nKey, i8nValues);
 
 export const addOnPressEnterEvent = (onPressEnter = undefined) => ({
   mwRender: ({ link: { host } }) => {

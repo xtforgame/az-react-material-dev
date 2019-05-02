@@ -12,21 +12,14 @@ import {
   FormPasswordVisibilityPreset,
   FormCheckboxPreset,
   assert,
-  translateLabel,
+  translateProp,
+  // translateLabel,
 } from '~/utils/InputLinker/helpers';
 
 
 export default {
   text: {
     presets: [FormTextFieldPreset],
-    mwRender: [
-      ({ link: { hostProps }, options: { translate, renderSession } }) => ({
-        placeholder: translate('usernameEmptyError', {
-          emailAddress: '$t(emailAddress)',
-          phoneNumber: '$t(phoneNumber)',
-        }),
-      }),
-    ],
     validate: value => assert(!!value, null, {
       key: 'usernameEmptyError',
       values: {
@@ -39,19 +32,25 @@ export default {
     presets: [FormTextFieldPreset],
     component: FormPasswordInput,
     validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
-    childLinks: [
-      {
-        name: 'passwordVisibility',
-        presets: [FormPasswordVisibilityPreset],
-        defaultValue: false,
-      },
-    ],
+    cfgMiddlewares: {
+      last: cfg => ({
+        ...cfg,
+        childLinks: [
+          {
+            name: `${cfg.name}Visibility`,
+            presets: [FormPasswordVisibilityPreset],
+            defaultValue: false,
+          },
+        ],
+      }),
+    },
   },
   checkbox: {
     presets: [FormCheckboxPreset],
     props: { dense: 'true', color: 'primary' },
   },
   // =========================
+  translateProp,
   autoCalculable: {
     mwPreRender: ({ nonProps }) => [{
       Component: nonProps.component,
@@ -59,12 +58,6 @@ export default {
       component: AutoCalculable,
       shouldRender: true,
     }],
-    mwRender: ({ link: { hostProps }, options: { translate, renderSession } }) => ({
-      placeholder: translate('usernameEmptyError', {
-        emailAddress: '$t(emailAddress)',
-        phoneNumber: '$t(phoneNumber)',
-      }),
-    }),
   },
   autoCalculableText: {
     presets: ['text', 'autoCalculable'],
