@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 
+export const defaultIsEqual = (r, v, p) => r === v;
+
 export default (props) => {
   const {
     Component,
     value: v,
     calculatedValue,
     acOptions: {
-      isEqual = (r, v, p) => r === v,
+      isEqual = defaultIsEqual,
       getExtraProps = () => undefined,
       onAutoCalcChanged = () => undefined,
       normalize = (v => v || ''),
@@ -16,7 +18,7 @@ export default (props) => {
     ...rest
   } = props;
 
-  const [value, setValue] = useState(v);
+  // const [value, setValue] = useState(v);
   const [lastAutoCalc, setLastAutoCalc] = useState(v == null || isEqual(calculatedValue, v, props));
   const [lastMatchedValue, setLastMatchedValue] = useState(null);
   const [extraProps, setExtraProps] = useState(getExtraProps(lastAutoCalc));
@@ -28,7 +30,7 @@ export default (props) => {
   const currentValue = autoCalc ? calculatedValue : v;
 
   useEffect(() => {
-    setValue(currentValue);
+    // setValue(currentValue);
     setLastAutoCalc(autoCalc);
     setLastMatchedValue(autoCalc ? v : null);
     setExtraProps(getExtraProps(autoCalc));

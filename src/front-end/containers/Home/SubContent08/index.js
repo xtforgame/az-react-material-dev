@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -36,12 +37,12 @@ const jsonFormData = {
   }) => {
     const username = rs.linker.getValue('username');
     if (rs.prevRenderSession && !$inputChanged) {
-      return (rs.calculated = rs.calculated || rs.prevRenderSession.calculated); // eslint-disable-line no-param-reassign
+      return (rs.calculated = rs.calculated || rs.prevRenderSession.calculated);
     }
 
-    console.log('rs.calculated');
+    // console.log('rs.calculated');
 
-    return (rs.calculated = { // eslint-disable-line no-param-reassign
+    return (rs.calculated = {
       ...rs.calculated,
       usernameX: username && `${rs.linker.getValue('username')}pp`,
     });
@@ -61,6 +62,7 @@ const jsonFormData = {
     {
       name: 'usernameX',
       presets: ['autoCalculableText', ['translateProp', 'label', 'rememberMe']],
+      defaultValue: '',
     },
     {
       name: 'password',
@@ -75,7 +77,7 @@ const jsonFormData = {
   ],
 };
 
-class SubContent08 extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class SubContent08 extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -110,6 +112,13 @@ class SubContent08 extends React.PureComponent { // eslint-disable-line react/pr
           Linker={JsonFormLinker}
           linkerOptions={{
             presets: {},
+            globalValidator: ({ linker, validate }) => {
+              if (!validate()) {
+                return false;
+              }
+              Object.values(linker.getFields()).forEach(f => f.setError(new Error('XXXX')));
+              return false;
+            },
           }}
           value={value}
           onChange={this.handleChange}
@@ -149,7 +158,6 @@ class SubContent08 extends React.PureComponent { // eslint-disable-line react/pr
           fields={jsonFormData.fileds}
           styleNs={['login']}
           i18nNs={['app-common']}
-          // onChange={(...agrs) => { console.log('agrs :', agrs); }}
           // onSubmit={(value) => { console.log('value :', value); }}
           submitButtonText="登入"
         />

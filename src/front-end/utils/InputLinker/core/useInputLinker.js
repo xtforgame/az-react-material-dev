@@ -25,10 +25,12 @@ export default (host, options, cb) => {
         il.setDefaultValues(resetOptions.defaultValues);
       }
       if (!resetOptions.ignoreResetValues) {
+        const changeMap = {};
         Object.values(il.fieldMap).forEach((f) => {
-          f.setValue(f.defaultValue);
+          changeMap[f.name] = f.defaultValue;
           f.setError();
         });
+        il.changeValues(changeMap);
       }
       const newIl = ilCreator(host, options, { ...resetOptions, reset: true }, cb)();
       setIl(newIl);

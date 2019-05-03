@@ -6,6 +6,7 @@
   },
   "include": [
     "./**/*.ts",
+    "./**/*.tsx",
     "../tsd/node.d.ts",
     "../tsd/server/**/*"
   ],

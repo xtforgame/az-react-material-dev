@@ -1,14 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import { FormSpace, FormContent } from '~/components/FormInputs';
-import useLayoutFeatures from '~/hooks/useLayoutFeatures';
+import useLayoutFeatures2 from '~/hooks/useLayoutFeatures2';
 import Linker from '~/utils/InputLinker/core/Linker';
+import { TwitterPicker } from 'react-color';
 import presets from './presets';
 
 export class JsonFormLinker extends Linker {
   constructor(...args) {
     super(...args);
     console.log('JsonFormLinker');
+    this.basicValidate = super.validate.bind(this);
+  }
+
+  validate() {
+    if (this.options.globalValidator) {
+      return this.options.globalValidator({
+        linker: this,
+        validate: this.basicValidate,
+      });
+    }
+    return super.validate();
   }
 }
 class RenderSession {
@@ -48,7 +60,7 @@ const JsonFormLayout = (props) => {
 
   const {
     il, resetIl, classesByNs, tData: { t/* , i18n, ready */ }, host,
-  } = useLayoutFeatures({
+  } = useLayoutFeatures2({
     ...props,
     Linker,
     linkerOptions: {
@@ -75,7 +87,10 @@ const JsonFormLayout = (props) => {
     prevRenderSession: ref.current && ref.current.prevRenderSession,
   });
 
-  il.updateHost(host);
+  il.updateHost({
+    ...host,
+    renderSession,
+  });
 
   renderSession.beforeRender();
   useEffect(() => {
@@ -83,6 +98,8 @@ const JsonFormLayout = (props) => {
     renderSession.afterRender();
     renderSession.prevRenderSession = null;
   });
+
+  const [bg, setBg] = useState('#fff');
 
   return (
     <div>
@@ -111,6 +128,12 @@ const JsonFormLayout = (props) => {
         <FormSpace variant="content1" />
       </FormContent>
       {children}
+      <TwitterPicker
+        width="100%"
+        triangle="hide"
+        color={bg}
+        onChangeComplete={c => setBg(c)}
+      />
     </div>
   );
 };

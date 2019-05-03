@@ -46,12 +46,12 @@ module.exports = function({ mode }) {
     resolve: {
       // extensions: ['', '.jsx', '.js', '.scss', '.css', '.json', '.md'],
       alias: webpackResolveAlias,
-      extensions: ['.js', '.jsx', '.ts'],
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
     module: {
       rules: [
         {
-          test: /\.(js|jsx|ts)$/,
+          test: /\.(js|jsx|ts|tsx)$/,
           include: [
             path.resolve(projRoot, frontEndJsEntryFolder),
             path.resolve(projRoot, commonConfigJsEntryFolder),
