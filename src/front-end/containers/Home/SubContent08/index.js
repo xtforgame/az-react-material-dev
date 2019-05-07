@@ -61,18 +61,32 @@ const jsonFormData = {
     },
     {
       name: 'usernameX',
-      presets: ['autoCalculableText', ['translateProp', 'label', 'rememberMe']],
+      presets: ['autoCalculableText'],
+      extraProps: {
+        label: '可編輯輸入',
+      },
       defaultValue: '',
     },
     {
       name: 'password',
       presets: ['password', ['translateProp', 'label', 'password']],
+    },
+    {
+      name: 'date',
+      presets: ['date'],
+      extraProps: {
+        label: '選擇日期',
+      },
       extraOptions: { space: <div /> },
     },
     {
       name: 'rememberMe',
       presets: ['checkbox', ['translateProp', 'label', 'rememberMe']],
       defaultValue: false,
+    },
+    {
+      name: 'submit',
+      presets: ['submit', ['translateProp', 'children', 'login']],
     },
   ],
 };

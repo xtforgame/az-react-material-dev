@@ -36,7 +36,7 @@
     "node": ">=10.0"
   },
   "dependencies": {
-    "@date-io/moment": "^0.0.2",
+    "@date-io/moment": "1.1.0",
     "@material-ui/core": "3.9.2",
     "@material-ui/icons": "3.0.2",
     "@material-ui/lab": "3.0.0-alpha.29",
@@ -66,7 +66,7 @@
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.0",
     "lodash": "^4.17.4",
-    "material-ui-pickers": "2.0.5",
+    "material-ui-pickers": "2.2.2",
     "moment": "^2.22.2",
     "numeral": "^2.0.6",
     "pngjs": "^3.3.3",

@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+import Button from '@material-ui/core/Button';
 import {
   // FormSpace,
   // FormContent,
@@ -12,8 +13,10 @@ import {
   FormTextFieldPreset,
   FormPasswordVisibilityPreset,
   FormCheckboxPreset,
+  DatePickerPreset,
   assert,
   translateProp,
+  createIgnoredPreset,
   // translateLabel,
 } from '~/utils/InputLinker/helpers';
 
@@ -48,7 +51,32 @@ export default {
   },
   checkbox: {
     presets: [FormCheckboxPreset],
-    props: { dense: 'true', color: 'primary' },
+    extraProps: { dense: 'true', color: 'primary' },
+  },
+  button: {
+    presets: [createIgnoredPreset(Button)],
+    component: Button,
+  },
+  date: {
+    presets: [DatePickerPreset],
+    extraProps: {
+      variant: 'outlined',
+      // InputProps: { style: { width: 140 } },
+      fullWidth: true,
+    },
+  },
+  submit: {
+    presets: ['button'],
+    extraProps: {
+      variant: 'contained',
+      color: 'primary',
+      fullWidth: true,
+    },
+    mwRender: ({ link: { host, hostProps, linker } }) => ({
+      className: hostProps.classesByNs.loginBtn,
+      onClick: host.handleSubmit,
+      // children: hostProps.countDownText,
+    }),
   },
   // =========================
   translateProp,

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Button from '@material-ui/core/Button';
-import { FormSpace, FormContent } from '~/components/FormInputs';
+import FormDialogInput from '~/components/FormInputs/FormDialogInput';
+import { FormSpace, FormContent, FormColorPicker } from '~/components/FormInputs';
 import useLayoutFeatures2 from '~/hooks/useLayoutFeatures2';
 import Linker from '~/utils/InputLinker/core/Linker';
-import { TwitterPicker } from 'react-color';
+// import { TwitterPicker } from 'react-color';
 import presets from './presets';
 
 export class JsonFormLinker extends Linker {
@@ -52,14 +52,13 @@ const JsonFormLayout = (props) => {
   const {
     Linker = JsonFormLinker,
     linkerOptions = {},
-    submitButtonText,
     renderSessionParent: rsp,
     renderSessionName: rsName,
     children,
   } = props;
 
   const {
-    il, resetIl, classesByNs, tData: { t/* , i18n, ready */ }, host,
+    il, resetIl, /* classesByNs, */ tData: { t/* , i18n, ready */ }, host,
   } = useLayoutFeatures2({
     ...props,
     Linker,
@@ -99,7 +98,7 @@ const JsonFormLayout = (props) => {
     renderSession.prevRenderSession = null;
   });
 
-  const [bg, setBg] = useState('#fff');
+  const [bg, setBg] = useState('#7BDCB5');
 
   return (
     <div>
@@ -107,7 +106,7 @@ const JsonFormLayout = (props) => {
       <FormContent>
         {
           il.fieldLinks.map((filedLink) => {
-            const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content1" />;
+            const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content2" />;
             return (
               <React.Fragment key={filedLink.name}>
                 {il.renderComponent(filedLink.name, { translate: t, renderSession })}
@@ -116,24 +115,38 @@ const JsonFormLayout = (props) => {
             );
           })
         }
-        <Button
-          variant="contained"
+        <FormColorPicker
+          label="Color"
+          value={bg}
+          onChange={c => console.log('c :', c) || setBg(c.hex || c || '')}
           fullWidth
-          color="primary"
-          className={classesByNs.login.loginBtn}
-          onClick={host.handleSubmit}
-        >
-          {submitButtonText}
-        </Button>
-        <FormSpace variant="content1" />
+          colorProps={{
+            colors: [
+              '#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3', '#EB144C', '#F78DA7', '#9900EF',
+            ],
+          }}
+        />
+        <FormSpace variant="content2" />
+        <FormDialogInput
+          label="Dialog"
+          value={bg}
+          onChange={c => setBg(c)}
+        />
+        {/* <TwitterPicker
+          width="100%"
+          triangle="hide"
+          styles={{
+            'hide-triangle': {
+              card: {
+                boxShadow: 'unset',
+              },
+            },
+          }}
+          color={bg}
+          onChangeComplete={c => console.log('c :', c) || setBg(c.hex || c || '')}
+        /> */}
       </FormContent>
       {children}
-      <TwitterPicker
-        width="100%"
-        triangle="hide"
-        color={bg}
-        onChangeComplete={c => setBg(c)}
-      />
     </div>
   );
 };

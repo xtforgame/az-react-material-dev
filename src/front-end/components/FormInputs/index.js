@@ -15,6 +15,7 @@ import FormFileInput from './FormFileInput';
 import FormFileInputWithMask from './FormFileInputWithMask';
 import FormImageButtonWithMask from './FormImageButtonWithMask';
 import FormSwitch from './FormSwitch';
+import FormColorPicker from './FormColorPicker';
 import NumberFormatInput from './NumberFormatInput';
 import ListInput from './ListInput';
 import InternalLink from './InternalLink';
@@ -38,6 +39,7 @@ export {
   FormFileInputWithMask,
   FormImageButtonWithMask,
   FormSwitch,
+  FormColorPicker,
   NumberFormatInput,
   InternalLink,
   HeaderSearchInput,
