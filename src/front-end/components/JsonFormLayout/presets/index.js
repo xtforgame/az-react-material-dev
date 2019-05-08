@@ -5,8 +5,10 @@ import {
   // FormContent,
   FormPasswordInput,
 } from '~/components/FormInputs';
+import FormDialogInput from '~/components/FormInputs/FormDialogInput';
 import AutoCalculable, { defaultIsEqual } from '~/components/AutoCalculable';
 import resetableInputPreset from './resetableInputPreset';
+import { DateRangePreset } from './range/presets';
 
 // import InputLinker from '~/utils/InputLinker';
 import {
@@ -64,6 +66,9 @@ export default {
       // InputProps: { style: { width: 140 } },
       fullWidth: true,
     },
+  },
+  dateRange: {
+    presets: [DateRangePreset],
   },
   submit: {
     presets: ['button'],

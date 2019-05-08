@@ -77,6 +77,13 @@ const jsonFormData = {
       extraProps: {
         label: '選擇日期',
       },
+    },
+    {
+      name: 'dateRange',
+      presets: ['dateRange'],
+      extraProps: {
+        label: '選擇日期範圍',
+      },
       extraOptions: { space: <div /> },
     },
     {

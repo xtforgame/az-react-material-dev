@@ -99,6 +99,7 @@ const JsonFormLayout = (props) => {
   });
 
   const [bg, setBg] = useState('#7BDCB5');
+  const [dialogText, setDialogText] = useState('Dialog Text');
 
   return (
     <div>
@@ -129,8 +130,10 @@ const JsonFormLayout = (props) => {
         <FormSpace variant="content2" />
         <FormDialogInput
           label="Dialog"
-          value={bg}
-          onChange={c => setBg(c)}
+          title="XXX Dialog"
+          value={dialogText}
+          displayValue={t => t}
+          onChange={t => setDialogText(t)}
         />
         {/* <TwitterPicker
           width="100%"

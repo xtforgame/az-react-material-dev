@@ -21,6 +21,15 @@ export default props => (
         },
       },
     }}
+    onKeyDown={(event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const { onKeyDown } = props;
+        if (onKeyDown) {
+          onKeyDown(event);
+        }
+      }
+    }}
     onClick={(e) => {
       e.stopPropagation();
       e.preventDefault();

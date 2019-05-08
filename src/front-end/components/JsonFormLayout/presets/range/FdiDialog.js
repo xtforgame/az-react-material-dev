@@ -3,7 +3,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import DialogContent from '@material-ui/core/DialogContent';
 import ConfirmDialog from '~/components/Dialogs/ConfirmDialog';
-import { FormTextField } from '~/components/FormInputs';
+import { FormSpace } from '~/components/FormInputs';
+import moment from 'moment';
+import { DateTimePicker } from 'material-ui-pickers';
+
+const diaplayFormat = 'YYYY/MM/DD HH:mm';
+const timeFormat = 'YYYY-MM-DD[T]HH:mm:ss.SSSZZ';
 
 export default class FdiDialog extends React.PureComponent {
   constructor(...args) {
@@ -40,6 +45,22 @@ export default class FdiDialog extends React.PureComponent {
       onExited,
       ...rest
     } = this.props;
+
+    const baseProps = {
+      variant: 'outlined',
+      fullWidth: true,
+      format: diaplayFormat,
+      animateYearScrolling: false,
+      cancelLabel: '取消',
+      clearLabel: '清除',
+      okLabel: '確定',
+      // clearable
+      // disableFuture
+      // maxDateMessage="Date must be less than today"
+    };
+
+    console.log('this.state.editingText :', this.state.editingText);
+
     return (
       <ConfirmDialog
         {...rest}
@@ -48,15 +69,20 @@ export default class FdiDialog extends React.PureComponent {
       >
         <DialogContent>
           {/* <FormSpace variant="content2" /> */}
-          <FormTextField
-            id=""
-            label={label}
-            onKeyPress={this.handleEnterForTextField}
+          <DateTimePicker
+            {...baseProps}
+            format={diaplayFormat}
+            minutesStep={20}
             value={this.state.editingText}
-            onChange={e => this.setState({ editingText: e.target.value })}
-            autoFocus
-            margin="dense"
-            fullWidth
+            onChange={v => this.setState({ editingText: moment(v).format(timeFormat)/* .toISOString(true) */ })}
+          />
+          <FormSpace variant="content2" />
+          <DateTimePicker
+            {...baseProps}
+            format={diaplayFormat}
+            minutesStep={20}
+            value={this.state.editingText}
+            onChange={v => this.setState({ editingText: moment(v).format(timeFormat)/* .toISOString(true) */ })}
           />
         </DialogContent>
       </ConfirmDialog>
