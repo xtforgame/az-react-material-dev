@@ -4,8 +4,9 @@ import {
   // FormSpace,
   // FormContent,
   FormPasswordInput,
+  FormDateTimePicker,
 } from '~/components/FormInputs';
-import FormDialogInput from '~/components/FormInputs/FormDialogInput';
+// import FormDialogInput from '~/components/FormInputs/FormDialogInput';
 import AutoCalculable, { defaultIsEqual } from '~/components/AutoCalculable';
 import resetableInputPreset from './resetableInputPreset';
 import { DateRangePreset } from './range/presets';
@@ -59,13 +60,28 @@ export default {
     presets: [createIgnoredPreset(Button)],
     component: Button,
   },
-  date: {
+  dateOld: {
     presets: [DatePickerPreset],
     extraProps: {
       variant: 'outlined',
       // InputProps: { style: { width: 140 } },
       fullWidth: true,
     },
+  },
+  date: {
+    component: FormDateTimePicker,
+    converter: {
+      fromView: ([v]) => v,
+      toView: v => v,
+    },
+    extraProps: {
+      // InputProps: { style: { width: 140 } },
+      fullWidth: true,
+    },
+    mwRender: ({ handleChange, value }) => ({
+      value,
+      onChange: handleChange,
+    }),
   },
   dateRange: {
     presets: [DateRangePreset],

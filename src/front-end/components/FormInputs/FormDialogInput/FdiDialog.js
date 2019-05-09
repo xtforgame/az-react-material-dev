@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import DialogContent from '@material-ui/core/DialogContent';
 import ConfirmDialog from '~/components/Dialogs/ConfirmDialog';
-import { FormTextField } from '~/components/FormInputs';
+import { FormTextField, FormSpace } from '~/components/FormInputs';
 
 export default class FdiDialog extends React.PureComponent {
   constructor(...args) {
@@ -47,7 +47,7 @@ export default class FdiDialog extends React.PureComponent {
         dialogProps={{ onExited }}
       >
         <DialogContent>
-          {/* <FormSpace variant="content2" /> */}
+          <FormSpace variant="content1" />
           <FormTextField
             id=""
             label={label}

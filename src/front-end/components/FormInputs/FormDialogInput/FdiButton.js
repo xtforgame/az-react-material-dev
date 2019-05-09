@@ -3,9 +3,9 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 
 const Content = ({ inputRef, ...props }) => (
-  <div {...props}>
+  <pre {...props}>
     {props.value || <br />}
-  </div>
+  </pre>
 );
 
 export default props => (
