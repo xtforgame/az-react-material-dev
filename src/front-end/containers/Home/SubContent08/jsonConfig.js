@@ -71,8 +71,8 @@ export default {
   fileds: [
     {
       name: 'username',
+      type: 'text',
       presets: [
-        'text',
         ['translateProp', 'label', 'username'],
         ['translateProp', 'placeholder', 'usernameEmptyError', {
           emailAddress: '$t(emailAddress)',
@@ -82,6 +82,7 @@ export default {
     },
     {
       name: 'usernameX',
+      type: 'text',
       presets: ['autoCalculableText'],
       extraProps: {
         label: '可編輯輸入',
@@ -94,7 +95,7 @@ export default {
     },
     {
       name: 'date',
-      presets: ['date'],
+      type: 'date',
       extraProps: {
         label: '選擇日期',
       },
@@ -108,28 +109,28 @@ export default {
     },
     {
       name: 'time',
-      presets: ['time'],
+      type: 'time',
       extraProps: {
         label: '選擇時間',
       },
     },
     {
       name: 'timeRange',
-      presets: ['timeRange'],
+      type: 'timeRange',
       extraProps: {
         label: '選擇時間範圍',
       },
     },
     {
       name: 'dateTime',
-      presets: ['dateTime'],
+      type: 'dateTime',
       extraProps: {
         label: '選擇日期時間',
       },
     },
     {
       name: 'dateTimeRange',
-      presets: ['dateTimeRange'],
+      type: 'dateTimeRange',
       extraProps: {
         label: '選擇日期時間範圍',
       },
@@ -137,12 +138,14 @@ export default {
     },
     {
       name: 'rememberMe',
-      presets: ['checkbox', ['translateProp', 'label', 'rememberMe']],
+      type: 'checkbox',
+      presets: [['translateProp', 'label', 'rememberMe']],
       defaultValue: false,
     },
     {
       name: 'submit',
-      presets: ['submit', ['translateProp', 'children', 'login']],
+      type: 'submit',
+      presets: [['translateProp', 'children', 'login']],
     },
   ],
 };

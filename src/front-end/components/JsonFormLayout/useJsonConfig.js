@@ -1,5 +1,8 @@
 /* eslint-disable no-param-reassign */
 import React, { useEffect, useRef, useState } from 'react';
+import {
+  toArray,
+} from '~/utils/InputLinker';
 
 export const normalizeJsonConfig = (json) => {
   if (Array.isArray(json.preRender)) {
@@ -8,6 +11,16 @@ export const normalizeJsonConfig = (json) => {
   if (Array.isArray(json.globalValidator)) {
     json.globalValidator = new Function(...json.globalValidator); // eslint-disable-line no-new-func
   }
+  json.fileds.forEach((filed) => {
+    if (filed.type) {
+      filed.presets = toArray(filed.type)
+      .concat([{ extraOptions: { jflType: filed.type } }])
+      .concat(toArray(filed.preset))
+      .concat(toArray(filed.presets));
+      delete filed.type;
+      delete filed.preset;
+    }
+  });
   return json;
 };
 

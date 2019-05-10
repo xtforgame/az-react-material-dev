@@ -98,9 +98,7 @@ export default class InputLinker {
       } = c;
 
       const addLast = (c) => {
-        if (last) {
-          lastQueue.unshift(last);
-        }
+        lastQueue.splice(0, 0, ...toArray(last));
         return c;
       };
 
