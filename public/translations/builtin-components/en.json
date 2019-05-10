@@ -1,0 +1,19 @@
+{
+  "confirmOK": "OK",
+  "confirmCancel": "Cancel",
+  "notSelected": "<Not Selected>",
+  "formClear": "Clear",
+
+  "date": "Date",
+  "dateRange": "Date range",
+  "dateStart": "Start date",
+  "dateEnd": "End date",
+  "time": "Time",
+  "timeRange": "Time range",
+  "timeStart": "Start time",
+  "timeEnd": "End time",
+  "dateTime": "Date and time",
+  "dateTimeimeRange": "Time range",
+  "dateTimeStart": "Start time",
+  "dateTimeEnd": "End time"
+}

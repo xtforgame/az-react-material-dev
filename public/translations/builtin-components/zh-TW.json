@@ -1,0 +1,19 @@
+{
+  "confirmOK": "確認",
+  "confirmCancel": "取消",
+  "notSelected": "<未選取>",
+  "formClear": "清除",
+
+  "date": "日期",
+  "dateRange": "日期範圍",
+  "dateStart": "開始日期",
+  "dateEnd": "結束日期",
+  "time": "時間",
+  "timeRange": "時間範圍",
+  "timeStart": "開始時間",
+  "timeEnd": "結束時間",
+  "dateTime": "日期時間",
+  "dateTimeimeRange": "日期時間範圍",
+  "dateTimeStart": "開始時間",
+  "dateTimeEnd": "結束時間"
+}

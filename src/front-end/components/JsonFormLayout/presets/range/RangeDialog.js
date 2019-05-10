@@ -1,102 +1,70 @@
 /* eslint-disable react/prop-types, react/forbid-prop-types */
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import DialogContent from '@material-ui/core/DialogContent';
 import ConfirmDialog from '~/components/Dialogs/ConfirmDialog';
-import { FormDateTimePicker, FormSpace } from '~/components/FormInputs';
+import { FormSpace } from '~/components/FormInputs';
+import { useTranslation } from 'react-i18next';
 
-export default class RangeDialog extends React.PureComponent {
-  constructor(...args) {
-    super(...args);
-    const {
-      normalize = v => v,
-    } = this.props;
-    const [lowerBound, upperBound] = normalize([
-      (this.props.value && this.props.value[0]) || null,
-      (this.props.value && this.props.value[1]) || null,
-    ]);
-    this.state = { lowerBound, upperBound };
-  }
+export default (props) => {
+  const {
+    normalize = v => v,
+    label,
+    value,
+    i18nNs = [],
+    onClose = () => undefined,
+    onExited,
+    RangeInput,
+    rangeInpuProps,
+    ...rest
+  } = props;
 
-  handleEnterForTextField = (event) => {
-    if (event.key === 'Enter') {
-      this.handleClose(true);
-      event.preventDefault();
-    }
+  const [initLb, initUb] = normalize([
+    (props.value && props.value[0]) || null,
+    (props.value && props.value[1]) || null,
+  ]);
+
+  const [lowerBound, setLowerBound] = useState(initLb);
+  const [upperBound, setUpperBound] = useState(initUb);
+
+  const { t } = useTranslation(['builtin-components']);
+
+  const setRange = (lb, ub) => {
+    const [nln, nub] = normalize([lb, ub]);
+    setLowerBound(nln);
+    setUpperBound(nub);
   };
 
-  normalize = (lb, ub) => {
-    const {
-      normalize = v => v,
-    } = this.props;
-
-    const [lowerBound, upperBound] = normalize([lb, ub]);
-
-    return this.setState({ lowerBound, upperBound });
-  }
-
-  setLowerBound = (lowerBound) => {
-    this.normalize(lowerBound, this.state.upperBound);
-  }
-
-  setUpperBound = (upperBound) => {
-    this.normalize(this.state.lowerBound, upperBound);
-  }
-
-  handleClose = (_result) => {
+  const handleClose = (_result) => {
     let result = _result;
     if (result === true) {
-      const { lowerBound, upperBound } = this.state;
       result = [lowerBound, upperBound];
     } else {
       result = undefined;
     }
-    if (this.props.onClose) {
-      this.props.onClose(result);
-    }
-  }
+    onClose(result);
+  };
 
-  render() {
-    const {
-      label,
-      value,
-      onClose,
-      onExited,
-      ...rest
-    } = this.props;
-
-    return (
-      <ConfirmDialog
-        {...rest}
-        onClose={this.handleClose}
-        dialogProps={{ onExited }}
-        buttonTexts={{
-          yes: '確定',
-          no: '取消',
-        }}
-      >
-        <DialogContent>
-          <FormSpace variant="content1" />
-          <FormDateTimePicker
-            label="開始時間"
-            minutesStep={60}
-            value={this.state.lowerBound}
-            onChange={v => this.setLowerBound(v)}
-          />
-          <FormSpace variant="content2" />
-          <FormDateTimePicker
-            label="結束時間"
-            minutesStep={60}
-            value={this.state.upperBound}
-            onChange={v => this.setUpperBound(v)}
-          />
-        </DialogContent>
-      </ConfirmDialog>
-    );
-  }
-}
-
-RangeDialog.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  return (
+    <ConfirmDialog
+      {...rest}
+      onClose={handleClose}
+      dialogProps={{ onExited }}
+      buttonTexts={{
+        yes: t('confirmOK'),
+        no: t('confirmCancel'),
+      }}
+    >
+      <DialogContent>
+        <FormSpace variant="content1" />
+        <RangeInput
+          i18nNs={i18nNs}
+          lowerBound={lowerBound}
+          upperBound={upperBound}
+          onLowerBoundChange={lb => setRange(lb, upperBound)}
+          onUpperBoundChange={ub => setRange(lowerBound, ub)}
+          {...rangeInpuProps}
+        />
+      </DialogContent>
+    </ConfirmDialog>
+  );
 };

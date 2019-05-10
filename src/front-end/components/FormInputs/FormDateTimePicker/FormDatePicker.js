@@ -1,18 +1,18 @@
 /* eslint-disable react/prop-types, react/forbid-prop-types */
 import React from 'react';
 import moment from 'moment';
-import { DateTimePicker } from 'material-ui-pickers';
+import { DatePicker } from 'material-ui-pickers';
 import { useTranslation } from 'react-i18next';
 import {
   timeFormat,
-  dateTimeDisplayFormat,
-  getDateTimeDisplayFuncFromProps,
+  dateDisplayFormat,
+  getDateDisplayFuncFromProps,
 } from './utils';
 
 export default (props) => {
   const {
     value = null,
-    format, // disable this prop from original DateTimePicker
+    format, // disable this prop from original DatePicker
     onChange = () => undefined,
     ...rest
   } = props;
@@ -22,7 +22,7 @@ export default (props) => {
   const baseProps = {
     variant: 'outlined',
     fullWidth: true,
-    format: dateTimeDisplayFormat,
+    format: dateDisplayFormat,
     animateYearScrolling: false,
     cancelLabel: t('confirmCancel'),
     clearLabel: t('formClear'),
@@ -34,11 +34,11 @@ export default (props) => {
   };
 
   return (
-    <DateTimePicker
+    <DatePicker
       {...baseProps}
       {...rest}
       value={value}
-      labelFunc={getDateTimeDisplayFuncFromProps(props)}
+      labelFunc={getDateDisplayFuncFromProps(props)}
       onChange={v => (v === null ? onChange(v) : onChange(moment(v).format(timeFormat)/* .toISOString(true) */))}
     />
   );

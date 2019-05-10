@@ -35,7 +35,5 @@
   "privacyPolicy": "Privacy Policy",
   "wrongUsernameOrPassword": "Wrong username or password",
   "usernameIsTaken": "That username is taken. Try another.",
-  "failToGetUserData": "Fail to get user data, please back to the login page.",
-  "confirmOK": "OK",
-  "confirmCancel": "Cancel"
+  "failToGetUserData": "Fail to get user data, please back to the login page."
 }

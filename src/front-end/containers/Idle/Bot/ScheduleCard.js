@@ -12,8 +12,6 @@ import {
 } from '~/components/FormInputs';
 import ScheduleStepper from './ScheduleStepper';
 
-moment.locale('zh-TW');
-
 const styles = theme => ({
   avatar: {
     backgroundColor: blue[500],

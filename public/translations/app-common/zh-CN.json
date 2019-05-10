@@ -35,7 +35,5 @@
   "privacyPolicy": "隐私权政策",
   "wrongUsernameOrPassword": "用户名或密码錯誤",
   "usernameIsTaken": "已有人使用了该用户名，请尝试其他用户名。",
-  "failToGetUserData": "无法获取用户信息，请返回重新登入。",
-  "confirmOK": "确认",
-  "confirmCancel": "取消"
+  "failToGetUserData": "无法获取用户信息，请返回重新登入。"
 }

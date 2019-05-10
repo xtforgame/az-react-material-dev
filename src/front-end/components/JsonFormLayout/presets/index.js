@@ -4,12 +4,18 @@ import {
   // FormSpace,
   // FormContent,
   FormPasswordInput,
+  FormDatePicker,
+  FormTimePicker,
   FormDateTimePicker,
 } from '~/components/FormInputs';
 // import FormDialogInput from '~/components/FormInputs/FormDialogInput';
 import AutoCalculable, { defaultIsEqual } from '~/components/AutoCalculable';
 import resetableInputPreset from './resetableInputPreset';
-import { DateRangePreset } from './range/presets';
+import {
+  DateRangePreset,
+  TimeRangePreset,
+  DateTimeRangePreset,
+} from './range/presets';
 
 // import InputLinker from '~/utils/InputLinker';
 import {
@@ -69,7 +75,7 @@ export default {
     },
   },
   date: {
-    component: FormDateTimePicker,
+    component: FormDatePicker,
     converter: {
       fromView: ([v]) => v,
       toView: v => v,
@@ -85,6 +91,42 @@ export default {
   },
   dateRange: {
     presets: [DateRangePreset],
+  },
+  time: {
+    component: FormTimePicker,
+    converter: {
+      fromView: ([v]) => v,
+      toView: v => v,
+    },
+    extraProps: {
+      // InputProps: { style: { width: 140 } },
+      fullWidth: true,
+    },
+    mwRender: ({ handleChange, value }) => ({
+      value,
+      onChange: handleChange,
+    }),
+  },
+  timeRange: {
+    presets: [TimeRangePreset],
+  },
+  dateTime: {
+    component: FormDateTimePicker,
+    converter: {
+      fromView: ([v]) => v,
+      toView: v => v,
+    },
+    extraProps: {
+      // InputProps: { style: { width: 140 } },
+      fullWidth: true,
+    },
+    mwRender: ({ handleChange, value }) => ({
+      value,
+      onChange: handleChange,
+    }),
+  },
+  dateTimeRange: {
+    presets: [DateTimeRangePreset],
   },
   submit: {
     presets: ['button'],
