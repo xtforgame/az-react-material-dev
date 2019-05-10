@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React, { useEffect, useRef, useState } from 'react';
 import FormDialogInput from '~/components/FormInputs/FormDialogInput';
 import { FormSpace, FormContent, FormColorPicker } from '~/components/FormInputs';
@@ -5,6 +6,7 @@ import useLayoutFeatures2 from '~/hooks/useLayoutFeatures2';
 import Linker from '~/utils/InputLinker/core/Linker';
 // import { TwitterPicker } from 'react-color';
 import presets from './presets';
+import useJsonConfig from './useJsonConfig';
 
 export class JsonFormLinker extends Linker {
   constructor(...args) {
@@ -48,7 +50,14 @@ class RenderSession {
   }
 }
 
-const JsonFormLayout = (props) => {
+const JsonFormLayout = (p) => {
+  const {
+    jsonConfig,
+    propsEx,
+  } = useJsonConfig(p);
+
+  const props = { ...p, ...propsEx };
+
   const {
     Linker = JsonFormLinker,
     linkerOptions = {},
@@ -61,6 +70,7 @@ const JsonFormLayout = (props) => {
     il, resetIl, /* classesByNs, */ tData: { t/* , i18n, ready */ }, host,
   } = useLayoutFeatures2({
     ...props,
+    ...propsEx,
     Linker,
     linkerOptions: {
       ...linkerOptions,
@@ -68,6 +78,7 @@ const JsonFormLayout = (props) => {
         ...presets,
         ...linkerOptions.presets,
       },
+      globalValidator: jsonConfig.globalValidator,
       // cursor jumps to end of controlled input in the async mode
       // this is a work-around for that issue
       applyChangesSync: true,
@@ -101,13 +112,23 @@ const JsonFormLayout = (props) => {
   const [bg, setBg] = useState('#7BDCB5');
   const [dialogText, setDialogText] = useState('Dialog Text');
 
+  const renderSpace = (filedLink) => {
+    if (!('space' in filedLink.options)) {
+      return <FormSpace variant="content2" />;
+    }
+    if (filedLink.options.space === 'none') {
+      return <div />;
+    }
+    return <div />;
+  };
+
   return (
     <div>
       <FormSpace variant="top" />
       <FormContent>
         {
           il.fieldLinks.map((filedLink) => {
-            const space = 'space' in filedLink.options ? filedLink.options.space : <FormSpace variant="content2" />;
+            const space = renderSpace(filedLink);
             return (
               <React.Fragment key={filedLink.name}>
                 {il.renderComponent(filedLink.name, { translate: t, renderSession })}
@@ -119,7 +140,7 @@ const JsonFormLayout = (props) => {
         <FormColorPicker
           label="Color"
           value={bg}
-          onChange={c => console.log('c :', c) || setBg(c.hex || c || '')}
+          onChange={c => setBg(c.hex || c || '')}
           fullWidth
           colorProps={{
             colors: [

@@ -29,6 +29,7 @@ export default (props) => {
     okLabel: t('confirmOK'),
     invalidLabel: props.label ? '' : t('notSelected'),
     clearable: true,
+    // ampm: false,
     // disableFuture
     // maxDateMessage="Date must be less than today"
   };
