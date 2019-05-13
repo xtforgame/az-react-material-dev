@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
-import React, { useEffect, useRef, useState } from 'react';
-import FormDialogInput from '~/components/FormInputs/FormDialogInput';
-import { FormSpace, FormContent, FormColorPicker } from '~/components/FormInputs';
+import React, { useEffect, useRef /* , useState */ } from 'react';
+// import FormDialogInput from '~/components/FormInputs/FormDialogInput';
+import { FormSpace, FormContent /* , FormColorPicker */ } from '~/components/FormInputs';
 import useLayoutFeatures2 from '~/hooks/useLayoutFeatures2';
 import Linker from '~/utils/InputLinker/core/Linker';
 // import { TwitterPicker } from 'react-color';
@@ -64,6 +64,8 @@ const JsonFormLayout = (p) => {
     renderSessionParent: rsp,
     renderSessionName: rsName,
     children,
+    i18nNs = [],
+    onSubmit = () => {},
   } = props;
 
   const {
@@ -72,6 +74,7 @@ const JsonFormLayout = (p) => {
     ...props,
     ...propsEx,
     Linker,
+    i18nNs: [...i18nNs, 'builtin-components'],
     linkerOptions: {
       ...linkerOptions,
       presets: {
@@ -84,7 +87,12 @@ const JsonFormLayout = (p) => {
       applyChangesSync: true,
     },
     // onDidMount: (il) => { console.warn('il :', il); },
-    onSubmit: (outputs) => { resetIl(); console.warn('outputs :', outputs); },
+    onSubmit: (outputs, linker) => {
+      onSubmit(outputs, {
+        linker,
+        resetIl,
+      });
+    },
   });
 
   // if (!ready) {
@@ -109,8 +117,8 @@ const JsonFormLayout = (p) => {
     renderSession.prevRenderSession = null;
   });
 
-  const [bg, setBg] = useState('#7BDCB5');
-  const [dialogText, setDialogText] = useState('Dialog Text');
+  // const [bg, setBg] = useState('#7BDCB5');
+  // const [dialogText, setDialogText] = useState('Dialog Text');
 
   const renderSpace = (filedLink) => {
     if (!('space' in filedLink.options)) {
@@ -137,25 +145,23 @@ const JsonFormLayout = (p) => {
             );
           })
         }
-        <FormColorPicker
+        {/* <FormColorPicker
           label="Color"
           value={bg}
-          onChange={c => setBg(c.hex || c || '')}
+          onChange={c => setBg(c)}
           fullWidth
-          colorProps={{
-            colors: [
-              '#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3', '#EB144C', '#F78DA7', '#9900EF',
-            ],
-          }}
-        />
-        <FormSpace variant="content2" />
+          colors={[
+            '#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3', '#EB144C', '#F78DA7', '#9900EF',
+          ]}
+        /> */}
+        {/* <FormSpace variant="content2" />
         <FormDialogInput
           label="Dialog"
           title="XXX Dialog"
           value={dialogText}
           displayValue={t => t}
           onChange={t => setDialogText(t)}
-        />
+        /> */}
         {/* <TwitterPicker
           width="100%"
           triangle="hide"

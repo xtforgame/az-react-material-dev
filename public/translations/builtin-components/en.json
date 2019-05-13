@@ -4,6 +4,10 @@
   "notSelected": "<Not Selected>",
   "formClear": "Clear",
 
+  "submit": "submit",
+  "update": "update",
+  "save": "save",
+
   "date": "Date",
   "dateRange": "Date range",
   "dateStart": "Start date",

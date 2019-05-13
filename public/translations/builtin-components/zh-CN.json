@@ -4,6 +4,10 @@
   "notSelected": "<未选取>",
   "formClear": "清除",
 
+  "submit": "发送",
+  "update": "更新",
+  "save": "储存",
+
   "date": "日期",
   "dateRange": "日期范围",
   "dateStart": "开始日期",

@@ -83,7 +83,7 @@ export default {
     {
       name: 'usernameX',
       type: 'text',
-      presets: ['autoCalculableText'],
+      presets: ['autoCalculable'],
       extraProps: {
         label: '可編輯輸入',
       },
@@ -91,7 +91,15 @@ export default {
     },
     {
       name: 'password',
-      presets: ['password', ['translateProp', 'label', 'password']],
+      type: 'password',
+      presets: [['translateProp', 'label', 'password']],
+    },
+    {
+      name: 'colorInlinePicker',
+      type: 'colorInlinePicker',
+      extraProps: {
+        label: '選擇顏色',
+      },
     },
     {
       name: 'date',
@@ -145,7 +153,7 @@ export default {
     {
       name: 'submit',
       type: 'submit',
-      presets: [['translateProp', 'children', 'login']],
+      presets: [['translateProp', 'children', 'builtin-components:submit']],
     },
   ],
 };

@@ -66,7 +66,10 @@ class SubContent08 extends React.PureComponent {
           }}
           styleNs={['login']}
           i18nNs={['app-common']}
-          // onSubmit={(value) => { console.log('value :', value); }}
+          onSubmit={(outputs, { resetIl }) => {
+            resetIl();
+            console.warn('outputs :', outputs);
+          }}
           submitButtonText="登入"
         />
       </Paper>

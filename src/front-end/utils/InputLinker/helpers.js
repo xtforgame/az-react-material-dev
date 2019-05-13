@@ -27,31 +27,36 @@ export const assert = (condition, message, i18n) => {
   }
 };
 
-export const FormTextFieldPreset = cfg => ({
-  ...cfg,
+export const FormTextFieldLikePreset = {
   component: FormTextField,
-  mwRender: ({
-    props,
-    value,
-    link,
-    handleChange,
-    validateError,
-    options: { translate },
-  }) => {
-    const validateErrorMessage = validateError && (
-      (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
-      || validateError.message
-    );
+  cfgMiddlewares: {
+    last: {
+      mwRender: ({
+        props,
+        value,
+        link,
+        handleChange,
+        validateError,
+        options: { translate },
+      }) => {
+        const validateErrorMessage = validateError && (
+          (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
+          || validateError.message
+        );
 
-    return {
-      id: link.key,
-      value,
-      onChange: handleChange,
-      error: !!validateErrorMessage,
-      helperText: validateErrorMessage || props.helperText, // helperMessage,
-    };
+        return {
+          id: link.key,
+          value,
+          onChange: handleChange,
+          error: !!validateErrorMessage,
+          helperText: validateErrorMessage || props.helperText, // helperMessage,
+        };
+      },
+    },
   },
-});
+};
+
+export const FormTextFieldPreset = FormTextFieldLikePreset;
 
 export const createFormNumberInputPreset = (currency = false) => cfg => ({
   ...cfg,
@@ -103,47 +108,49 @@ export const mwpDisplayErrorFromPropsForTextField = (propKey, getMessageFunc = e
 };
 
 const InputTypePreset = {
-  mwRender: ({
-    props,
-    value,
-    link,
-    handleChange,
-    validateError,
-    options: { translate },
-  }) => {
-    const validateErrorMessage = validateError && (
-      (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
-      || validateError.message
-    );
-
-    return {
-      id: link.key,
-      value,
-      onChange: handleChange,
-      formProps: {
-        ...props.formProps,
-        error: validateErrorMessage,
-      },
-      helperText: validateErrorMessage || props.helperText, // helperMessage,
-    };
-  },
   cfgMiddlewares: {
     last: cfg => ({
       ...cfg,
-      mwRender: ({ props }) => {
-        const formProps = props.formProps || {};
-        const style = { ...formProps.style };
-        if (props.fullWidth && !('width' in style)) {
-          style.width = '100%';
-        }
+      mwRender: [
+        ({
+          props,
+          value,
+          link,
+          handleChange,
+          validateError,
+          options: { translate },
+        }) => {
+          const validateErrorMessage = validateError && (
+            (validateError.i18n && translate(validateError.i18n.key, validateError.i18n.values))
+            || validateError.message
+          );
 
-        return {
-          formProps: {
-            ...formProps,
-            style,
-          },
-        };
-      },
+          return {
+            id: link.key,
+            value,
+            onChange: handleChange,
+            formProps: {
+              ...props.formProps,
+              error: validateErrorMessage,
+            },
+            helperText: validateErrorMessage || props.helperText, // helperMessage,
+          };
+        },
+        ({ props }) => {
+          const formProps = props.formProps || {};
+          const style = { ...formProps.style };
+          if (props.fullWidth && !('width' in style)) {
+            style.width = '100%';
+          }
+
+          return {
+            formProps: {
+              ...formProps,
+              style,
+            },
+          };
+        },
+      ],
     }),
   },
 };

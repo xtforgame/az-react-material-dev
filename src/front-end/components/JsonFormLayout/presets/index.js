@@ -4,6 +4,7 @@ import {
   // FormSpace,
   // FormContent,
   FormPasswordInput,
+  FormColorPicker,
   FormDatePicker,
   FormTimePicker,
   FormDateTimePicker,
@@ -18,11 +19,12 @@ import {
 
 // import InputLinker from '~/utils/InputLinker';
 import {
+  FormTextFieldLikePreset,
   FormTextFieldPreset,
   FormPasswordVisibilityPreset,
   FormCheckboxPreset,
   DatePickerPreset,
-  assert,
+  // assert,
   translateProp,
   createIgnoredPreset,
   // translateLabel,
@@ -32,18 +34,18 @@ import {
 export default {
   text: {
     presets: [FormTextFieldPreset],
-    validate: value => assert(!!value, null, {
-      key: 'usernameEmptyError',
-      values: {
-        emailAddress: '$t(emailAddress)',
-        phoneNumber: '$t(phoneNumber)',
-      },
-    }),
+    // validate: value => assert(!!value, null, {
+    //   key: 'usernameEmptyError',
+    //   values: {
+    //     emailAddress: '$t(emailAddress)',
+    //     phoneNumber: '$t(phoneNumber)',
+    //   },
+    // }),
   },
   password: {
     presets: [FormTextFieldPreset],
     component: FormPasswordInput,
-    validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
+    // validate: value => assert(value != null && value !== '', null, { key: 'passwordEmptyError' }),
     cfgMiddlewares: {
       last: cfg => ({
         ...cfg,
@@ -65,6 +67,13 @@ export default {
     presets: [createIgnoredPreset(Button)],
     component: Button,
   },
+  colorInlinePicker: {
+    presets: [FormTextFieldLikePreset],
+    component: FormColorPicker,
+    converter: {
+      fromView: (([v]) => v),
+    },
+  },
   dateOld: {
     presets: [DatePickerPreset],
     extraProps: {
@@ -75,6 +84,7 @@ export default {
   },
   date: {
     component: FormDatePicker,
+    presets: [FormTextFieldLikePreset],
     converter: {
       fromView: ([v]) => v,
       toView: v => v,
@@ -142,9 +152,5 @@ export default {
   },
   // =========================
   translateProp,
-  autoCalculableText: {
-    cfgMiddlewares: {
-      last: [autoCalculablePreset],
-    },
-  },
+  autoCalculable: autoCalculablePreset,
 };

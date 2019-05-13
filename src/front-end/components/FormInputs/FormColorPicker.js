@@ -5,10 +5,13 @@ import { TwitterPicker } from 'react-color';
 
 // https://codepen.io/davidhalford/pen/ywEva
 
+const defaultColor = '#FFFFFF';
+const defaultTextColor = '#000000';
+
 function getCorrectTextColor(_h) {
   let hex = _h;
   if (!hex) {
-    return '#000000';
+    return defaultTextColor;
   }
 
   hex = cutHex(hex);
@@ -31,7 +34,7 @@ function getCorrectTextColor(_h) {
   function cutHex(h) { return (h.charAt(0) === '#') ? h.substr(1, 7) : h; }
 
   const cBrightness = ((hRed * 299) + (hGreen * 587) + (hBlue * 114)) / 1000;
-  if (cBrightness > threshold) { return '#000000'; } else { return '#ffffff'; }
+  if (cBrightness > threshold) { return '#000000'; } else { return '#FFFFFF'; }
 }
 
 const Content = ({ inputRef, colorProps, ...props }) => (
@@ -70,7 +73,7 @@ const Content = ({ inputRef, colorProps, ...props }) => (
   </div>
 );
 
-export default ({ colorProps, ...props }) => (
+export default ({ colors, colorProps, ...props }) => (
   <TextField
     variant="outlined"
     {...props}
@@ -80,8 +83,16 @@ export default ({ colorProps, ...props }) => (
       inputProps: {
         colorProps: {
           ...colorProps,
-          color: props.value,
-          onChangeComplete: props.onChange,
+          colors: colors || [
+            '#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3', '#EB144C', '#F78DA7', '#9900EF',
+          ],
+          color: props.value || defaultColor,
+          onChangeComplete: (c) => {
+            const { onChange } = props;
+            if (onChange) {
+              onChange(c.hex || c || '');
+            }
+          },
         },
       },
     }}
