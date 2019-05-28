@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import React from 'react';
 import moment from 'moment';
-import { DateTimePicker, DatePicker } from 'material-ui-pickers';
+import { DateTimePicker, DatePicker } from '@material-ui/pickers';
 import Typography from '@material-ui/core/Typography';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -263,7 +263,7 @@ export const FormCheckboxPreset = cfg => ({
   }) => ({
     id: link.key,
     onChange: handleChange,
-    checked: value,
+    checked: value || false,
   }),
   converter: {
     fromView: (([e, v]) => v),

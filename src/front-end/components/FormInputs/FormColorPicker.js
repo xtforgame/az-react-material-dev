@@ -41,6 +41,9 @@ const Content = ({ inputRef, colorProps, ...props }) => (
   <div {...props} style={{ height: 'auto' }}>
     <div
       style={{
+        borderWidth: 1,
+        borderColor: 'rgba(0, 0, 0, 0.3)',
+        borderStyle: 'solid',
         height: 48,
         marginTop: 6,
         marginBottom: 6,

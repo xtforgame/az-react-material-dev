@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types, react/forbid-prop-types */
 import React from 'react';
 import moment from 'moment';
-import { DatePicker } from 'material-ui-pickers';
+import { DatePicker } from '@material-ui/pickers';
 import { useTranslation } from 'react-i18next';
 import {
   timeFormat,
@@ -20,7 +20,7 @@ export default (props) => {
   const { t } = useTranslation(['builtin-components']);
 
   const baseProps = {
-    variant: 'outlined',
+    inputVariant: 'outlined',
     fullWidth: true,
     format: dateDisplayFormat,
     animateYearScrolling: false,

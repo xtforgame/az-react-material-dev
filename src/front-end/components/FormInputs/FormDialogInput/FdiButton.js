@@ -3,7 +3,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 
 const Content = ({ inputRef, ...props }) => (
-  <pre {...props}>
+  <pre {...props} style={{ height: 'auto' }}>
     {props.value || <br />}
   </pre>
 );
