@@ -10,23 +10,23 @@ const styles = theme => ({
     flexShrink: 0,
   },
   content1: {
-    height: theme.spacing.unit,
+    height: theme.spacing(1),
     flexShrink: 0,
   },
   content2: {
-    height: theme.spacing.unit * 2,
+    height: theme.spacing(2),
     flexShrink: 0,
   },
   content4: {
-    height: theme.spacing.unit * 4,
+    height: theme.spacing(4),
     flexShrink: 0,
   },
   content8: {
-    height: theme.spacing.unit * 8,
+    height: theme.spacing(8),
     flexShrink: 0,
   },
   top: {
-    height: theme.spacing.unit * 8,
+    height: theme.spacing(8),
     flexShrink: 0,
   },
 
@@ -35,19 +35,19 @@ const styles = theme => ({
     flexShrink: 0,
   },
   'h-content1': {
-    width: theme.spacing.unit,
+    width: theme.spacing(1),
     flexShrink: 0,
   },
   'h-content2': {
-    width: theme.spacing.unit * 2,
+    width: theme.spacing(2),
     flexShrink: 0,
   },
   'h-content4': {
-    width: theme.spacing.unit * 4,
+    width: theme.spacing(4),
     flexShrink: 0,
   },
   'h-content8': {
-    width: theme.spacing.unit * 8,
+    width: theme.spacing(8),
     flexShrink: 0,
   },
 });

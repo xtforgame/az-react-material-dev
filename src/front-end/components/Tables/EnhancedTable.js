@@ -36,7 +36,7 @@ const styles = theme => ({
   actionsCell: {
     width: 48 + (12 * 2),
     '&:last-child': {
-      paddingRight: theme.spacing.unit * 1.5,
+      paddingRight: theme.spacing(1.5),
     },
   },
   detailCell: {

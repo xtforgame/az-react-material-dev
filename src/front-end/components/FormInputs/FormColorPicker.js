@@ -38,7 +38,7 @@ function getCorrectTextColor(_h) {
 }
 
 const Content = ({ inputRef, colorProps, ...props }) => (
-  <div {...props}>
+  <div {...props} style={{ height: 'auto' }}>
     <div
       style={{
         height: 48,

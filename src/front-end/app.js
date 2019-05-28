@@ -1,7 +1,6 @@
 /* eslint-disable global-require */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { install } from '@material-ui/styles';
 import { Provider } from 'react-redux';
 import { createHashHistory } from 'history';
 import { MuiPickersUtilsProvider } from 'material-ui-pickers';
@@ -21,8 +20,6 @@ import {
 } from '~/containers/App/actions';
 import { i18nextInited } from './i18next';
 import './main.css';
-
-install();
 
 // Create a history of your choosing (we're using a browser history in this case)
 const history = createHashHistory();

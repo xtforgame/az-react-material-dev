@@ -17,7 +17,7 @@ export default theme => ({
   },
   appBarChip: {
     color: theme.palette.common.white,
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     background: fade(theme.palette.common.white, 0.15),
     '&:hover, &:focus': {
       background: fade(theme.palette.common.white, 0.15),

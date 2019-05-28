@@ -29,13 +29,13 @@ const styles = theme => ({
   nested0: {
   },
   nested1: {
-    paddingLeft: theme.spacing.unit * 4,
+    paddingLeft: theme.spacing(4),
   },
   nested2: {
-    paddingLeft: theme.spacing.unit * 8,
+    paddingLeft: theme.spacing(8),
   },
   nested3: {
-    paddingLeft: theme.spacing.unit * 12,
+    paddingLeft: theme.spacing(12),
   },
 });
 
@@ -67,7 +67,7 @@ class RouteList extends React.PureComponent {
               <ListItemIcon>
                 <InboxIcon />
               </ListItemIcon>
-              <ListItemText inset primary={item.title} />
+              <ListItemText primary={item.title} />
               <ListItemIcon>
                 {this.state[`open-${item.name}`] ? <ExpandLess /> : <ExpandMore />}
               </ListItemIcon>
@@ -84,7 +84,7 @@ class RouteList extends React.PureComponent {
               <ListItemIcon>
                 <StarBorder />
               </ListItemIcon>
-              <ListItemText inset primary={item.title} />
+              <ListItemText primary={item.title} />
             </ListItem>
           );
         }

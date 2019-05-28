@@ -23,7 +23,7 @@ const styles = theme => ({
   card: {
     maxWidth: 350,
     height: 'fit-content',
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   cardLayout: {
     display: 'flex',
@@ -42,8 +42,8 @@ const styles = theme => ({
   controls: {
     display: 'flex',
     alignItems: 'baseline', // 'center',
-    // paddingLeft: theme.spacing.unit,
-    // paddingBottom: theme.spacing.unit,
+    // paddingLeft: theme.spacing(1),
+    // paddingBottom: theme.spacing(1),
     padding: 16,
   },
   playIcon: {

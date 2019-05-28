@@ -19,7 +19,7 @@ const styles = theme => ({
   },
   spaceForFab: {
     width: 1,
-    height: theme.spacing.unit * 2 * 2 + 56,
+    height: theme.spacing(2) * 2 + 56,
   },
   fabContainer: {
     position: 'relative',

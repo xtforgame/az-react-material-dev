@@ -39,14 +39,14 @@ const styles = theme => ({
     // },
   },
   button: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   textAlignLeft: {
     textAlign: 'left',
   },
   instructions: {
-    marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit,
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
   success: {
     color: theme.status.success.main,

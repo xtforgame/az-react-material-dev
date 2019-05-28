@@ -6,7 +6,7 @@ import rtl from 'jss-rtl';
 import { createGenerateClassName, jssPreset } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import {
-  /* purple, */green, orange, red, blue, black, pink, grey, common,
+  /* purple, */green, orange, red, blue, indigo, pink, grey, common,
 } from '@material-ui/core/colors';
 
 // const theme = createMuiTheme({
@@ -25,7 +25,7 @@ export function getTheme(theme) {
     default: grey[50],
   };
   if (theme.paletteType === 'dark') {
-    primary = black;
+    primary = indigo;
     background = {
       paper: grey[800],
       default: '#303030',

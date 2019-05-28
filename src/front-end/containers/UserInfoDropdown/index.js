@@ -83,7 +83,6 @@ class UserInfoDropdown extends React.PureComponent {
       //     <AccountBox />
       //   </ListItemIcon> */}
       //   <ListItemText
-      //     inset
       //     classes={{ primary: classes.primary }}
       //     primary={<FormattedMessage {...messages.myAccount} />}
       //   />
@@ -102,7 +101,6 @@ class UserInfoDropdown extends React.PureComponent {
           <Settings />
         </ListItemIcon>
         <ListItemText
-          inset
           classes={{ primary: classes.primary }}
           primary={t('settings')}
         />
@@ -122,7 +120,6 @@ class UserInfoDropdown extends React.PureComponent {
           <ExitToApp />
         </ListItemIcon>
         <ListItemText
-          inset
           classes={{ primary: classes.primary }}
           primary={t('logout')}
         />

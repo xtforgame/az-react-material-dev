@@ -31,7 +31,7 @@ const styles = theme => ({
     // height: '100%',
   },
   progress: {
-    // margin: `0 ${theme.spacing.unit * 2}px`,
+    // margin: `0 ${theme.spacing(2}px`,
   },
 });
 
