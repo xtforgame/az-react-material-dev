@@ -41,7 +41,7 @@
     "@material-ui/icons": "4.2.1",
     "@material-ui/lab": "4.0.0-alpha.23",
     "@material-ui/pickers": "3.2.2",
-    "@material-ui/styles": "4.3.0",
+    "@material-ui/styles": "4.3.3",
     "app-root-path": "^1.0.0",
     "axios": "^0.19.0",
     "az-mail-kit": "git+https://github.com/xtforgame/az-mail-kit.git#v0.1.0",

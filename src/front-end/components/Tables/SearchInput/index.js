@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import keycode from 'keycode';
 import { fade } from '@material-ui/core/styles/colorManipulator';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
 import ClearIcon from '@material-ui/icons/Clear';
 import SearchIcon from '@material-ui/icons/Search';
+import useEffectIgnoreFirstRun from '~/hooks/useEffectIgnoreFirstRun';
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     fontFamily: theme.typography.fontFamily,
     position: 'relative',
@@ -33,105 +34,91 @@ const styles = theme => ({
       opacity: 0.38,
     },
   },
-});
+}));
 
 /**
  * Material design search bar
  * @see [Search patterns](https://material.io/guidelines/patterns/search.html)
  */
-class SearchInput extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: this.props.value,
-      active: false,
-    };
-  }
+const SearchInput = (props) => {
+  const {
+    disabled,
+    onRequestSearch,
+    onChange = () => {},
+    ...inputProps
+  } = props;
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value) {
-      this.setState({ ...this.state, value: nextProps.value });
-    }
-  }
+  const classes = useStyles();
+  const [value, setValue] = useState(props.value);
 
-  handleInput = (e) => {
-    this.setState({ value: e.target.value });
-    if (this.props.onChange) {
-      this.props.onChange(e.target.value);
-    }
-  }
+  useEffectIgnoreFirstRun(() => {
+    setValue(value);
+  }, [props.value]);
 
-  handleCancel = () => {
-    this.setState({ active: false, value: '' });
-    if (this.props.onChange) {
-      this.props.onChange('');
-    }
-  }
+  const handleInput = (e) => {
+    setValue(e.target.value);
+    onChange(e.target.value);
+  };
 
-  handleKeyDown = (event) => {
+  const handleCancel = () => {
+    setValue('');
+    onChange('');
+  };
+
+  const handleKeyDown = (event) => {
     if (keycode(event) === 'enter') {
-      this.props.onRequestSearch(this.state.value);
+      onRequestSearch(value);
     }
-  }
+  };
 
-  render() {
-    const { value } = this.state;
-    const {
-      disabled,
-      onRequestSearch,
-      classes,
-      ...inputProps
-    } = this.props;
+  const nonEmpty = value && value.length > 0;
 
-    const nonEmpty = value && value.length > 0;
+  const styles = {
+    iconButtonClose: {
+      transform: nonEmpty ? 'scale(1, 1)' : 'scale(0, 0)',
+    },
+    iconButtonSearch: {
+      transform: nonEmpty ? 'scale(0, 0)' : 'scale(1, 1)',
+    },
+  };
 
-    const styles = {
-      iconButtonClose: {
-        transform: nonEmpty ? 'scale(1, 1)' : 'scale(0, 0)',
-      },
-      iconButtonSearch: {
-        transform: nonEmpty ? 'scale(0, 0)' : 'scale(1, 1)',
-      },
-    };
-
-    return (
-      <div
-        className={classes.root}
-      >
-        <div className={classes.searchContainer}>
-          <Input
-            {...inputProps}
-            className={classes.input}
-            value={value || ''}
-            onChange={this.handleInput}
-            onKeyDown={this.handleKeyDown}
-            fullWidth
-            disableUnderline
-            disabled={disabled}
-          />
-        </div>
-        <div style={{ position: 'relative', width: 48 }}>
-          <IconButton
-            color="inherit"
-            className={classes.iconButton}
-            style={styles.iconButtonSearch}
-            disabled={disabled}
-          >
-            <SearchIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            onClick={this.handleCancel}
-            className={classes.iconButton}
-            style={styles.iconButtonClose}
-            disabled={disabled}
-          >
-            <ClearIcon />
-          </IconButton>
-        </div>
+  return (
+    <div
+      className={classes.root}
+    >
+      <div className={classes.searchContainer}>
+        <Input
+          {...inputProps}
+          className={classes.input}
+          value={value || ''}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          fullWidth
+          disableUnderline
+          disabled={disabled}
+        />
       </div>
-    );
-  }
-}
+      <div style={{ position: 'relative', width: 48 }}>
+        <IconButton
+          color="inherit"
+          className={classes.iconButton}
+          style={styles.iconButtonSearch}
+          disabled={disabled}
+        >
+          <SearchIcon />
+        </IconButton>
+        <IconButton
+          color="inherit"
+          onClick={handleCancel}
+          className={classes.iconButton}
+          style={styles.iconButtonClose}
+          disabled={disabled}
+        >
+          <ClearIcon />
+        </IconButton>
+      </div>
+    </div>
+  );
+};
 
-export default withStyles(styles)(SearchInput);
+export default (SearchInput);

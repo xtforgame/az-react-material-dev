@@ -34,7 +34,9 @@ module.exports = function({ mode }) {
     },
     resolve: {
       // extensions: ['', '.jsx', '.js', '.scss', '.css', '.json', '.md'],
-      alias: {},
+      alias: {
+        '@material-ui/styles': path.resolve(projRoot, 'node_modules', '@material-ui/styles'),
+      },
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
     module: {

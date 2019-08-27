@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { useState } from 'react';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import global from '../common/global';
 import login from '../FormPaper/login';
 import flex from '../common/flex';
