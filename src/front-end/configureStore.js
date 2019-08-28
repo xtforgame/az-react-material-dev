@@ -6,6 +6,7 @@ import RrwExEpic from 'rrw-module/extensions/epic';
 import createReduxWaitForMiddleware from 'redux-wait-for-action';
 
 import languageProviderReducer from '~/containers/LanguageProvider/reducer';
+import { createModelMapEx } from '~/containers/App/modelMapEx';
 
 import {
   CLEAR_SENSITIVE_DATA,
@@ -58,3 +59,18 @@ export default (initialState, history) => store = configureStore(getStaticReduce
   middlewares: [routerMiddleware(history), localStorageMiddleware, createReduxWaitForMiddleware()],
   compose: composeEnhancers,
 });
+
+setTimeout(() => {
+  const {
+    querchy,
+    // cacher,
+  } = createModelMapEx();
+  const {
+    httpBinRes,
+  } = querchy.actionCreatorSets;
+
+  store.dispatch(httpBinRes.create(
+    {},
+    { query: { id: 1 }, headers: { Ppp: 'xxx' } },
+  ));
+}, 5000);

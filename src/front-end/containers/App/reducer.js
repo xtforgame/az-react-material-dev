@@ -7,6 +7,8 @@ import {
 } from './constants';
 import modelMap from './modelMap';
 
+import { createModelMapEx } from './modelMapEx';
+
 const {
   sessionReducer,
   userReducer,
@@ -19,6 +21,11 @@ const {
   organizationReducer,
   projectReducer,
 } = modelMap.reducers;
+
+const {
+  // querchy,
+  cacher,
+} = createModelMapEx();
 
 const persistence = (state = { rememberUser: false }, action) => {
   switch (action.type) {
@@ -77,6 +84,7 @@ export default combineReducers({
   memos: memoReducer,
   organizations: organizationReducer,
   projects: projectReducer,
+  cache: cacher.rootReducer,
   persistence,
   appTempState,
 });
