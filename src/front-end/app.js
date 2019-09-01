@@ -11,7 +11,8 @@ theme(Highcharts);
 
 const cachedArray = [];
 
-const createStockChart = ({ year, month, date }, startPrice, priceData, volumnData) => {
+const createStockChart = ({ title: t, year, month, date }, startPrice, priceData, volumnData) => {
+  const title = t || 'Unknown';
   // priceData.sort((a, b) => a[0] - b[0]);
   // volumnData.sort((a, b) => a[0] - b[0]);
   const yMin = Math.ceil(startPrice * 9.0) / 10.0;
@@ -71,7 +72,7 @@ const createStockChart = ({ year, month, date }, startPrice, priceData, volumnDa
         labels: {
           align: 'left',
           formatter: function formatter() {
-            console.log('this.value :', this.value);
+            // console.log('this.value :', this.value);
             return this.value;
           },
         },
@@ -96,23 +97,31 @@ const createStockChart = ({ year, month, date }, startPrice, priceData, volumnDa
 
     rangeSelector: {
       buttons: [{
-        count: 1,
-        type: 'minute',
-        text: '1M',
-      }, {
         count: 5,
         type: 'minute',
         text: '5M',
+      }, {
+        count: 30,
+        type: 'minute',
+        text: '30M',
+      }, {
+        count: 1,
+        type: 'hour',
+        text: '1H',
+      }, {
+        count: 2,
+        type: 'hour',
+        text: '2H',
       }, {
         type: 'all',
         text: 'All',
       }],
       inputEnabled: false,
-      selected: 2,
+      selected: 4,
     },
 
     title: {
-      text: 'Live random data',
+      text: `${title}: ${year}/${month + 1}/${date}`,
     },
 
     exporting: {
@@ -121,11 +130,15 @@ const createStockChart = ({ year, month, date }, startPrice, priceData, volumnDa
 
     series: [{
       type: 'area',
-      name: 'Random data',
+      name: 'Price',
       dataGrouping: {
         forced: true,
         units: [['second', [1]]],
       },
+      // pointFormatter: function formatter() {
+      //   console.log('this :', this);
+      //   return `The value for <b>${this.x}</b> is <b>${this.y}</b>`;
+      // },
       data: priceData,
       threshold: startPrice,
       lineWidth: 1,
@@ -180,12 +193,14 @@ const createStockChart = ({ year, month, date }, startPrice, priceData, volumnDa
 
 // const stockId = '8028';
 const stockId = '3338';
+// const stockId = '3008';
 
 Promise.all([
   getTickInfo(stockId),
   getTradDetails(stockId),
 ])
 .then(([tick, tradDetails]) => {
+  console.log('tick :', tick);
   const year = moment().year();
   const month = moment().month();
   const date = moment().date();
@@ -200,7 +215,9 @@ Promise.all([
     return parseFloat(cell);
   }));
   createStockChart(
-    { year, month, date },
+    {
+      year, month, date, title: `${tick.msgArray[0].n}(${tick.msgArray[0].c})`
+    },
     tradDetails[0][3] - tradDetails[0][4],
     tradDetails.map(tradDetail => [tradDetail[0], tradDetail[3]]),
     tradDetails.map(tradDetail => [tradDetail[0], tradDetail[5]]),
