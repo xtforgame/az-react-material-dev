@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 export default (Highcharts) => {
   // Highcharts.createElement('link', {
   //   href: 'https://fonts.googleapis.com/css?family=Unica+One',

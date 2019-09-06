@@ -11,12 +11,26 @@ theme(Highcharts);
 
 const cachedArray = [];
 
-const createStockChart = ({ title: t, year, month, date }, startPrice, priceData, volumnData) => {
+const createStockChart = ({
+  title: t, year, month, date,
+}, startPrice, priceData, volumnData) => {
   const title = t || 'Unknown';
   // priceData.sort((a, b) => a[0] - b[0]);
   // volumnData.sort((a, b) => a[0] - b[0]);
   const yMin = Math.ceil(startPrice * 9.0) / 10.0;
   const yMax = Math.floor(startPrice * 11.0) / 10.0;
+  const xMin = new Date(year, month, date, 8, 55).getTime();
+  const xMax = new Date(year, month, date, 13, 35).getTime();
+  const extraData = [];
+  const extraMin = volumnData.length ? volumnData[volumnData.length - 1][0] : xMin;
+  {
+    let time = extraMin + 1000;
+    while (time < xMax) {
+      extraData.push([time, 0]);
+      time += 5000;
+    }
+    extraData.push([xMax, 0]);
+  }
   Highcharts.stockChart('container', {
     chart: {
       animation: false,
@@ -33,13 +47,19 @@ const createStockChart = ({ title: t, year, month, date }, startPrice, priceData
           //     y2 = randomVolume();
           //   this.series[1].addPoint([x2, y2], true, false);
           // }, 1000);
+
+          // setInterval(() => {
+          //   this.series[1].update({
+          //     data: [],
+          //   }, true);
+          // }, 1000);
         },
       },
     },
 
     xAxis: {
-      min: new Date(year, month, date, 8, 55).getTime(),
-      max: new Date(year, month, date, 13, 35).getTime(),
+      min: xMin,
+      max: xMax,
       // breaks: [{ // Nights
       //   from: new Date(2011, 9, 6, 16),
       //   to: new Date(2011, 9, 7, 8),
@@ -60,6 +80,12 @@ const createStockChart = ({ title: t, year, month, date }, startPrice, priceData
             color: 'red',
             dashStyle: 'longdashdot',
             value: yMax,
+            width: 1,
+          },
+          {
+            color: 'gray',
+            dashStyle: 'longdashdot',
+            value: startPrice,
             width: 1,
           },
           {
@@ -129,7 +155,7 @@ const createStockChart = ({ title: t, year, month, date }, startPrice, priceData
     },
 
     series: [{
-      type: 'area',
+      // type: 'area',
       name: 'Price',
       dataGrouping: {
         forced: true,
@@ -161,7 +187,7 @@ const createStockChart = ({ title: t, year, month, date }, startPrice, priceData
         forced: true,
         units: [['second', [1]]],
       },
-      data: volumnData,
+      data: [...volumnData, ...extraData],
       yAxis: 1,
     }],
 
@@ -171,6 +197,11 @@ const createStockChart = ({ title: t, year, month, date }, startPrice, priceData
       // },
       series: {
         animation: false,
+        states: {
+          hover: {
+            lineWidth: 1,
+          },
+        },
       },
     },
 
