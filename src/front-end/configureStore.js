@@ -4,8 +4,10 @@ import { connectRouter, routerMiddleware } from 'connected-react-router';
 import { configureStore } from 'rrw-module';
 import RrwExEpic from 'rrw-module/extensions/epic';
 import createReduxWaitForMiddleware from 'redux-wait-for-action';
+import { createQuerchyMiddleware } from 'querchy';
 
 import languageProviderReducer from '~/containers/LanguageProvider/reducer';
+import { createModelMapEx } from '~/containers/App/modelMapEx';
 
 import {
   CLEAR_SENSITIVE_DATA,
@@ -55,6 +57,6 @@ export default (initialState, history) => store = configureStore(getStaticReduce
       },
     },
   ],
-  middlewares: [routerMiddleware(history), localStorageMiddleware, createReduxWaitForMiddleware()],
+  middlewares: [createQuerchyMiddleware(), routerMiddleware(history), localStorageMiddleware, createReduxWaitForMiddleware()],
   compose: composeEnhancers,
 });

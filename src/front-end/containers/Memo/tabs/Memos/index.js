@@ -7,12 +7,14 @@ import { withStyles } from '@material-ui/core/styles';
 import FlipMove from 'react-flip-move';
 import MemoCard from './MemoCard';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 
 const {
-  makeDefaultMemoCollectionSelector,
-} = modelMap.selectors;
+  memo: {
+    extraSelectorX1,
+  },
+} = modelMapEx.cacher.selectorCreatorSet;
 
 const styles = theme => ({
 });
@@ -37,7 +39,7 @@ class Memos extends React.PureComponent {
 }
 
 const mapStateToProps = createStructuredSelector({
-  memos: makeDefaultMemoCollectionSelector(),
+  memos: extraSelectorX1(),
 });
 
 export default compose(

@@ -15,15 +15,15 @@ import {
 } from 'react-router-dom';
 import createCommonStyles from '~/styles/common';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 import FilterBar from './FilterBar';
 import NewMemoDialog from './tabs/Memos/NewMemoDialog';
 
 import MobileTabsFrame from '~/containers/MobileTabsFrame';
 
 const {
-  getMemos,
-} = modelMap.waitableActions;
+  memo,
+} = modelMapEx.querchy.actionCreatorSets;
 
 const styles = theme => ({
   fab: {
@@ -142,7 +142,7 @@ class Memo extends React.PureComponent {
 }
 
 export default compose(
-  connect(null, { getMemos, push }),
+  connect(null, { getMemos: memo.getCollection, push }),
   withRouter,
   withStyles(styles),
 )(Memo);
