@@ -79,54 +79,6 @@ const modelsDefine = {
       },
     },
   },
-  recoveryTokens: {
-    url: './api/recoveryTokens',
-    names: { model: 'recoveryToken', member: 'recoveryToken', collection: 'recoveryTokens' },
-    config: {
-      // actionNoRedundantBody: true,
-      getId: data => 'current',
-    },
-    extensionConfigs: {
-      waitableActions: { symbols },
-      epics,
-      selectors: {
-        createSelector,
-        baseSelector: state => state.global.recoveryTokens,
-      },
-    },
-  },
-  challengeRecoveryTokens: {
-    url: './api/challengeRecoveryTokens',
-    names: { model: 'challengeRecoveryToken', member: 'challengeRecoveryToken', collection: 'challengeRecoveryTokens' },
-    config: {
-      // actionNoRedundantBody: true,
-      getId: data => 'current',
-    },
-    extensionConfigs: {
-      waitableActions: { symbols },
-      epics,
-      selectors: {
-        createSelector,
-        baseSelector: state => state.global.challengeRecoveryTokens,
-      },
-    },
-  },
-  resetPasswordRequests: {
-    url: './api/resetPasswordRequests',
-    names: { model: 'resetPasswordRequest', member: 'resetPasswordRequest', collection: 'resetPasswordRequests' },
-    config: {
-      // actionNoRedundantBody: true,
-      getId: data => 'current',
-    },
-    extensionConfigs: {
-      waitableActions: { symbols },
-      epics,
-      selectors: {
-        createSelector,
-        baseSelector: state => state.global.resetPasswordRequests,
-      },
-    },
-  },
 };
 
 const modelMap = new ModelMap('global', modelsDefine, defaultExtensions.concat([SelectorsCreator, EpicCreator, WaitableActionsCreator]));

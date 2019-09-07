@@ -133,6 +133,18 @@ export const createModelMapEx = () => {
           },
         },
       },
+      recoveryToken: {
+        ...getSharedInfo(),
+        url: './api/recoveryTokens',
+      },
+      challengeRecoveryToken: {
+        ...getSharedInfo(),
+        url: './api/challengeRecoveryTokens',
+      },
+      resetPasswordRequest: {
+        ...getSharedInfo(),
+        url: './api/resetPasswordRequests',
+      },
       organization: {
         ...getSharedInfo(),
         url: './api/organizations',
@@ -223,6 +235,21 @@ export const createModelMapEx = () => {
   });
   const cacher = new CacherX1(querchy, {
     userSetting: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
+      },
+    },
+    recoveryToken: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
+      },
+    },
+    challengeRecoveryToken: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
+      },
+    },
+    resetPasswordRequest: {
       extraSelectorX1: {
         creatorCreator: getExtraSelectorX1(),
       },

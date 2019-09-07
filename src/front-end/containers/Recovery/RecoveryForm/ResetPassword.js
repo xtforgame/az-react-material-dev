@@ -1,18 +1,11 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { connect } from 'react-redux';
 import { compose } from 'recompose';
 import { withTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import FormBaseType001 from '~/containers/LoginForms/FormBaseType001';
 import createResetPasswordInputConfigs from '~/containers/LoginForms/createResetPasswordInputConfigs';
-
-import modelMap from '~/containers/App/modelMap';
-
-const {
-  postRecoveryTokens,
-} = modelMap.waitableActions;
 
 const styles = theme => ({
   flexContainer: {
@@ -65,9 +58,6 @@ class ResetPassword extends React.PureComponent {
 
 
 export default compose(
-  connect(null, {
-    postRecoveryTokens,
-  }),
   withTranslation(['app-common']),
   withStyles(styles),
 )(ResetPassword);

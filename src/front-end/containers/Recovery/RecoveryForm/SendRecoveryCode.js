@@ -9,11 +9,11 @@ import { withStyles } from '@material-ui/core/styles';
 import FormBaseType001 from '~/containers/LoginForms/FormBaseType001';
 import createSendRecoveryCodeInputConfigs from '~/containers/LoginForms/createSendRecoveryCodeInputConfigs';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 const {
-  postRecoveryTokens,
-} = modelMap.waitableActions;
+  recoveryToken,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const styles = theme => ({
 });
@@ -63,14 +63,14 @@ class SendRecoveryCode extends React.PureComponent {
   }
 
   recover = ({ username }, linker) => {
-    const { postRecoveryTokens, onCodeSent } = this.props;
+    const { onCodeSent } = this.props;
     const userNameState = linker.getValue('username');
 
-    postRecoveryTokens({
+    recoveryToken.create({
       type: userNameState.type,
       username: userNameState.value,
     })
-    .then(({ data }) => {
+    .then(({ response: { data } }) => {
       onCodeSent({
         recoveringUsername: username,
         nextTimeToSend: new Date().getTime() + data.remainingTime,
@@ -118,9 +118,7 @@ class SendRecoveryCode extends React.PureComponent {
 
 
 export default compose(
-  connect(null, {
-    postRecoveryTokens,
-  }),
+  connect(null, {}),
   withTranslation(['app-common']),
   withStyles(styles),
 )(SendRecoveryCode);

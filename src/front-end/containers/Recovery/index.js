@@ -16,6 +16,7 @@ import RecoveryForm from '~/containers/Recovery/RecoveryForm';
 import ProgressWithMask from '~/components/Progress/ProgressWithMask';
 import { createStructuredSelector } from 'reselect';
 import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 import {
   makeUserSessionSelector,
   makeRememberUserSelector,
@@ -24,13 +25,15 @@ import EnterRecoveryCode from './RecoveryForm/EnterRecoveryCode';
 
 const {
   postSessions,
-  postRecoveryTokens,
-  postChallengeRecoveryTokens,
 } = modelMap.waitableActions;
 
 const {
   cancelPostSessions,
 } = modelMap.actions;
+
+const {
+  challengeRecoveryToken,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const styles = theme => ({
   ...createFormPaperStyle(theme),
@@ -63,7 +66,7 @@ class Recovery extends React.PureComponent {
   }
 
   challenge = ({ username, code }) => {
-    const { postChallengeRecoveryTokens, t } = this.props;
+    const { t } = this.props;
     this.setState({
       codeVerifyState: null,
       recoveryCodeError: null,
@@ -71,8 +74,8 @@ class Recovery extends React.PureComponent {
 
     const worngCodeFromUrl = t('worngCodeFromUrl');
 
-    postChallengeRecoveryTokens({ username, token: code })
-    .then(({ data }) => {
+    challengeRecoveryToken.create({ username, token: code })
+    .then(({ response: { data } }) => {
       this.setState({
         codeVerifyState: data.passed ? 'passed' : 'wrong',
         recoveryCodeError: data.passed ? null : worngCodeFromUrl,
@@ -153,8 +156,6 @@ export default compose(
     {
       postSessions,
       cancelPostSessions,
-      postRecoveryTokens,
-      postChallengeRecoveryTokens,
     }
   ),
   withTranslation(['app-common']),

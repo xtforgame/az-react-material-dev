@@ -67,6 +67,18 @@ export type ModelMapX1 = {
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
   >;
+  recoveryToken: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
+  challengeRecoveryToken: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
+  resetPasswordRequest: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
   organization: MakeResourceModelType<
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
@@ -122,6 +134,21 @@ export type ExtraSelectorCreatorCreatorX1<ReturnType> = (
 
 export type ExtraSelectorInfosForModelX1 = {
   userSetting: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
+    },
+  },
+  recoveryToken: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
+    },
+  },
+  challengeRecoveryToken: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
+    },
+  },
+  resetPasswordRequest: {
     extraSelectorX1: {
       creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
     },

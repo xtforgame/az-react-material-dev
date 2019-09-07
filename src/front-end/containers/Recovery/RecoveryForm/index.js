@@ -15,12 +15,12 @@ import {
   clearSensitiveData,
 } from '~/containers/App/actions';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 const {
-  postChallengeRecoveryTokens,
-  postResetPasswordRequests,
-} = modelMap.waitableActions;
+  challengeRecoveryToken,
+  resetPasswordRequest,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const styles = theme => ({
 });
@@ -84,9 +84,9 @@ class RecoveryForm extends React.PureComponent {
   }
 
   handleChallenge = ({ username, code }) => {
-    const { postChallengeRecoveryTokens, t } = this.props;
-    postChallengeRecoveryTokens({ username, token: code })
-    .then(({ data }) => {
+    const { t } = this.props;
+    challengeRecoveryToken.create({ username, token: code })
+    .then(({ response: { data } }) => {
       if (data.passed) {
         this.setState({
           recoveringCode: code,
@@ -102,13 +102,13 @@ class RecoveryForm extends React.PureComponent {
   }
 
   handleResetPassword = ({ username, code, newPassword }) => {
-    const { postResetPasswordRequests, t } = this.props;
-    postResetPasswordRequests({
+    const { t } = this.props;
+    resetPasswordRequest.create({
       username,
       token: code,
       newPassword,
     })
-    .then(({ data }) => {
+    .then(({ response: { data } }) => {
       // console.log('data :', data);
       if (data.passed) {
         this.setState({
@@ -193,8 +193,6 @@ class RecoveryForm extends React.PureComponent {
 
 export default compose(
   connect(null, {
-    postChallengeRecoveryTokens,
-    postResetPasswordRequests,
     push,
     clearSensitiveData,
   }),
