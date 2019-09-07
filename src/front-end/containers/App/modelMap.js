@@ -127,22 +127,6 @@ const modelsDefine = {
       },
     },
   },
-  organizations: {
-    url: './api/organizations',
-    names: { model: 'organization', member: 'organization', collection: 'organizations' },
-    config: {
-      // actionNoRedundantBody: true,
-      getId: data => data.id,
-    },
-    extensionConfigs: {
-      waitableActions: { symbols },
-      epics,
-      selectors: {
-        createSelector,
-        baseSelector: state => state.global.organizations,
-      },
-    },
-  },
 };
 
 const modelMap = new ModelMap('global', modelsDefine, defaultExtensions.concat([SelectorsCreator, EpicCreator, WaitableActionsCreator]));

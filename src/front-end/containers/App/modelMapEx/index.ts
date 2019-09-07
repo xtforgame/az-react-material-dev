@@ -133,6 +133,10 @@ export const createModelMapEx = () => {
           },
         },
       },
+      organization: {
+        ...getSharedInfo(),
+        url: './api/organizations',
+      },
       project: {
         ...getSharedInfo(),
         url: './api/projects',
@@ -221,6 +225,29 @@ export const createModelMapEx = () => {
     userSetting: {
       extraSelectorX1: {
         creatorCreator: getExtraSelectorX1(),
+      },
+    },
+    organization: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
+      },
+      selectCurrentOrganization: {
+        creatorCreator: (baseSelector, builtinSelectorCreators) => {
+          return () => createSelector(
+            builtinSelectorCreators.selectQueryMapValues(),
+            builtinSelectorCreators.selectResourceMapValues(),
+            (queryMap, resourceMap) => {
+              if (!queryMap
+                || !queryMap.getCollection
+              ) {
+                return undefined;
+              }
+              return queryMap.getCollection.find(
+                item => resourceMap[item.id] && resourceMap[item.id].name === 'default',
+              );
+            },
+          );
+        },
       },
     },
     project: {

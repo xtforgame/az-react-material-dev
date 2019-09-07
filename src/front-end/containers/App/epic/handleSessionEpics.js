@@ -23,13 +23,7 @@ const { types } = modelMap;
 const {
   getUser,
   postSessions,
-
-  getOrganizations,
 } = modelMap.waitableActions;
-
-const {
-  selectOrganizationPath,
-} = modelMap.actions;
 
 const dispatchSessionVerifiedAfterPostedSession = (action$, state$) => action$.ofType(types.respondPostSessions)
   .pipe(
@@ -37,12 +31,6 @@ const dispatchSessionVerifiedAfterPostedSession = (action$, state$) => action$.o
       sessionVerified(action.data),
     ])
   );
-
-const autoSelectDefaultOrganization = (organizations) => {
-  let array = organizations.filter(org => org.name === 'default');
-  array = array.length ? array : (organizations[0] ? [organizations[0]] : []);
-  return array.map(org => selectOrganizationPath(org.id));
-};
 
 const fetchDataAfterSessionVerified = (action$, state$, { getStore }) => action$.ofType(SESSION_VERIFIED)
   .pipe(
@@ -53,14 +41,13 @@ const fetchDataAfterSessionVerified = (action$, state$, { getStore }) => action$
         Promise.all([
           store.dispatch(getUser(action.session.user_id)),
           modelMapEx.querchy.promiseActionCreatorSets.userSetting.getCollection(),
-          store.dispatch(getOrganizations()),
+          modelMapEx.querchy.promiseActionCreatorSets.organization.getCollection(),
           modelMapEx.querchy.promiseActionCreatorSets.project.getCollection(),
         ])
         .then(
-          ([_, { response: { data: userSettings } }, { data: organizations }]) => userSettings
+          ([_, { response: { data: userSettings } }]) => userSettings
           .filter(setting => setting.type === 'preference' && setting.data)
           .map(setting => changeTheme(setting.data.uiTheme, false))
-          .concat(autoSelectDefaultOrganization(organizations))
         )
       )
       .pipe(

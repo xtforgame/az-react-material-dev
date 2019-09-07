@@ -67,6 +67,10 @@ export type ModelMapX1 = {
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
   >;
+  organization: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
   project: MakeResourceModelType<
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
@@ -120,6 +124,14 @@ export type ExtraSelectorInfosForModelX1 = {
   userSetting: {
     extraSelectorX1: {
       creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
+    },
+  },
+  organization: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
+    },
+    selectCurrentOrganization: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any>,
     },
   },
   project: {

@@ -16,7 +16,6 @@ const {
 
   challengeRecoveryTokenReducer,
   resetPasswordRequestReducer,
-  organizationReducer,
 } = modelMap.reducers;
 
 const {
@@ -77,7 +76,6 @@ export default combineReducers({
   recoveryTokens: recoveryTokenReducer,
   challengeRecoveryTokens: challengeRecoveryTokenReducer,
   resetPasswordRequests: resetPasswordRequestReducer,
-  organizations: organizationReducer,
   cache: cacher.rootReducer,
   persistence,
   appTempState,
