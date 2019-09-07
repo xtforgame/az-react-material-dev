@@ -12,12 +12,10 @@ import { createModelMapEx } from './modelMapEx';
 const {
   sessionReducer,
   userReducer,
-  userSettingReducer,
   recoveryTokenReducer,
 
   challengeRecoveryTokenReducer,
   resetPasswordRequestReducer,
-  memoReducer,
   organizationReducer,
   projectReducer,
 } = modelMap.reducers;
@@ -77,11 +75,9 @@ const appTempState = (state = {}, action) => {
 export default combineReducers({
   sessions: sessionReducer,
   users: userReducer,
-  userSettings: userSettingReducer,
   recoveryTokens: recoveryTokenReducer,
   challengeRecoveryTokens: challengeRecoveryTokenReducer,
   resetPasswordRequests: resetPasswordRequestReducer,
-  memos: memoReducer,
   organizations: organizationReducer,
   projects: projectReducer,
   cache: cacher.rootReducer,

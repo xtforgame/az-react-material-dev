@@ -11,12 +11,11 @@ import SimpleFullScreenDialog from '~/components/Dialogs/SimpleFullScreenDialog'
 import {
   FormTextField,
 } from '~/components/FormInputs';
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 const {
-  getMemos,
-  postMemos,
-} = modelMap.waitableActions;
+  memo,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const styles = theme => ({
   ...createCommonStyles(theme, ['flex']),
@@ -52,8 +51,6 @@ class NewMemoDialog extends React.PureComponent {
       classes,
       open,
       onClose,
-      postMemos,
-      getMemos,
     } = this.props;
 
     return (
@@ -65,7 +62,7 @@ class NewMemoDialog extends React.PureComponent {
           <Button
             color="inherit"
             onClick={() => {
-              postMemos({
+              memo.create({
                 title: 'Backup Check',
                 executor: {
                   id: 'backup-bot',
@@ -80,7 +77,7 @@ class NewMemoDialog extends React.PureComponent {
                 createdTime: new Date().getTime(),
               })
               .then(() => {
-                getMemos();
+                memo.getCollection();
                 onClose();
               })
               .catch((e) => {
@@ -126,7 +123,7 @@ class NewMemoDialog extends React.PureComponent {
                 variant="contained"
                 color="primary"
                 onClick={() => {
-                  postMemos({
+                  memo.create({
                     title: this.state.memoText || 'Backup Check',
                     executor: {
                       id: 'backup-bot',
@@ -141,7 +138,7 @@ class NewMemoDialog extends React.PureComponent {
                     createdTime: new Date().getTime(),
                   })
                   .then(() => {
-                    getMemos();
+                    memo.getCollection();
                     onClose();
                   })
                   .catch((e) => {
@@ -161,12 +158,5 @@ class NewMemoDialog extends React.PureComponent {
 
 
 export default compose(
-  connect(
-    null,
-    {
-      getMemos,
-      postMemos,
-    },
-  ),
   withStyles(styles),
 )(NewMemoDialog);

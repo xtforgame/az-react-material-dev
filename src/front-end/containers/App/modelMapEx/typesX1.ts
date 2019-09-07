@@ -67,6 +67,10 @@ export type ModelMapX1 = {
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
   >;
+  userSetting: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
 };
 
 export type QueryBuilderMapX1 = {
@@ -104,6 +108,15 @@ export type ExtraActionInfosX1 = {
 
 export type ExtraSelectorInfosForModelX1 = {
   memo: {
+    extraSelectorX1: {
+      creatorCreator: (
+        baseSelector : BaseSelector<ModelMapX1>,
+        builtinSelectorCreators: BuiltinSelectorCreators<MyStateX1>,
+        builtinSelectors: BuiltinSelectors<MyStateX1>,
+      ) => () => (state : any) => any[],
+    },
+  },
+  userSetting: {
     extraSelectorX1: {
       creatorCreator: (
         baseSelector : BaseSelector<ModelMapX1>,

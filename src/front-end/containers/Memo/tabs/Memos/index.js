@@ -11,9 +11,7 @@ import modelMapEx from '~/containers/App/modelMapEx';
 
 
 const {
-  memo: {
-    extraSelectorX1,
-  },
+  memo,
 } = modelMapEx.cacher.selectorCreatorSet;
 
 const styles = theme => ({
@@ -39,7 +37,7 @@ class Memos extends React.PureComponent {
 }
 
 const mapStateToProps = createStructuredSelector({
-  memos: extraSelectorX1(),
+  memos: memo.extraSelectorX1(),
 });
 
 export default compose(

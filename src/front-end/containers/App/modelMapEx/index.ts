@@ -43,7 +43,6 @@ let modelMapEx : {
 } | null = null;
 
 const getSharedInfo = () => ({
-  url: './api/memos',
   buildUrl: (modelBaseUrl, action) => {
     if (
       action.crudType === 'create'
@@ -55,6 +54,26 @@ const getSharedInfo = () => ({
   },
   queryInfos: {},
   actionInfos: {},
+  feature: crudUpdateCacheCollectionT1,
+  featureDeps: {
+    getId: (action) => {
+      return (
+        action.response
+        && action.response.data
+        && action.response.data.id
+      );
+    },
+    parseResponse: (s, action) => {
+      return {
+        update: (
+          (
+            action.response
+            && action.response.data
+          ) || []
+        ).reduce((m, item) => ({ ...m, [item.id]: item }), {}),
+      };
+    },
+  },
 });
 
 export const createModelMapEx = () => {
@@ -90,13 +109,17 @@ export const createModelMapEx = () => {
     models: {
       memo: {
         ...getSharedInfo(),
-        feature: crudUpdateCacheCollectionT1,
+        url: './api/memos',
+      },
+      userSetting: {
+        ...getSharedInfo(),
+        url: './api/userSettings',
         featureDeps: {
           getId: (action) => {
             return (
               action.response
               && action.response.data
-              && action.response.data.id
+              && action.response.data.type
             );
           },
           parseResponse: (s, action) => {
@@ -106,7 +129,7 @@ export const createModelMapEx = () => {
                   action.response
                   && action.response.data
                 ) || []
-              ).reduce((m, item) => ({ ...m, [item.id]: item }), {}),
+              ).reduce((m, item) => ({ ...m, [item.type]: item }), {}),
             };
           },
         },
@@ -189,6 +212,24 @@ export const createModelMapEx = () => {
   });
   const cacher = new CacherX1(querchy, {
     memo: {
+      extraSelectorX1: {
+        creatorCreator: (baseSelector, builtinSelectorCreators) => {
+          return () => createSelector(
+            builtinSelectorCreators.selectQueryMapValues(),
+            builtinSelectorCreators.selectResourceMapValues(),
+            (queryMap, resourceMap) => {
+              if (!queryMap
+                || !queryMap.getCollection
+              ) {
+                return [];
+              }
+              return queryMap.getCollection.map(item => resourceMap[item.id]);
+            },
+          );
+        },
+      },
+    },
+    userSetting: {
       extraSelectorX1: {
         creatorCreator: (baseSelector, builtinSelectorCreators) => {
           return () => createSelector(

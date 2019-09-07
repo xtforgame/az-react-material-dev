@@ -6,7 +6,7 @@ import {
   toNull,
 } from 'reduxtful/core/helper-functions';
 
-import modelMap from '../modelMap';
+import modelMapEx from '../modelMapEx';
 import {
   CHANGE_THEME,
   REQUEST_SAVE_USER_SETTING,
@@ -19,8 +19,8 @@ import {
 } from '../actions';
 
 const {
-  patchUserSetting,
-} = modelMap.waitableActions;
+  userSetting,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 let unsavedUserSettings = {};
 const requestSaveUserSettingEpic = (action$, state$) => action$.ofType(REQUEST_SAVE_USER_SETTING)
@@ -40,10 +40,9 @@ const delaySaveUserSettingsEpic = (action$, state$, { getStore }) => action$.ofT
       switchMap(() => {
         const currentUnsavedUserSettings = unsavedUserSettings;
         unsavedUserSettings = {};
-        const store = getStore();
         const p = Promise.all(
           Object.keys(currentUnsavedUserSettings)
-            .map(key => store.dispatch(patchUserSetting(key, currentUnsavedUserSettings[key])))
+            .map(key => userSetting.update(key, currentUnsavedUserSettings[key]))
         );
         return from(p)
           .pipe(

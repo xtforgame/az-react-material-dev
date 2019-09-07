@@ -79,22 +79,6 @@ const modelsDefine = {
       },
     },
   },
-  userSettings: {
-    url: './api/userSettings',
-    names: { model: 'userSetting', member: 'userSetting', collection: 'userSettings' },
-    config: {
-      // actionNoRedundantBody: true,
-      getId: data => data.type,
-    },
-    extensionConfigs: {
-      waitableActions: { symbols },
-      epics,
-      selectors: {
-        createSelector,
-        baseSelector: state => state.global.userSettings,
-      },
-    },
-  },
   recoveryTokens: {
     url: './api/recoveryTokens',
     names: { model: 'recoveryToken', member: 'recoveryToken', collection: 'recoveryTokens' },
@@ -140,22 +124,6 @@ const modelsDefine = {
       selectors: {
         createSelector,
         baseSelector: state => state.global.resetPasswordRequests,
-      },
-    },
-  },
-  memos: {
-    url: './api/memos',
-    names: { model: 'memo', member: 'memo', collection: 'memos' },
-    config: {
-      // actionNoRedundantBody: true,
-      getId: data => data.id,
-    },
-    extensionConfigs: {
-      waitableActions: { symbols },
-      epics,
-      selectors: {
-        createSelector,
-        baseSelector: state => state.global.memos,
       },
     },
   },

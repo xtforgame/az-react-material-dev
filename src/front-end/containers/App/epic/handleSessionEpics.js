@@ -4,6 +4,7 @@ import {
   mergeMap, take, switchMap, catchError, /* auditTime */
 } from 'rxjs/operators';
 import HeaderManager from '~/utils/HeaderManager';
+import modelMapEx from '~/containers/App/modelMapEx';
 import modelMap from '../modelMap';
 import {
   SESSION_VERIFIED,
@@ -21,7 +22,6 @@ const { types } = modelMap;
 
 const {
   getUser,
-  getUserSettings,
   postSessions,
 
   getOrganizations,
@@ -53,12 +53,12 @@ const fetchDataAfterSessionVerified = (action$, state$, { getStore }) => action$
       return from(
         Promise.all([
           store.dispatch(getUser(action.session.user_id)),
-          store.dispatch(getUserSettings()),
+          modelMapEx.querchy.promiseActionCreatorSets.userSetting.getCollection(),
           store.dispatch(getOrganizations()),
           store.dispatch(getProjects()),
         ])
         .then(
-          ([_, { data: userSettings }, { data: organizations }]) => userSettings
+          ([_, { response: { data: userSettings } }, { data: organizations }]) => userSettings
           .filter(setting => setting.type === 'preference' && setting.data)
           .map(setting => changeTheme(setting.data.uiTheme, false))
           .concat(autoSelectDefaultOrganization(organizations))
