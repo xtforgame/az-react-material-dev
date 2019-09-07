@@ -72,20 +72,21 @@ const getSharedInfo = () => ({
   },
 });
 
-const getExtraSelectorX1 : () => ExtraSelectorCreatorCreatorX1 = () => (baseSelector, builtinSelectorCreators) => {
-  return () => createSelector(
-    builtinSelectorCreators.selectQueryMapValues(),
-    builtinSelectorCreators.selectResourceMapValues(),
-    (queryMap, resourceMap) => {
-      if (!queryMap
-        || !queryMap.getCollection
-      ) {
-        return [];
-      }
-      return queryMap.getCollection.map(item => resourceMap[item.id]);
-    },
-  );
-};
+const getExtraSelectorX1 :
+  () => ExtraSelectorCreatorCreatorX1<any[]> = () => (baseSelector, builtinSelectorCreators) => {
+    return () => createSelector(
+      builtinSelectorCreators.selectQueryMapValues(),
+      builtinSelectorCreators.selectResourceMapValues(),
+      (queryMap, resourceMap) => {
+        if (!queryMap
+          || !queryMap.getCollection
+        ) {
+          return [];
+        }
+        return queryMap.getCollection.map(item => resourceMap[item.id]);
+      },
+    );
+  };
 
 export const createModelMapEx = () => {
   const querchy = new QuerchyX1({

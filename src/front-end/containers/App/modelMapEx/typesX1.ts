@@ -110,26 +110,26 @@ export type ExtraActionInfosX1 = {
 
 // ===========================================
 
-export type ExtraSelectorCreatorCreatorX1 = (
+export type ExtraSelectorCreatorCreatorX1<ReturnType> = (
   baseSelector : BaseSelector<ModelMapX1>,
   builtinSelectorCreators: BuiltinSelectorCreators<MyStateX1>,
   builtinSelectors: BuiltinSelectors<MyStateX1>,
-) => () => (state : any) => any[];
+) => () => (state : any) => ReturnType;
 
 export type ExtraSelectorInfosForModelX1 = {
   userSetting: {
     extraSelectorX1: {
-      creatorCreator: ExtraSelectorCreatorCreatorX1,
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
     },
   },
   project: {
     extraSelectorX1: {
-      creatorCreator: ExtraSelectorCreatorCreatorX1,
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
     },
   },
   memo: {
     extraSelectorX1: {
-      creatorCreator: ExtraSelectorCreatorCreatorX1,
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
     },
   },
 };
