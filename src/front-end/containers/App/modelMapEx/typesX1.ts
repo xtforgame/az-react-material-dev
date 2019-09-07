@@ -63,11 +63,15 @@ export type RawActionCreatorUpdateCacheX1 = (
 };
 
 export type ModelMapX1 = {
-  memo: MakeResourceModelType<
+  userSetting: MakeResourceModelType<
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
   >;
-  userSetting: MakeResourceModelType<
+  project: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
+  memo: MakeResourceModelType<
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
   >;
@@ -106,23 +110,26 @@ export type ExtraActionInfosX1 = {
 
 // ===========================================
 
+export type ExtraSelectorCreatorCreatorX1 = (
+  baseSelector : BaseSelector<ModelMapX1>,
+  builtinSelectorCreators: BuiltinSelectorCreators<MyStateX1>,
+  builtinSelectors: BuiltinSelectors<MyStateX1>,
+) => () => (state : any) => any[];
+
 export type ExtraSelectorInfosForModelX1 = {
-  memo: {
-    extraSelectorX1: {
-      creatorCreator: (
-        baseSelector : BaseSelector<ModelMapX1>,
-        builtinSelectorCreators: BuiltinSelectorCreators<MyStateX1>,
-        builtinSelectors: BuiltinSelectors<MyStateX1>,
-      ) => () => (state : any) => any[],
-    },
-  },
   userSetting: {
     extraSelectorX1: {
-      creatorCreator: (
-        baseSelector : BaseSelector<ModelMapX1>,
-        builtinSelectorCreators: BuiltinSelectorCreators<MyStateX1>,
-        builtinSelectors: BuiltinSelectors<MyStateX1>,
-      ) => () => (state : any) => any[],
+      creatorCreator: ExtraSelectorCreatorCreatorX1,
+    },
+  },
+  project: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1,
+    },
+  },
+  memo: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1,
     },
   },
 };

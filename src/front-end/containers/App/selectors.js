@@ -17,12 +17,6 @@ const {
   makeSelectedUserNodeSelector,
   makeSelectedUserCollectionSelector,
   makeSelectedUserSelector,
-
-  makeOrganizationSelectionSelector,
-  makeEntryInstHierarchySelector,
-  makeCategoryHierarchySelector,
-  makeCategoryLayoutHierarchySelector,
-  makeOrgRecordHierarchySelector,
 } = modelMap.selectors;
 
 const makeUserSessionSelector = () => createSelector(
@@ -56,41 +50,7 @@ const makeUiThemeSelector = () => createSelector(
   persistence => persistence.uiTheme || defaultUiTheme,
 );
 
-
 const appTempStateSelector = state => state.global.appTempState;
-
-const makeSelectedNodeSelector = hierarchySelector => createSelector(
-  makeOrganizationSelectionSelector(),
-  hierarchySelector,
-  (selectedOrgPath, hierarchyRoot) => {
-    if (selectedOrgPath && selectedOrgPath.entry && selectedOrgPath.entry.id
-      && hierarchyRoot
-      && hierarchyRoot[selectedOrgPath.entry.id]) {
-      return hierarchyRoot[selectedOrgPath.entry.id];
-    }
-    return undefined;
-  },
-);
-
-const makeSelectedEntryInstNodeSelector = () => makeSelectedNodeSelector(makeEntryInstHierarchySelector());
-const makeSelectedCategoryNodeSelector = () => makeSelectedNodeSelector(makeCategoryHierarchySelector());
-const makeSelectedCategoryLayoutNodeSelector = () => makeSelectedNodeSelector(makeCategoryLayoutHierarchySelector());
-const makeSelectedOrgRecordNodeSelector = () => makeSelectedNodeSelector(makeOrgRecordHierarchySelector());
-
-const makeMyCurrentEntryInstSelector = () => createSelector(
-  makeMyUserSelector(),
-  makeSelectedEntryInstNodeSelector(),
-  (myUser, entryInstNode) => {
-    if (!myUser || !entryInstNode || !entryInstNode.byId) {
-      return undefined;
-    }
-    const myEntryInst = myUser.asEntryInsts.filter(e => e.organization_id == 1)[0]; // eslint-disable-line eqeqeq
-    if (!myEntryInst) {
-      return undefined;
-    }
-    return entryInstNode.byId[myEntryInst.id];
-  }
-);
 
 export {
   sessionSelector,
@@ -114,12 +74,4 @@ export {
   makeUiThemeSelector,
 
   appTempStateSelector,
-
-  makeSelectedNodeSelector,
-  makeSelectedEntryInstNodeSelector,
-  makeSelectedCategoryNodeSelector,
-  makeSelectedCategoryLayoutNodeSelector,
-  makeSelectedOrgRecordNodeSelector,
-
-  makeMyCurrentEntryInstSelector,
 };

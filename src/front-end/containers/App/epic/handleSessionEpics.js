@@ -25,7 +25,6 @@ const {
   postSessions,
 
   getOrganizations,
-  getProjects,
 } = modelMap.waitableActions;
 
 const {
@@ -55,7 +54,7 @@ const fetchDataAfterSessionVerified = (action$, state$, { getStore }) => action$
           store.dispatch(getUser(action.session.user_id)),
           modelMapEx.querchy.promiseActionCreatorSets.userSetting.getCollection(),
           store.dispatch(getOrganizations()),
-          store.dispatch(getProjects()),
+          modelMapEx.querchy.promiseActionCreatorSets.project.getCollection(),
         ])
         .then(
           ([_, { response: { data: userSettings } }, { data: organizations }]) => userSettings

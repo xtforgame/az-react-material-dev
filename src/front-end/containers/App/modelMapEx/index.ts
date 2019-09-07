@@ -6,6 +6,7 @@ import {
 } from 'querchy';
 
 import {
+  ExtraSelectorCreatorCreatorX1,
   QuerchyX1,
   AxiosRunnerX1,
   CacherX1,
@@ -36,11 +37,6 @@ export const crudUpdateCacheCollectionT1 = createFeatureGroup(
 // );
 
 const rootSliceKey = 'cache';
-
-let modelMapEx : {
-  querchy: QuerchyX1,
-  cacher: CacherX1,
-} | null = null;
 
 const getSharedInfo = () => ({
   buildUrl: (modelBaseUrl, action) => {
@@ -76,18 +72,24 @@ const getSharedInfo = () => ({
   },
 });
 
+const getExtraSelectorX1 : () => ExtraSelectorCreatorCreatorX1 = () => (baseSelector, builtinSelectorCreators) => {
+  return () => createSelector(
+    builtinSelectorCreators.selectQueryMapValues(),
+    builtinSelectorCreators.selectResourceMapValues(),
+    (queryMap, resourceMap) => {
+      if (!queryMap
+        || !queryMap.getCollection
+      ) {
+        return [];
+      }
+      return queryMap.getCollection.map(item => resourceMap[item.id]);
+    },
+  );
+};
+
 export const createModelMapEx = () => {
-  if (modelMapEx) {
-    return modelMapEx;
-  }
   const querchy = new QuerchyX1({
     commonConfig: {
-      // defaultBuildUrl: (modelBaseUrl, action) => {
-      //   if (action.crudType === 'create') {
-      //     return modelBaseUrl;
-      //   }
-      //   return `${modelBaseUrl}/${action.id}`;
-      // },
       defaultBuildUrl: (modelBaseUrl, action) => {
         if (
           action.crudType === 'create'
@@ -107,10 +109,6 @@ export const createModelMapEx = () => {
       return s.global[rootSliceKey];
     },
     models: {
-      memo: {
-        ...getSharedInfo(),
-        url: './api/memos',
-      },
       userSetting: {
         ...getSharedInfo(),
         url: './api/userSettings',
@@ -133,6 +131,14 @@ export const createModelMapEx = () => {
             };
           },
         },
+      },
+      project: {
+        ...getSharedInfo(),
+        url: './api/projects',
+      },
+      memo: {
+        ...getSharedInfo(),
+        url: './api/memos',
       },
     },
     queryBuilders: {
@@ -211,45 +217,24 @@ export const createModelMapEx = () => {
     },
   });
   const cacher = new CacherX1(querchy, {
-    memo: {
-      extraSelectorX1: {
-        creatorCreator: (baseSelector, builtinSelectorCreators) => {
-          return () => createSelector(
-            builtinSelectorCreators.selectQueryMapValues(),
-            builtinSelectorCreators.selectResourceMapValues(),
-            (queryMap, resourceMap) => {
-              if (!queryMap
-                || !queryMap.getCollection
-              ) {
-                return [];
-              }
-              return queryMap.getCollection.map(item => resourceMap[item.id]);
-            },
-          );
-        },
-      },
-    },
     userSetting: {
       extraSelectorX1: {
-        creatorCreator: (baseSelector, builtinSelectorCreators) => {
-          return () => createSelector(
-            builtinSelectorCreators.selectQueryMapValues(),
-            builtinSelectorCreators.selectResourceMapValues(),
-            (queryMap, resourceMap) => {
-              if (!queryMap
-                || !queryMap.getCollection
-              ) {
-                return [];
-              }
-              return queryMap.getCollection.map(item => resourceMap[item.id]);
-            },
-          );
-        },
+        creatorCreator: getExtraSelectorX1(),
+      },
+    },
+    project: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
+      },
+    },
+    memo: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
       },
     },
   });
 
-  return modelMapEx = {
+  return {
     querchy,
     cacher,
   };
