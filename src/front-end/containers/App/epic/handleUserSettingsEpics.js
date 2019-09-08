@@ -2,10 +2,7 @@ import { from } from 'rxjs';
 import {
   mergeMap, debounceTime, switchMap, map, catchError, /* auditTime */
 } from 'rxjs/operators';
-import {
-  toNull,
-} from 'reduxtful/core/helper-functions';
-
+import { toNull } from 'querchy';
 import modelMapEx from '../modelMapEx';
 import {
   CHANGE_THEME,
