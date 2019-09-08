@@ -1,41 +1,19 @@
 import { createSelector } from 'reselect';
 import { defaultUiTheme } from '~/styles/getPageContext';
 
-import modelMap from './modelMap';
-
-const {
-  sessionSelector,
-  makeSessionHierarchySelector,
-  makeSessionSelectionSelector,
-  makeSelectedSessionNodeSelector,
-  makeSelectedSessionCollectionSelector,
-  makeSelectedSessionSelector,
-
-  userSelector,
-  makeUserHierarchySelector,
-  makeUserSelectionSelector,
-  makeSelectedUserNodeSelector,
-  makeSelectedUserCollectionSelector,
-  makeSelectedUserSelector,
-} = modelMap.selectors;
-
-const makeUserSessionSelector = () => createSelector(
-  makeSessionHierarchySelector(),
-  hierarchy => hierarchy && hierarchy.byId && hierarchy.byId.me
-);
+import modelMapEx from './modelMapEx';
 
 const makeMyUserSelector = () => createSelector(
-  makeUserSessionSelector(),
-  makeUserHierarchySelector(),
-  (mySession, userHierarchy) => {
-    if (!mySession
-      || !userHierarchy
+  modelMapEx.cacher.selectorCreatorSet.session.selectMe(),
+  modelMapEx.cacher.selectorCreatorSet.user.selectResourceMapValues(),
+  (mySession, users) => {
+    if (
+      !mySession || !users
       || (mySession.user_id === undefined)
-      || !userHierarchy.byId
     ) {
       return undefined;
     }
-    return userHierarchy.byId[mySession.user_id];
+    return users[mySession.user_id];
   }
 );
 
@@ -53,21 +31,6 @@ const makeUiThemeSelector = () => createSelector(
 const appTempStateSelector = state => state.global.appTempState;
 
 export {
-  sessionSelector,
-  makeSessionHierarchySelector,
-  makeSessionSelectionSelector,
-  makeSelectedSessionNodeSelector,
-  makeSelectedSessionCollectionSelector,
-  makeSelectedSessionSelector,
-
-  userSelector,
-  makeUserHierarchySelector,
-  makeUserSelectionSelector,
-  makeSelectedUserNodeSelector,
-  makeSelectedUserCollectionSelector,
-  makeSelectedUserSelector,
-
-  makeUserSessionSelector,
   makeMyUserSelector,
   persistenceSelector,
   makeRememberUserSelector,

@@ -1,4 +1,3 @@
-import modelMap from '../modelMap';
 import { createModelMapEx } from '../modelMapEx';
 import handleSessionEpics from './handleSessionEpics';
 import handleUserSettingsEpics from './handleUserSettingsEpics';
@@ -16,6 +15,4 @@ export default [
 
   querchy.getRootEpic(),
   cacher.getRootEpic(),
-
-  ...Object.values(modelMap.epics),
 ];

@@ -5,18 +5,8 @@ import {
   USER_LOADED,
   FAIL_TO_LOAD_USER,
 } from './constants';
-import modelMap from './modelMap';
 
 import { createModelMapEx } from './modelMapEx';
-
-const {
-  sessionReducer,
-  userReducer,
-  recoveryTokenReducer,
-
-  challengeRecoveryTokenReducer,
-  resetPasswordRequestReducer,
-} = modelMap.reducers;
 
 const {
   // querchy,
@@ -71,11 +61,6 @@ const appTempState = (state = {}, action) => {
 };
 
 export default combineReducers({
-  sessions: sessionReducer,
-  users: userReducer,
-  recoveryTokens: recoveryTokenReducer,
-  challengeRecoveryTokens: challengeRecoveryTokenReducer,
-  resetPasswordRequests: resetPasswordRequestReducer,
   cache: cacher.rootReducer,
   persistence,
   appTempState,

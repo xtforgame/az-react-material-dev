@@ -1,10 +1,10 @@
 import throttle from 'lodash/throttle';
 import {
-  makeUserSessionSelector,
   makeRememberUserSelector,
 } from '~/containers/App/selectors';
+import modelMapEx from '~/containers/App/modelMapEx';
 
-const userSessionSelector = makeUserSessionSelector();
+const userSessionSelector = modelMapEx.cacher.selectorCreatorSet.session.selectMe();
 const rememberUserSelector = makeRememberUserSelector();
 
 export const loadState = () => {
@@ -47,11 +47,15 @@ const delaySave = throttle((store) => {
 
   if (rememberUserSelector(state) && userSessionSelector(state)) {
     const {
-      sessions,
+      cache: {
+        session,
+      },
       persistence,
     } = persistedData;
     saveState({
-      sessions,
+      cache: {
+        session,
+      },
       persistence,
     });
   } else {

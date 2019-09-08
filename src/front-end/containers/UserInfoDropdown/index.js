@@ -13,13 +13,13 @@ import { connect } from 'react-redux';
 import { withTranslation } from 'react-i18next';
 import { compose } from 'recompose';
 import { push } from 'connected-react-router';
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 import ProfileDialog from '~/containers/UserProfile/ProfileDialog';
 import UserSettingsDialog from '~/containers/UserSettingsDialog';
 
 const {
-  clearSessionCache,
-} = modelMap.actions;
+  session,
+} = modelMapEx.querchy.actionCreatorSets;
 
 const styles = theme => ({
   menuItem: {
@@ -189,7 +189,7 @@ export default compose(
   connect(
     state => ({}),
     {
-      clearSessionCache,
+      clearSessionCache: session.clearAllCache,
       push,
     }
   ),

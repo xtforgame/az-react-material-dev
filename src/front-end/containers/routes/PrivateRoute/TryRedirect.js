@@ -3,9 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { createStructuredSelector } from 'reselect';
-import {
-  makeUserSessionSelector,
-} from '~/containers/App/selectors';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 /*
   Assuming props containing:
@@ -34,7 +32,7 @@ const TryRedirect = (props) => {
 };
 
 const mapStateToProps = createStructuredSelector({
-  isAuthenticated: state => !!makeUserSessionSelector()(state),
+  isAuthenticated: modelMapEx.cacher.selectorCreatorSet.session.selectIsAuthenticated(),
 });
 
 export default connect(

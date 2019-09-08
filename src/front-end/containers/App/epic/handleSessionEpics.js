@@ -5,7 +5,6 @@ import {
 } from 'rxjs/operators';
 import HeaderManager from '~/utils/HeaderManager';
 import modelMapEx from '~/containers/App/modelMapEx';
-import modelMap from '../modelMap';
 import {
   SESSION_VERIFIED,
 } from '../constants';
@@ -18,17 +17,23 @@ import {
   changeTheme,
 } from '../actions';
 
-const { types } = modelMap;
+const {
+  user,
+  userSetting,
+  organization,
+  project,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const {
-  getUser,
-  postSessions,
-} = modelMap.waitableActions;
+  session,
+} = modelMapEx.querchy.actionCreatorSets;
 
-const dispatchSessionVerifiedAfterPostedSession = (action$, state$) => action$.ofType(types.respondPostSessions)
+const dispatchSessionVerifiedAfterPostedSession = (action$, state$) => action$.ofType(
+  session.create.creatorRefs.respond.actionType
+)
   .pipe(
     mergeMap(action => [
-      sessionVerified(action.data),
+      sessionVerified(action.response.data),
     ])
   );
 
@@ -36,13 +41,12 @@ const fetchDataAfterSessionVerified = (action$, state$, { getStore }) => action$
   .pipe(
     mergeMap((action) => {
       HeaderManager.set('Authorization', `${action.session.token_type} ${action.session.token}`);
-      const store = getStore();
       return from(
         Promise.all([
-          store.dispatch(getUser(action.session.user_id)),
-          modelMapEx.querchy.promiseActionCreatorSets.userSetting.getCollection(),
-          modelMapEx.querchy.promiseActionCreatorSets.organization.getCollection(),
-          modelMapEx.querchy.promiseActionCreatorSets.project.getCollection(),
+          user.read(action.session.user_id),
+          userSetting.getCollection(),
+          organization.getCollection(),
+          project.getCollection(),
         ])
         .then(
           ([_, { response: { data: userSettings } }]) => userSettings
@@ -60,7 +64,7 @@ const fetchDataAfterSessionVerified = (action$, state$, { getStore }) => action$
     })
   );
 
-const clearAuthorizationHeaderAfterClearSession = (action$, state$) => action$.ofType(types.clearSessionCache)
+const clearAuthorizationHeaderAfterClearSession = (action$, state$) => action$.ofType(session.clearAllCache.actionType)
   .pipe(
     mergeMap((action) => {
       HeaderManager.delete('Authorization');
@@ -70,13 +74,13 @@ const clearAuthorizationHeaderAfterClearSession = (action$, state$) => action$.o
     })
   );
 
-const autologinAfterRegistration = (action$, state$) => action$.ofType(types.postUsers)
+const autologinAfterRegistration = (action$, state$) => action$.ofType(user.create.actionType)
   .pipe(
     switchMap(
-      startAction => action$.ofType(types.respondPostUsers)
+      startAction => action$.ofType(user.create.creatorRefs.respond.actionType)
       .pipe(
         take(1), // don't listen forever! IMPORTANT!
-        switchMap(() => [postSessions(startAction.data.accountLinks[0])])
+        switchMap(() => [session.create(startAction.data.accountLinks[0])])
       )
     )
   );

@@ -9,8 +9,8 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
-import SuccessButton from '~/components/Buttons/SuccessButton';
 import grey from '@material-ui/core/colors/grey';
+import SuccessButton from '~/components/Buttons/SuccessButton';
 import Centered from '~/components/Layout/Centered';
 import EditableCardLayout from '~/components/FormLayouts/EditableCardLayout';
 import {
@@ -35,11 +35,11 @@ import {
   makeMyUserSelector,
 } from '~/containers/App/selectors';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 const {
-  patchUser,
-} = modelMap.waitableActions;
+  user: userP,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const styles = theme => ({
   spaceAfterMedia: {
@@ -167,7 +167,6 @@ class Profile extends React.PureComponent {
 
   submit = (values) => {
     const {
-      patchUser,
       user = {},
     } = this.props;
 
@@ -195,7 +194,7 @@ class Profile extends React.PureComponent {
       if (values.avatarImg) {
         patchData.picture = values.avatarImg;
       }
-      p = patchUser(user.id, patchData);
+      p = userP.create(user.id, patchData);
     }
     p.then(() => {
       this.setState({
@@ -253,8 +252,6 @@ const mapStateToProps = createStructuredSelector({
 });
 
 export default compose(
-  connect(mapStateToProps, {
-    patchUser,
-  }),
+  connect(mapStateToProps, {}),
   withStyles(styles),
 )(Profile);

@@ -63,6 +63,14 @@ export type RawActionCreatorUpdateCacheX1 = (
 };
 
 export type ModelMapX1 = {
+  session: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
+  user: MakeResourceModelType<
+    CommonConfigX1,
+    CrudUpdateCacheTypesCollectionT1
+  >;
   userSetting: MakeResourceModelType<
     CommonConfigX1,
     CrudUpdateCacheTypesCollectionT1
@@ -133,6 +141,25 @@ export type ExtraSelectorCreatorCreatorX1<ReturnType> = (
 ) => () => (state : any) => ReturnType;
 
 export type ExtraSelectorInfosForModelX1 = {
+  session: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
+    },
+    selectMe: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any>,
+    },
+    selectIsAuthenticated: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<boolean>,
+    },
+  },
+  user: {
+    extraSelectorX1: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,
+    },
+    selectMyUser: {
+      creatorCreator: ExtraSelectorCreatorCreatorX1<any>,
+    },
+  },
   userSetting: {
     extraSelectorX1: {
       creatorCreator: ExtraSelectorCreatorCreatorX1<any[]>,

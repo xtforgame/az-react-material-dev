@@ -11,9 +11,7 @@ import configureStore from './configureStore';
 import getRoutes from './getRoutes';
 import fontLoader from './fontLoader';
 import { loadState } from './localStorage';
-import {
-  makeUserSessionSelector,
-} from '~/containers/App/selectors';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 import App from '~/containers/App';
 import {
@@ -30,7 +28,7 @@ const initialState = {
 };
 // console.log('initialState :', initialState);
 const store = configureStore(initialState, history);
-const userSessionSelector = makeUserSessionSelector();
+const userSessionSelector = modelMapEx.cacher.selectorCreatorSet.session.selectMe();
 const session = userSessionSelector(store.getState());
 
 if (session) {

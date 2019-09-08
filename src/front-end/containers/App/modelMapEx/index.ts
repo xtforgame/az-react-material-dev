@@ -110,6 +110,17 @@ export const createModelMapEx = () => {
       return s.global[rootSliceKey];
     },
     models: {
+      session: {
+        ...getSharedInfo(),
+        url: './api/sessions',
+        featureDeps: {
+          getId: () => 'me',
+        },
+      },
+      user: {
+        ...getSharedInfo(),
+        url: './api/users',
+      },
       userSetting: {
         ...getSharedInfo(),
         url: './api/userSettings',
@@ -234,6 +245,40 @@ export const createModelMapEx = () => {
     },
   });
   const cacher = new CacherX1(querchy, {
+    session: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
+      },
+      selectMe: {
+        creatorCreator: (baseSelector, builtinSelectorCreators) => {
+          return () => createSelector(
+            builtinSelectorCreators.selectResourceMapValues(),
+            resourceMap => resourceMap && resourceMap.me,
+          );
+        },
+      },
+      selectIsAuthenticated: {
+        creatorCreator: (baseSelector, builtinSelectorCreators) => {
+          return () => createSelector(
+            builtinSelectorCreators.selectResourceMapValues(),
+            resourceMap => !!(resourceMap && resourceMap.me),
+          );
+        },
+      },
+    },
+    user: {
+      extraSelectorX1: {
+        creatorCreator: getExtraSelectorX1(),
+      },
+      selectMyUser: {
+        creatorCreator: (baseSelector, builtinSelectorCreators) => {
+          return () => createSelector(
+            builtinSelectorCreators.selectResourceMapValues(),
+            resourceMap => !!(resourceMap && resourceMap.me),
+          );
+        },
+      },
+    },
     userSetting: {
       extraSelectorX1: {
         creatorCreator: getExtraSelectorX1(),

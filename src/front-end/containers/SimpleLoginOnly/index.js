@@ -27,21 +27,20 @@ import { createStructuredSelector } from 'reselect';
 import LoginForm from '~/containers/LoginForms/LoginForm';
 import createSimpleLoginInputConfigs from '~/containers/LoginForms/createSimpleLoginInputConfigs';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 import {
-  makeUserSessionSelector,
   makeRememberUserSelector,
 } from '~/containers/App/selectors';
 
 const {
-  postSessions,
-  postUsers,
-} = modelMap.waitableActions;
+  session: sessionP,
+  user: userP,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const {
-  cancelPostSessions,
-  cancelPostUsers,
-} = modelMap.actions;
+  session,
+  user,
+} = modelMapEx.querchy.actionCreatorSets;
 
 const styles = theme => ({
   ...createFormPaperStyle(theme),
@@ -71,11 +70,11 @@ class Login extends React.PureComponent {
   };
 
   login = ({ username, password, rememberMe }) => {
-    const { postSessions, rememberMe: remember } = this.props;
+    const { rememberMe: remember } = this.props;
     remember(rememberMe);
     // popup('/auth-popup.html');
     // return ;
-    postSessions({
+    sessionP.create({
       auth_type: 'basic',
       username,
       password,
@@ -147,7 +146,7 @@ class Login extends React.PureComponent {
 }
 
 const mapStateToProps = createStructuredSelector({
-  session: makeUserSessionSelector(),
+  session: modelMapEx.cacher.selectorCreatorSet.session.selectMe(),
   rememberUser: makeRememberUserSelector(),
 });
 
@@ -155,10 +154,8 @@ export default compose(
   connect(
     mapStateToProps,
     {
-      postSessions,
-      cancelPostSessions,
-      postUsers,
-      cancelPostUsers,
+      cancelCreateSession: session.create.creatorRefs.cancel,
+      cancelCreateUser: user.create.creatorRefs.cancel,
       rememberMe,
     }
   ),

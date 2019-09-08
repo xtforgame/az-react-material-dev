@@ -8,25 +8,21 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-import translateMessages from '~/utils/translateMessages';
 import {
   Redirect,
 } from 'react-router-dom';
-import {
-  rememberMe,
-} from '../App/actions';
 import Typography from '@material-ui/core/Typography';
-import LocaleDropdown from '~/containers/LocaleDropdown';
 
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBack from '@material-ui/icons/ArrowBack';
-import createCommonStyles from '~/styles/common';
-import createFormPaperStyle from '~/styles/FormPaper';
-
 import SwipeableViews from 'react-swipeable-views';
 
 import { createStructuredSelector } from 'reselect';
 
+import translateMessages from '~/utils/translateMessages';
+import LocaleDropdown from '~/containers/LocaleDropdown';
+import createCommonStyles from '~/styles/common';
+import createFormPaperStyle from '~/styles/FormPaper';
 import {
   FormContent,
 } from '~/components/FormInputs';
@@ -36,21 +32,24 @@ import createSimpleLoginInputConfigs from '~/containers/LoginForms/createSimpleL
 import createSimpleRegistrationInputConfigs from '~/containers/LoginForms/createSimpleRegistrationInputConfigs';
 import { messages } from '~/containers/App/translation';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 import {
-  makeUserSessionSelector,
   makeRememberUserSelector,
 } from '~/containers/App/selectors';
+import {
+  rememberMe,
+} from '../App/actions';
 
 const {
-  postSessions,
-  postUsers,
-} = modelMap.waitableActions;
+  session: sessionP,
+  user: userP,
+} = modelMapEx.querchy.promiseActionCreatorSets;
 
 const {
-  cancelPostSessions,
-  cancelPostUsers,
-} = modelMap.actions;
+  session,
+  user,
+} = modelMapEx.querchy.actionCreatorSets;
+
 
 const styles = theme => ({
   ...createFormPaperStyle(theme),
@@ -81,11 +80,11 @@ class Login extends React.PureComponent {
   };
 
   login = ({ username, password, rememberMe }) => {
-    const { postSessions, rememberMe: remember } = this.props;
+    const { rememberMe: remember } = this.props;
     remember(rememberMe);
     // popup('/auth-popup.html');
     // return ;
-    postSessions({
+    sessionP.create({
       auth_type: 'basic',
       username,
       password,
@@ -98,8 +97,7 @@ class Login extends React.PureComponent {
   };
 
   register = ({ username, password }) => {
-    const { postUsers } = this.props;
-    postUsers({
+    userP.create({
       name: username,
       privilege: 'admin',
       accountLinks: [{
@@ -193,7 +191,7 @@ class Login extends React.PureComponent {
 }
 
 const mapStateToProps = createStructuredSelector({
-  session: makeUserSessionSelector(),
+  session: modelMapEx.cacher.selectorCreatorSet.session.selectMe(),
   rememberUser: makeRememberUserSelector(),
 });
 
@@ -201,10 +199,8 @@ export default compose(
   connect(
     mapStateToProps,
     {
-      postSessions,
-      cancelPostSessions,
-      postUsers,
-      cancelPostUsers,
+      cancelCreateSession: session.create.creatorRefs.cancel,
+      cancelCreateUser: user.create.creatorRefs.cancel,
       rememberMe,
     }
   ),

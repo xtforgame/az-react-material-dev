@@ -12,11 +12,11 @@ import {
 } from '~/components/FormInputs';
 import MainAppBar from './MainAppBar';
 
-import modelMap from '~/containers/App/modelMap';
+import modelMapEx from '~/containers/App/modelMapEx';
 
 const {
-  clearSessionCache,
-} = modelMap.actions;
+  session,
+} = modelMapEx.querchy.actionCreatorSets;
 
 const styles = theme => ({
   ...createCommonStyles(theme, ['flex']),
@@ -62,7 +62,9 @@ class ErrorContent extends React.PureComponent {
 export default compose(
   connect(
     null,
-    { clearSessionCache }
+    {
+      clearSessionCache: session.clearAllCache,
+    }
   ),
   withTranslation(['app-common']),
   withStyles(styles),
