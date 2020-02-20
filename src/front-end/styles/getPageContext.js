@@ -30,6 +30,23 @@ export function getTheme(theme) {
       paper: grey[800],
       default: '#303030',
     };
+  } else if (theme.paletteType === 'light') {
+    primary = {
+      light: '#83acb4',
+      main: '#557e85',
+      dark: '#295157',
+      contrastText: common.white,
+    };
+    secondary = {
+      light: '#ffa88f',
+      main: '#cc7861',
+      dark: '#984b37',
+      contrastText: common.white,
+    };
+    background = {
+      paper: grey[100],
+      default: grey[200],
+    };
   } else if (theme.paletteType === 'vaxal') {
     primary = {
       light: '#765cb7',

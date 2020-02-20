@@ -39,11 +39,11 @@ const MainAppBar = (props) => {
 
   return (
     <div className={classes.root}>
-      <AppBar position="fixed" style={{ background: grey[900] }}>
+      <AppBar position="fixed">
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Toolbar>
             <img
-              src="./images/logo2.png"
+              src="./images/72333838_115362189874794_8239742238792351744_n (1).png"
               width={64}
               style={{ marginRight: 20 }}
             />

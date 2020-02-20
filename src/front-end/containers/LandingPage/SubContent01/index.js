@@ -38,13 +38,13 @@ export default () => {
     <div>
       <div className={classnames(classes.topImageContainer)}>
         <CardMedia
-          image="./images/StockSnap_3FOSIEZDTW.jpg"
+          image="./images/top.jpg"
           title="Bridge"
           className={classnames(classes.topImageContainer, classes.cardMedia)}
         />
         <div className={classnames(classes.topImageContainer, classes.texts)}>
           <Typography variant="h4" style={{ color: 'white', width: '100%', textAlign: 'center' }}>
-            Az React Material UI
+            與長輩共遊 — 青松走走
           </Typography>
           <Typography variant="h4" style={{ color: 'white', width: '100%', textAlign: 'center' }}>
             <br />
@@ -57,20 +57,20 @@ export default () => {
           >
             <Button
               variant="outlined"
-              color="primary"
+              color="secondary"
               style={{
                 borderWidth: 2,
-                borderColor: theme.palette.primary.main,
+                borderColor: theme.palette.secondary.main,
               }}
             >
-              立即開始
+              立即體驗
             </Button>
           </div>
         </div>
       </div>
       <Section
-        title="Az React Material UI"
-        subtitle="Az React Material UI"
+        title="青松走走"
+        subtitle="讓我們在自己家走出健康快樂的生活"
       >
         <div style={{ width: '100%', height: 90 }} />
         {/* <div style={{ width: '100%', height: 500 }} /> */}
